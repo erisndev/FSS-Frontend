@@ -12,6 +12,7 @@ const ConfirmDeleteModal = ({
   actionType = "delete", // "delete" or "withdraw"
 }) => {
   if (!isOpen) return null;
+  const [processing, setProcessing] = React.useState(false);
 
   const getActionColor = () => {
     switch (actionType) {
@@ -49,7 +50,9 @@ const ConfirmDeleteModal = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-      onClick={onClose}
+      onClick={() => {
+        if (!processing) onClose();
+      }}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
@@ -66,18 +69,38 @@ const ConfirmDeleteModal = ({
         <div className="flex justify-end space-x-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg hover:bg-slate-800/70 transition-all duration-300"
+            disabled={processing}
+            aria-disabled={processing}
+            className={`px-4 py-2 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg transition-all duration-300 ${
+              processing ? "opacity-60 cursor-not-allowed" : "hover:bg-slate-800/70"
+            }`}
           >
             Cancel
           </button>
           <button
-            onClick={() => {
-              onConfirm();
-              onClose();
+            onClick={async () => {
+              try {
+                setProcessing(true);
+                await onConfirm();
+                onClose();
+              } finally {
+                setProcessing(false);
+              }
             }}
-            className={`px-4 py-2 text-white rounded-lg transition-all duration-300 ${getActionColor()}`}
+            disabled={processing}
+            aria-busy={processing}
+            className={`px-4 py-2 text-white rounded-lg transition-all duration-300 ${getActionColor()} ${
+              processing ? "opacity-80 cursor-wait" : ""
+            }`}
           >
-            {actionText}
+            {processing ? (
+              <span className="flex items-center space-x-2">
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <span>{actionType === "withdraw" ? "Withdrawing..." : "Deleting..."}</span>
+              </span>
+            ) : (
+              actionText
+            )}
           </button>
         </div>
       </motion.div>

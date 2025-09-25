@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Shield, Mail, ArrowLeft } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 const ForgotPassword = () => {
   const { forgotPassword } = useAuth();
@@ -23,6 +24,7 @@ const ForgotPassword = () => {
       // Start OTP timer and move to OTP Verification step
       console.log("Password reset OTP sent to:", email);
       localStorage.setItem("otpTimestamp", Date.now().toString());
+      toast.success("OTP sent to your email");
       navigate("/verify-otp", { state: { email, isRegistration: false } });
     } catch (err) {
       setError(err.message);

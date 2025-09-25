@@ -19,7 +19,7 @@ const EditTender = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const successRef = useRef(null);
-
+  const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -96,13 +96,24 @@ const EditTender = () => {
   // Handle file uploads
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
+    addFiles(files);
+  };
+
+  // Handle drag-and-drop
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files);
+    addFiles(files);
+  };
+
+  const addFiles = (files) => {
     const newFiles = files.map((file) => ({
       id: Date.now() + Math.random(),
       name: file.name,
       size: file.size,
       file,
     }));
-
     setFormData((prev) => ({
       ...prev,
       documents: [...prev.documents, ...newFiles],
@@ -540,7 +551,19 @@ const EditTender = () => {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Documents
               </label>
-              <div className="border-2 border-dashed border-cyan-400/20 rounded-lg p-6 hover:border-cyan-400/40 transition-all duration-300">
+              <div
+                className={`border-2 border-dashed rounded-lg p-6 transition-all duration-300 ${
+                  isDragging
+                    ? "border-cyan-400 bg-cyan-500/10"
+                    : "border-cyan-400/20 hover:border-cyan-400/40"
+                }`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={handleDrop}
+              >
                 <div className="text-center">
                   <Upload className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
                   <p className="text-gray-300 mb-2">

@@ -11,18 +11,18 @@ const CreateTender = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
   const navigate = useNavigate();
 
   // Initialize form data with localStorage or defaults
   const getInitialFormData = () => {
-    const savedData = localStorage.getItem('createTenderFormData');
+    const savedData = localStorage.getItem("createTenderFormData");
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
-        // Don't restore documents from localStorage for security reasons
-        return { ...parsed, documents: [] };
+        return { ...parsed, documents: [] }; // do not restore documents for security
       } catch (error) {
-        console.error('Error parsing saved form data:', error);
+        console.error("Error parsing saved form data:", error);
       }
     }
     return {
@@ -49,36 +49,33 @@ const CreateTender = () => {
 
   const [formData, setFormData] = useState(getInitialFormData);
 
-  // Show notification if data was restored from localStorage
+  // Show notification if draft restored
   useEffect(() => {
-    const savedData = localStorage.getItem('createTenderFormData');
+    const savedData = localStorage.getItem("createTenderFormData");
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
-        // Check if there's actually meaningful data (not just empty form)
-        const hasData = Object.values(parsed).some(value => 
-          value !== "" && value !== false && value !== "active"
+        const hasData = Object.values(parsed).some(
+          (value) => value !== "" && value !== false && value !== "active"
         );
         if (hasData) {
           toast.success("Draft restored from previous session!");
         }
       } catch (error) {
-        console.error('Error checking saved data:', error);
+        console.error("Error checking saved data:", error);
       }
     }
-  }, []); // Only run on mount
+  }, []);
 
-  // Save form data to localStorage whenever it changes
+  // Save form data to localStorage
   useEffect(() => {
     const dataToSave = { ...formData };
-    // Don't save documents to localStorage for security reasons
     delete dataToSave.documents;
-    localStorage.setItem('createTenderFormData', JSON.stringify(dataToSave));
+    localStorage.setItem("createTenderFormData", JSON.stringify(dataToSave));
   }, [formData]);
 
-  // Clear localStorage when component unmounts or form is successfully submitted
   const clearSavedData = () => {
-    localStorage.removeItem('createTenderFormData');
+    localStorage.removeItem("createTenderFormData");
   };
 
   const categories = [
@@ -107,13 +104,24 @@ const CreateTender = () => {
   // Handle file uploads
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
+    addFiles(files);
+  };
+
+  // Handle drag-and-drop
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files);
+    addFiles(files);
+  };
+
+  const addFiles = (files) => {
     const newFiles = files.map((file) => ({
       id: Date.now() + Math.random(),
       name: file.name,
       size: file.size,
       file,
     }));
-
     setFormData((prev) => ({
       ...prev,
       documents: [...prev.documents, ...newFiles],
@@ -145,39 +153,15 @@ const CreateTender = () => {
 
       console.log("Preparing to submit form data:", formData);
 
-      // Call API with the formData object directly
       await tenderApi.createTender(formData);
 
       toast.success("Tender created successfully!");
       setSuccess("Tender created successfully!");
-
-      // Clear saved form data from localStorage
       clearSavedData();
 
-      // Redirect after 2 seconds
       setTimeout(() => navigate("/issuer/tenders"), 2000);
 
-      // Reset form
-      setFormData({
-        title: "",
-        description: "",
-        category: "",
-        budgetMin: "",
-        budgetMax: "",
-        deadline: "",
-        isUrgent: false,
-        tags: "",
-        requirements: "",
-        companyName: "",
-        registrationNumber: "",
-        bbeeLevel: "",
-        cidbGrading: "",
-        contactPerson: "",
-        contactEmail: "",
-        contactPhone: "",
-        status: "active",
-        documents: [],
-      });
+      setFormData(getInitialFormData());
     } catch (err) {
       console.error("Error creating tender:", err);
       setError("Failed to create tender. Please try again.");
@@ -187,7 +171,7 @@ const CreateTender = () => {
     }
   };
 
-  const { documents } = formData; // Destructure for convenience
+  const { documents } = formData;
 
   return (
     <DashboardLayout
@@ -529,14 +513,26 @@ const CreateTender = () => {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Documents
               </label>
-              <div className="border-2 border-dashed border-cyan-400/20 rounded-lg p-6 hover:border-cyan-400/40 transition-all duration-300">
+              <div
+                className={`border-2 border-dashed rounded-lg p-6 transition-all duration-300 ${
+                  isDragging
+                    ? "border-cyan-400 bg-cyan-500/10"
+                    : "border-cyan-400/20 hover:border-cyan-400/40"
+                }`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={handleDrop}
+              >
                 <div className="text-center">
                   <Upload className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
                   <p className="text-gray-300 mb-2">
                     Drop files here or click to upload
                   </p>
                   <p className="text-gray-500 text-sm">
-                    PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB each)
+                    PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 50MB each)
                   </p>
                   <input
                     type="file"
@@ -621,7 +617,7 @@ const CreateTender = () => {
               >
                 Clear Draft
               </button>
-              
+
               <button
                 type="submit"
                 disabled={loading}

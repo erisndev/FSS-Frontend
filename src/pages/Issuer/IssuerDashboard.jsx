@@ -17,8 +17,11 @@ import ApplicationModal from "../../components/UI/ApplicationModal";
 import { tenderApi, applicationApi } from "../../services/api";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 const IssuerDashboard = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     totalTenders: 0,
     activeTenders: 0,
@@ -127,8 +130,36 @@ const IssuerDashboard = () => {
   };
 
   const handleViewApplication = (application) => {
+    // Find the tender for this application
+    const tender = recentTenders.find(t => 
+      t._id === application.tenderId || 
+      t.id === application.tenderId ||
+      application.tenderTitle === t.title
+    );
+    console.log("Selected tender for application:", tender);
+    setSelectedTender(tender || null);
     setSelectedApplication(application);
     setShowApplicationModal(true);
+  };
+
+  const handleStatusUpdate = async (applicationId, status, comment = "") => {
+    console.log("IssuerDashboard handleStatusUpdate called with:", { applicationId, status, comment });
+    try {
+      const normalizedStatus = status.toLowerCase().replace('accept', 'accepted').replace('reject', 'rejected');
+      console.log("Normalized status:", normalizedStatus);
+      await applicationApi.updateApplicationStatus(applicationId, normalizedStatus, comment);
+      toast.success(`Application ${normalizedStatus} successfully`);
+      
+      // Refresh the dashboard data
+      await fetchDashboardData();
+      
+      // Close the modal
+      setShowApplicationModal(false);
+      setSelectedApplication(null);
+    } catch (error) {
+      toast.error("Failed to update application status");
+      console.error("Error updating application status:", error);
+    }
   };
 
   const statCards = [
@@ -137,24 +168,32 @@ const IssuerDashboard = () => {
       value: stats.totalTenders,
       icon: FileText,
       color: "from-blue-500 to-cyan-500",
+      bgColor: "bg-blue-500/10",
+      iconBg: "bg-blue-500/20",
     },
     {
       title: "Active Tenders",
       value: stats.activeTenders,
       icon: TrendingUp,
       color: "from-green-500 to-emerald-500",
+      bgColor: "bg-green-500/10",
+      iconBg: "bg-green-500/20",
     },
     {
       title: "Total Applications",
       value: stats.totalApplications,
       icon: Users,
       color: "from-purple-500 to-pink-500",
+      bgColor: "bg-purple-500/10",
+      iconBg: "bg-purple-500/20",
     },
     {
       title: "Pending Reviews",
       value: stats.pendingApplications,
       icon: Clock,
       color: "from-yellow-500 to-orange-500",
+      bgColor: "bg-yellow-500/10",
+      iconBg: "bg-yellow-500/20",
     },
   ];
 
@@ -185,19 +224,21 @@ const IssuerDashboard = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:bg-white/10 transition-all duration-300"
+              className={`${stat.bgColor} backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:shadow-lg hover:shadow-cyan-400/10 transition-all duration-300 group`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm">{stat.title}</p>
-                  <p className="text-2xl font-bold text-white mt-1">
-                    {stat.value}
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-gray-400 text-sm font-medium mb-2">{stat.title}</p>
+                  <p className="text-3xl font-bold text-white">
+                    {stat.value.toLocaleString()}
                   </p>
                 </div>
                 <div
-                  className={`w-12 h-12 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center`}
+                  className={`w-14 h-14 rounded-xl ${stat.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                 >
-                  <stat.icon className="w-6 h-6 text-white" />
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
+                    <stat.icon className="w-5 h-5 text-white" />
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -400,8 +441,12 @@ const IssuerDashboard = () => {
         onClose={() => {
           setShowApplicationModal(false);
           setSelectedApplication(null);
+          setSelectedTender(null);
         }}
         application={selectedApplication}
+        tender={selectedTender}
+        user={user}
+        onStatusUpdate={handleStatusUpdate}
       />
     </DashboardLayout>
   );

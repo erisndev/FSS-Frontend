@@ -18,6 +18,7 @@ import {
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import { useAuth } from "../../contexts/AuthContext";
 import { authApi } from "../../services/api";
+import toast from "react-hot-toast";
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
@@ -66,10 +67,12 @@ const Profile = () => {
       const updatedUser = await updateProfile(formData); // <-- use context
       console.log("Updated user returned: ", updatedUser);
       setSuccess("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
       setIsEditing(false);
     } catch (err) {
       console.error(err.response?.data);
       setError(err.response?.data?.message || "Failed to update profile");
+      toast.error(err.response?.data?.message || "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -98,6 +101,7 @@ const Profile = () => {
         passwordData.newPassword
       );
       setSuccess("Password changed successfully!");
+      toast.success("Password changed successfully!");
       setIsChangingPassword(false);
       setPasswordData({
         currentPassword: "",
@@ -106,6 +110,7 @@ const Profile = () => {
       });
     } catch (err) {
       setError(err.response?.data?.message || "Failed to change password");
+      toast.error(err.response?.data?.message || "Failed to change password");
     } finally {
       setLoading(false);
     }

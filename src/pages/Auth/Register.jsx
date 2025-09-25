@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Shield, Mail, Lock, User, Eye, EyeOff, Users } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 const Register = () => {
   const { user, loading, register } = useAuth();
@@ -67,9 +68,11 @@ const Register = () => {
       );
 
       // Registration successful → redirect to OTP verification
+      toast.success("Registration successful! Please verify your email.");
       setIsRegistered(true);
     } catch (err) {
       setError(err.message || "Registration failed");
+      toast.error(err.message || "Registration failed");
     } finally {
       setIsLoading(false);
     }

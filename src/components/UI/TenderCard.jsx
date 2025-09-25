@@ -7,6 +7,8 @@ import {
   Eye,
   FileText,
   AlertCircle,
+  Lock,
+  Archive,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -17,6 +19,8 @@ const TenderCard = ({ tender, index, onView, onApply }) => {
         return "text-green-400 bg-green-400/20";
       case "CLOSED":
         return "text-red-400 bg-red-400/20";
+      case "ARCHIVED":
+        return "text-gray-400 bg-gray-400/20";
       case "CANCELLED":
         return "text-gray-400 bg-gray-400/20";
       default:
@@ -41,6 +45,13 @@ const TenderCard = ({ tender, index, onView, onApply }) => {
     return diffDays;
   };
 
+  const isClosedOrArchived = () => {
+    const s = (tender.status || "").toLowerCase();
+    return s === "closed" || s === "archived";
+  };
+
+  const applyLabel = isClosedOrArchived() ? (tender.status || "Closed") : "Apply";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -51,7 +62,9 @@ const TenderCard = ({ tender, index, onView, onApply }) => {
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white mb-2">{tender.title}</h3>
+          <h3 className="text-lg font-semibold text-white mb-2">
+            {tender.title}
+          </h3>
           <p className="text-gray-400 text-sm">{tender.category}</p>
         </div>
         <div className="flex flex-col items-end space-y-2">
@@ -61,14 +74,20 @@ const TenderCard = ({ tender, index, onView, onApply }) => {
               <span>Urgent</span>
             </span>
           )}
-          <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(tender.status)}`}>
+          <span
+            className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
+              tender.status
+            )}`}
+          >
             {tender.status}
           </span>
         </div>
       </div>
 
       {/* Description */}
-      <p className="text-gray-300 text-sm mb-4 line-clamp-3">{tender.description}</p>
+      <p className="text-gray-300 text-sm mb-4 line-clamp-3">
+        {tender.description}
+      </p>
 
       {/* Details */}
       <div className="space-y-3 mb-4">
@@ -76,8 +95,10 @@ const TenderCard = ({ tender, index, onView, onApply }) => {
           <DollarSign className="w-4 h-4 text-cyan-400" />
           <span className="text-cyan-400 font-medium">
             {tender.budgetMin || tender.budgetMax
-              ? `$${Number(tender.budgetMin || 0).toLocaleString()} - $${Number(tender.budgetMax || 0).toLocaleString()}`
-              : `$${Number(tender.budget || 0).toLocaleString()}`}
+              ? `R${Number(tender.budgetMin || 0).toLocaleString()} - R${Number(
+                  tender.budgetMax || 0
+                ).toLocaleString()}`
+              : `R${Number(tender.budget || 0).toLocaleString()}`}
           </span>
           <span className="text-gray-400">budget</span>
         </div>
@@ -98,12 +119,16 @@ const TenderCard = ({ tender, index, onView, onApply }) => {
 
         <div className="flex items-center space-x-2 text-sm">
           <Clock className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-400">Posted {formatDate(tender.createdAt, "MMM dd")}</span>
+          <span className="text-gray-400">
+            Posted {formatDate(tender.createdAt, "MMM dd")}
+          </span>
         </div>
 
         <div className="flex items-center space-x-2 text-sm">
           <FileText className="w-4 h-4 text-emerald-400" />
-          <span className="text-emerald-400">{tender.documents?.length || 0} documents</span>
+          <span className="text-emerald-400">
+            {tender.documents?.length || 0} documents
+          </span>
         </div>
       </div>
 
@@ -117,12 +142,35 @@ const TenderCard = ({ tender, index, onView, onApply }) => {
           >
             <Eye className="w-4 h-4" />
           </button>
-          <button
-            onClick={() => onApply(tender)}
-            className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300"
-          >
-            Apply
-          </button>
+          {isClosedOrArchived() ? (
+            <div
+              role="status"
+              title="This tender is not accepting applications"
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg border select-none ${
+                (tender.status || "").toLowerCase() === "archived"
+                  ? "bg-gray-600/30 text-gray-200 border-gray-400/30"
+                  : "bg-red-600/20 text-red-200 border-red-400/30"
+              }`}
+            >
+              {(tender.status || "").toLowerCase() === "archived" ? (
+                <Archive className="w-4 h-4" />
+              ) : (
+                <Lock className="w-4 h-4" />
+              )}
+              <span>
+                {(tender.status || "").toLowerCase() === "archived"
+                  ? "Archived"
+                  : "Applications closed"}
+              </span>
+            </div>
+          ) : (
+            <button
+              onClick={() => onApply(tender)}
+              className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300"
+            >
+              Apply
+            </button>
+          )}
         </div>
       </div>
     </motion.div>

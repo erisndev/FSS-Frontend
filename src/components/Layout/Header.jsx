@@ -28,7 +28,12 @@ const Header = ({ title, subtitle }) => {
   const { user } = useAuth();
   const role = (user?.role || "").toLowerCase();
   const navigate = useNavigate();
-  const notificationsPath = role === "admin" ? "/admin/notifications" : role === "issuer" ? "/issuer/notifications" : "/bidder/notifications";
+  const notificationsPath =
+    role === "admin"
+      ? "/admin/notifications"
+      : role === "issuer"
+      ? "/issuer/notifications"
+      : "/bidder/notifications";
 
   const [isMobile, setIsMobile] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -67,37 +72,48 @@ const Header = ({ title, subtitle }) => {
   }, [notifOpen]);
 
   // Fetch notifications via API
-  useEffect(() => {
-    let mounted = true;
-    const fetchNotifications = async () => {
-      try {
-        setNotifLoading(true);
-        setNotifError("");
-        const list = await notificationApi.getMyNotifications();
-        const items = (list || []).map((n) => ({
-          id: n._id || n.id,
-          title: n.title || (n.type ? String(n.type).replace(/[_:]/g, " ") : "Notification"),
-          message: n.message || n.body || n.description || "",
-          time: n.createdAt ? new Date(n.createdAt) : (n.time ? new Date(n.time) : new Date()),
-          icon: FileText,
-          isRead: n.isRead === true,
-        }));
-        items.sort((a, b) => (b.time?.getTime?.() || 0) - (a.time?.getTime?.() || 0));
-        const onlyUnread = items.filter((x) => !x.isRead);
-        const limited = onlyUnread.slice(0, 10);
-        if (mounted) setNotifications(limited);
-      } catch (err) {
-        console.error("Error loading notifications:", err);
-        if (mounted) setNotifError("Failed to load notifications");
-      } finally {
-        if (mounted) setNotifLoading(false);
-      }
-    };
+  const fetchNotifications = async () => {
+    try {
+      setNotifLoading(true);
+      setNotifError("");
+      const list = await notificationApi.getMyNotifications();
+      const items = (list || []).map((n) => ({
+        id: n._id || n.id,
+        title:
+          n.title ||
+          (n.type ? String(n.type).replace(/[_:]/g, " ") : "Notification"),
+        message: n.message || n.body || n.description || "",
+        time: n.createdAt
+          ? new Date(n.createdAt)
+          : n.time
+          ? new Date(n.time)
+          : new Date(),
+        icon: FileText,
+        isRead: n.isRead === true,
+      }));
+      items.sort(
+        (a, b) => (b.time?.getTime?.() || 0) - (a.time?.getTime?.() || 0)
+      );
+      const onlyUnread = items.filter((x) => !x.isRead);
+      const limited = onlyUnread.slice(0, 10);
+      setNotifications(limited);
+    } catch (err) {
+      console.error("Error loading notifications:", err);
+      setNotifError("Failed to load notifications");
+    } finally {
+      setNotifLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchNotifications();
-    return () => {
-      mounted = false;
-    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const unreadCount = useMemo(() => notifications.length, [notifications]);
@@ -119,10 +135,7 @@ const Header = ({ title, subtitle }) => {
 
   const NotificationBell = () => (
     <div className="relative" ref={notifBtnRef}>
-      <motion.button
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3 }}
+      <button
         onClick={() => setNotifOpen((v) => !v)}
         aria-haspopup="true"
         aria-expanded={notifOpen}
@@ -134,7 +147,7 @@ const Header = ({ title, subtitle }) => {
             {unreadCount}
           </span>
         )}
-      </motion.button>
+      </button>
 
       {/* Dropdown */}
       <AnimatePresence>
@@ -159,22 +172,41 @@ const Header = ({ title, subtitle }) => {
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {notifLoading ? (
-                  <div className="p-4 text-center text-gray-400">Loading...</div>
+                  <div className="p-4 text-center text-gray-400">
+                    Loading...
+                  </div>
                 ) : notifError ? (
-                  <div className="p-4 text-center text-red-400">{notifError}</div>
+                  <div className="p-4 text-center text-red-400">
+                    {notifError}
+                  </div>
                 ) : notifications.length === 0 ? (
-                  <div className="p-4 text-center text-gray-400">No notifications</div>
+                  <div className="p-4 text-center text-gray-400">
+                    No notifications
+                  </div>
                 ) : (
                   notifications.map((n) => (
-                    <div key={`${n.id}`} className="flex items-start space-x-3 p-4 hover:bg-white/5 transition-colors">
+                    <div
+                      key={`${n.id}`}
+                      className="flex items-start space-x-3 p-4 hover:bg-white/5 transition-colors"
+                    >
                       <div className="w-9 h-9 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                        {n.icon ? <n.icon className="w-5 h-5 text-cyan-400" /> : <FileText className="w-5 h-5 text-cyan-400" />}
+                        {n.icon ? (
+                          <n.icon className="w-5 h-5 text-cyan-400" />
+                        ) : (
+                          <FileText className="w-5 h-5 text-cyan-400" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-white text-sm font-medium truncate">{n.title}</div>
-                        <div className="text-gray-400 text-xs truncate">{n.message}</div>
+                        <div className="text-white text-sm font-medium truncate">
+                          {n.title}
+                        </div>
+                        <div className="text-gray-400 text-xs truncate">
+                          {n.message}
+                        </div>
                         <div className="flex items-center justify-between mt-1">
-                          <div className="text-gray-500 text-[11px]">{timeAgo(n.time)}</div>
+                          <div className="text-gray-500 text-[11px]">
+                            {timeAgo(n.time)}
+                          </div>
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleViewNotification(n)}
@@ -241,7 +273,9 @@ const Header = ({ title, subtitle }) => {
               className="flex items-center space-x-2 flex-1 justify-end min-w-0"
             >
               <div className="text-right min-w-0 flex-1 max-w-[200px] sm:max-w-none">
-                <p className="text-white font-medium text-sm truncate">{user?.name}</p>
+                <p className="text-white font-medium text-sm truncate">
+                  {user?.name}
+                </p>
                 <p className="text-cyan-400/70 text-xs">{user?.role}</p>
               </div>
 

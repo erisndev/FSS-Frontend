@@ -17,8 +17,10 @@ import ViewTenderModal from "../../components/UI/ViewTenderModal";
 import ApplicationModal from "../../components/UI/ApplicationModal";
 import { tenderApi, applicationApi } from "../../services/api";
 import { format } from "date-fns";
+import { useAuth } from "../../contexts/AuthContext";
 
 const BidderDashboard = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   
   const [stats, setStats] = useState({
@@ -149,28 +151,32 @@ const BidderDashboard = () => {
       value: stats.totalApplications,
       icon: FileText,
       color: "from-blue-500 to-cyan-500",
-      change: "+12%",
+      bgColor: "bg-blue-500/10",
+      iconBg: "bg-blue-500/20",
     },
     {
       title: "Pending Applications",
       value: stats.pendingApplications,
       icon: Clock,
       color: "from-yellow-500 to-orange-500",
-      change: "+5%",
+      bgColor: "bg-yellow-500/10",
+      iconBg: "bg-yellow-500/20",
     },
     {
       title: "Accepted Applications",
       value: stats.acceptedApplications,
       icon: CheckCircle,
       color: "from-green-500 to-emerald-500",
-      change: "+8%",
+      bgColor: "bg-green-500/10",
+      iconBg: "bg-green-500/20",
     },
     {
       title: "Rejected Applications",
       value: stats.rejectedApplications,
       icon: AlertCircle,
       color: "from-red-500 to-pink-500",
-      change: "-3%",
+      bgColor: "bg-red-500/10",
+      iconBg: "bg-red-500/20",
     },
   ];
 
@@ -201,22 +207,21 @@ const BidderDashboard = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:bg-white/10 transition-all duration-300"
+              className={`${stat.bgColor} backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:shadow-lg hover:shadow-cyan-400/10 transition-all duration-300 group`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm">{stat.title}</p>
-                  <p className="text-2xl font-bold text-white mt-1">
-                    {stat.value}
-                  </p>
-                  <p className="text-green-400 text-sm mt-1">
-                    {stat.change} from last month
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-gray-400 text-sm font-medium mb-2">{stat.title}</p>
+                  <p className="text-3xl font-bold text-white">
+                    {stat.value.toLocaleString()}
                   </p>
                 </div>
                 <div
-                  className={`w-12 h-12 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center`}
+                  className={`w-14 h-14 rounded-xl ${stat.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                 >
-                  <stat.icon className="w-6 h-6 text-white" />
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
+                    <stat.icon className="w-5 h-5 text-white" />
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -257,8 +262,8 @@ const BidderDashboard = () => {
                       </p>
                       <div className="flex items-center space-x-4 mt-2">
                         <span className="text-cyan-400 text-sm">
-                          <DollarSign className="w-4 h-4 inline mr-1" />$
-                          {tender.budgetMin?.toLocaleString()}
+                          <DollarSign className="w-4 h-4 inline mr-1" />
+                          R{tender.budgetMin?.toLocaleString()}
                         </span>
                         <span className="text-gray-400 text-sm">
                           Due: {formatDate(tender.deadline)}
@@ -326,8 +331,8 @@ const BidderDashboard = () => {
                       </p>
                       <div className="flex items-center space-x-4 mt-2">
                         <span className="text-cyan-400 text-sm">
-                          <DollarSign className="w-4 h-4 inline mr-1" />$
-                          {application.bidAmount?.toLocaleString()}
+                          <DollarSign className="w-4 h-4 inline mr-1" />
+                          R{application.bidAmount?.toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -413,6 +418,7 @@ const BidderDashboard = () => {
           setSelectedApplication(null);
         }}
         application={selectedApplication}
+        user={user}
       />
     </DashboardLayout>
   );

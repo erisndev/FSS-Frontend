@@ -165,7 +165,9 @@ export const applicationApi = {
       payload.comment = comment;
       payload.message = comment;
     }
+    console.log("Sending update to API:", { id, payload });
     const res = await api.put(`/applications/${id}/status`, payload);
+    console.log("API response:", res.data);
     return res.data;
   },
   withdrawApplication: async (id) => {

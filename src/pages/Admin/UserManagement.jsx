@@ -13,6 +13,7 @@ import DashboardLayout from "../../components/Layout/DashboardLayout";
 import { userApi } from "../../services/api";
 import { format } from "date-fns";
 import ConfirmDeleteModal from "../../components/UI/ConfirmDeleteModal";
+import toast from "react-hot-toast";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -52,10 +53,13 @@ const UserManagement = () => {
     e.preventDefault();
     try {
       await userApi.createUser(formData);
+
       fetchUsers();
+      toast.success("User created successfully");
       setShowCreateModal(false);
       setFormData({ name: "", email: "", role: "bidder", isActive: true });
     } catch (error) {
+      toast.error("Failed to create user");
       console.error("Error creating user:", error);
     }
   };
@@ -65,10 +69,12 @@ const UserManagement = () => {
     try {
       await userApi.updateUser(selectedUser.id, formData);
       fetchUsers();
+      toast.success("User updated successfully");
       setShowEditModal(false);
       setSelectedUser(null);
       setFormData({ name: "", email: "", role: "bidder", isActive: true });
     } catch (error) {
+      toast.error("Failed to update user");
       console.error("Error updating user:", error);
     }
   };
@@ -76,8 +82,10 @@ const UserManagement = () => {
   const handleDeleteUser = async (userId) => {
     try {
       await userApi.deleteUser(userId);
+      toast.success("User deleted successfully");
       fetchUsers();
     } catch (error) {
+      toast.error("Failed to delete user");
       console.error("Error deleting user:", error);
     }
   };

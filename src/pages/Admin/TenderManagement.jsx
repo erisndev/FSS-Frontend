@@ -21,6 +21,7 @@ import ConfirmDeleteModal from "../../components/UI/ConfirmDeleteModal";
 import ViewTenderModal from "../../components/UI/ViewTenderModal";
 import { tenderApi } from "../../services/api";
 import { format } from "date-fns";
+import toast from "react-hot-toast";
 
 const TenderManagement = () => {
   const [tenders, setTenders] = useState([]);
@@ -42,6 +43,10 @@ const TenderManagement = () => {
     "Education",
     "Manufacturing",
     "Transportation",
+    "Legal Services",
+    "Financial Services",
+    "Engineering",
+    "Design",
   ];
 
   useEffect(() => {
@@ -65,8 +70,10 @@ const TenderManagement = () => {
   const handleDeleteTender = async (tenderId) => {
     try {
       await tenderApi.deleteTender(tenderId);
+      toast.success("Tender deleted successfully");
       fetchTenders();
     } catch (error) {
+      toast.error("Failed to delete tender");
       console.error("Error deleting tender:", error);
     }
   };
@@ -233,7 +240,7 @@ const TenderManagement = () => {
                       {tender.companyName}
                     </td>
                     <td className="px-6 py-4 text-cyan-400">
-                      ${tender.budgetMin?.toLocaleString()}
+                      R{tender.budgetMin?.toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
                       <span
@@ -325,7 +332,8 @@ const TenderManagement = () => {
             setTenderToDelete(null);
           }}
           onConfirm={() => {
-            if (tenderToDelete) handleDeleteTender(tenderToDelete.id);
+            if (tenderToDelete)
+              handleDeleteTender(tenderToDelete._id || tenderToDelete.id);
             setTenderToDelete(null);
           }}
           itemName={tenderToDelete?.title}

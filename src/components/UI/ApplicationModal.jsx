@@ -17,6 +17,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { format } from "date-fns";
+import StatusChangeModal from "./StatusChangeModal";
 
 const ApplicationModal = ({
   isOpen,
@@ -26,67 +27,24 @@ const ApplicationModal = ({
   user,
   onStatusUpdate,
 }) => {
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [statusAction, setStatusAction] = useState(""); // "Accept" | "Reject"
   const [showStatusModal, setShowStatusModal] = useState(false);
-  const [statusAction, setStatusAction] = useState("");
-  const [statusComment, setStatusComment] = useState("");
 
   const canChangeStatus = () => {
-    // Check if user is admin or tender creator
-    return (
-      user?.role === "admin" ||
-      tender?.createdBy === user?.id ||
-      tender?.userId === user?.id
-    );
-  };
-
-  const openConfirmModal = useCallback((action) => {
-    setStatusAction(action);
-    setShowConfirmModal(true);
-  }, []);
-
-  const confirmStatusChange = useCallback(() => {
-    setShowConfirmModal(false);
-    setShowStatusModal(true);
-  }, []);
-
-  const handleStatusUpdate = useCallback(
-    (comment) => {
-      if (onStatusUpdate) {
-        onStatusUpdate(
-          application._id || application.id,
-          statusAction === "ACCEPT" ? "ACCEPTED" : "REJECTED",
-          comment
-        );
-      }
-      setShowStatusModal(false);
-      setStatusComment("");
-      setStatusAction("");
-      onClose();
-    },
-    [onStatusUpdate, application, statusAction, onClose]
-  );
-
-  const handleCommentChange = useCallback(
-    (e) => {
-      setStatusComment(e.target.value);
-    },
-    [setStatusComment]
-  );
-
-  const getStatusColor = (status) => {
-    switch ((status || "").toUpperCase()) {
-      case "PENDING":
-        return "text-yellow-400 bg-yellow-400/20 border-yellow-400/30";
-      case "ACCEPTED":
-        return "text-green-400 bg-green-400/20 border-green-400/30";
-      case "REJECTED":
-        return "text-red-400 bg-red-400/20 border-red-400/30";
-      case "WITHDRAWN":
-        return "text-gray-400 bg-gray-400/20 border-gray-400/30";
-      default:
-        return "text-gray-400 bg-gray-400/20 border-gray-400/30";
+    // Admin or issuer for the tender
+    if (user?.role === "admin") return true;
+    if (user?.role === "issuer") {
+      const userId = user?.id || user?._id;
+      return (
+        tender?.createdBy === userId ||
+        tender?.userId === userId ||
+        tender?.issuerId === userId ||
+        tender?.issuer === userId ||
+        tender?.user === userId ||
+        !tender // fallback if tender not passed
+      );
     }
+    return false;
   };
 
   const formatDate = (date) => {
@@ -103,6 +61,24 @@ const ApplicationModal = ({
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return (bytes / Math.pow(k, i)).toFixed(2) + " " + sizes[i];
   };
+
+  const openStatusModal = useCallback((action) => {
+    setStatusAction(action);
+    setShowStatusModal(true);
+  }, []);
+
+  const submitStatusChange = useCallback(
+    async (comment) => {
+      if (!onStatusUpdate || !application) return;
+      const id = application._id || application.id;
+      const apiStatus = statusAction === "Accept" ? "ACCEPTED" : "REJECTED";
+      await onStatusUpdate(id, apiStatus, comment);
+      setShowStatusModal(false);
+      setStatusAction("");
+      onClose?.();
+    },
+    [onStatusUpdate, application, statusAction, onClose]
+  );
 
   if (!isOpen || !application) return null;
 
@@ -124,18 +100,20 @@ const ApplicationModal = ({
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
-            <h3 className="text-2xl font-bold text-white mb-3">
-              Application Details
-            </h3>
+            <h3 className="text-2xl font-bold text-white mb-3">Application Details</h3>
             <div className="flex items-center space-x-3">
               <h4 className="text-lg text-cyan-400 font-semibold">
                 {application.tender?.title || "Unknown Tender"}
               </h4>
-              <span
-                className={`px-3 py-1 text-sm rounded-full border ${getStatusColor(
-                  application.status
-                )}`}
-              >
+              <span className={`px-3 py-1 text-sm rounded-full border ${
+                (application.status || "").toUpperCase() === "PENDING"
+                  ? "text-yellow-400 bg-yellow-400/20 border-yellow-400/30"
+                  : (application.status || "").toUpperCase() === "ACCEPTED"
+                  ? "text-green-400 bg-green-400/20 border-green-400/30"
+                  : (application.status || "").toUpperCase() === "REJECTED"
+                  ? "text-red-400 bg-red-400/20 border-red-400/30"
+                  : "text-gray-400 bg-gray-400/20 border-gray-400/30"
+              }`}>
                 {application.status}
               </span>
             </div>
@@ -156,16 +134,14 @@ const ApplicationModal = ({
             transition={{ delay: 0.1 }}
             className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
           >
-            <h5 className="text-lg font-semibold text-cyan-400 mb-4">
-              Application Summary
-            </h5>
+            <h5 className="text-lg font-semibold text-cyan-400 mb-4">Application Summary</h5>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center space-x-3">
                 <DollarSign className="w-5 h-5 text-cyan-400" />
                 <div>
                   <p className="text-gray-400 text-sm">Proposed Amount</p>
                   <p className="text-cyan-400 font-semibold text-lg">
-                    ${application.bidAmount?.toLocaleString()}
+                    R{application.bidAmount?.toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -175,9 +151,7 @@ const ApplicationModal = ({
                   <Calendar className="w-5 h-5 text-purple-400" />
                   <div>
                     <p className="text-gray-400 text-sm">Timeframe</p>
-                    <p className="text-white font-medium">
-                      {application.timeframe}
-                    </p>
+                    <p className="text-white font-medium">{application.timeframe}</p>
                   </div>
                 </div>
               )}
@@ -186,9 +160,7 @@ const ApplicationModal = ({
                 <Clock className="w-5 h-5 text-emerald-400" />
                 <div>
                   <p className="text-gray-400 text-sm">Applied On</p>
-                  <p className="text-white font-medium">
-                    {formatDate(application.createdAt)}
-                  </p>
+                  <p className="text-white font-medium">{formatDate(application.createdAt)}</p>
                 </div>
               </div>
 
@@ -196,9 +168,7 @@ const ApplicationModal = ({
                 <Clock className="w-5 h-5 text-yellow-400" />
                 <div>
                   <p className="text-gray-400 text-sm">Last Updated</p>
-                  <p className="text-white font-medium">
-                    {formatDate(application.updatedAt)}
-                  </p>
+                  <p className="text-white font-medium">{formatDate(application.updatedAt)}</p>
                 </div>
               </div>
             </div>
@@ -211,18 +181,14 @@ const ApplicationModal = ({
             transition={{ delay: 0.2 }}
             className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
           >
-            <h5 className="text-lg font-semibold text-cyan-400 mb-4">
-              Company Information
-            </h5>
+            <h5 className="text-lg font-semibold text-cyan-400 mb-4">Company Information</h5>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Building className="w-5 h-5 text-emerald-400" />
                   <div>
                     <p className="text-gray-400 text-sm">Company Name</p>
-                    <p className="text-white font-medium">
-                      {application.companyName}
-                    </p>
+                    <p className="text-white font-medium">{application.companyName}</p>
                   </div>
                 </div>
 
@@ -230,12 +196,8 @@ const ApplicationModal = ({
                   <div className="flex items-center space-x-3">
                     <FileText className="w-5 h-5 text-blue-400" />
                     <div>
-                      <p className="text-gray-400 text-sm">
-                        Registration Number
-                      </p>
-                      <p className="text-white font-medium">
-                        {application.registrationNumber}
-                      </p>
+                      <p className="text-gray-400 text-sm">Registration Number</p>
+                      <p className="text-white font-medium">{application.registrationNumber}</p>
                     </div>
                   </div>
                 )}
@@ -247,9 +209,7 @@ const ApplicationModal = ({
                     <Award className="w-5 h-5 text-yellow-400" />
                     <div>
                       <p className="text-gray-400 text-sm">B-BBEE Level</p>
-                      <p className="text-white font-medium">
-                        Level {application.bbeeLevel}
-                      </p>
+                      <p className="text-white font-medium">Level {application.bbeeLevel}</p>
                     </div>
                   </div>
                 )}
@@ -259,9 +219,7 @@ const ApplicationModal = ({
                     <Award className="w-5 h-5 text-purple-400" />
                     <div>
                       <p className="text-gray-400 text-sm">CIDB Grading</p>
-                      <p className="text-white font-medium">
-                        {application.cidbGrading}
-                      </p>
+                      <p className="text-white font-medium">{application.cidbGrading}</p>
                     </div>
                   </div>
                 )}
@@ -276,17 +234,13 @@ const ApplicationModal = ({
             transition={{ delay: 0.3 }}
             className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
           >
-            <h5 className="text-lg font-semibold text-cyan-400 mb-4">
-              Contact Information
-            </h5>
+            <h5 className="text-lg font-semibold text-cyan-400 mb-4">Contact Information</h5>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-center space-x-3">
                 <User className="w-5 h-5 text-emerald-400" />
                 <div>
                   <p className="text-gray-400 text-sm">Contact Person</p>
-                  <p className="text-white font-medium">
-                    {application.contactPerson}
-                  </p>
+                  <p className="text-white font-medium">{application.contactPerson}</p>
                 </div>
               </div>
 
@@ -351,14 +305,10 @@ const ApplicationModal = ({
                       </div>
                       <div>
                         <p className="text-white font-medium text-sm">
-                          {doc.originalName ||
-                            doc.name ||
-                            `Document ${idx + 1}`}
+                          {doc.originalName || doc.name || `Document ${idx + 1}`}
                         </p>
                         {doc.size && (
-                          <p className="text-gray-400 text-xs">
-                            {formatFileSize(doc.size)}
-                          </p>
+                          <p className="text-gray-400 text-xs">{formatFileSize(doc.size)}</p>
                         )}
                       </div>
                     </div>
@@ -387,213 +337,70 @@ const ApplicationModal = ({
               transition={{ delay: 0.6 }}
               className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
             >
-              <h5 className="text-lg font-semibold text-cyan-400 mb-4">
-                Tender Information
-              </h5>
+              <h5 className="text-lg font-semibold text-cyan-400 mb-4">Tender Information</h5>
               <div className="space-y-3">
                 <div>
                   <p className="text-gray-400 text-sm">Title</p>
-                  <p className="text-white font-medium">
-                    {application.tender.title}
-                  </p>
+                  <p className="text-white font-medium">{application.tender.title}</p>
                 </div>
                 {application.tender.description && (
                   <div>
                     <p className="text-gray-400 text-sm">Description</p>
-                    <p className="text-gray-300">
-                      {application.tender.description}
-                    </p>
+                    <p className="text-gray-300">{application.tender.description}</p>
                   </div>
                 )}
                 {application.tender.category && (
                   <div>
                     <p className="text-gray-400 text-sm">Category</p>
-                    <p className="text-white font-medium">
-                      {application.tender.category}
-                    </p>
+                    <p className="text-white font-medium">{application.tender.category}</p>
                   </div>
                 )}
               </div>
             </motion.div>
           )}
 
-          {/* Action Buttons - Only show for pending applications and authorized users */}
-          {application.status?.toUpperCase() === "PENDING" &&
-            canChangeStatus() && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
-              >
-                <h5 className="text-lg font-semibold text-cyan-400 mb-4">
-                  Application Actions
-                </h5>
-                <div className="flex items-center justify-end space-x-4">
-                  <button
-                    onClick={() => openConfirmModal("REJECT")}
-                    className="flex items-center space-x-2 px-6 py-3 bg-red-500/20 border border-red-400/30 text-red-400 rounded-lg hover:bg-red-500/30 hover:border-red-400/50 transition-all duration-300"
-                  >
-                    <XIcon className="w-5 h-5" />
-                    <span>Reject Application</span>
-                  </button>
-                  <button
-                    onClick={() => openConfirmModal("ACCEPT")}
-                    className="flex items-center space-x-2 px-6 py-3 bg-green-500/20 border border-green-400/30 text-green-400 rounded-lg hover:bg-green-500/30 hover:border-green-400/50 transition-all duration-300"
-                  >
-                    <Check className="w-5 h-5" />
-                    <span>Accept Application</span>
-                  </button>
-                </div>
-              </motion.div>
-            )}
+          {/* Actions */}
+          {application.status?.toLowerCase() === "pending" && canChangeStatus() && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
+            >
+              <h5 className="text-lg font-semibold text-cyan-400 mb-4">
+                Application Actions
+              </h5>
+              <div className="flex items-center justify-end space-x-4">
+                <button
+                  onClick={() => openStatusModal("Reject")}
+                  className="flex items-center space-x-2 px-6 py-3 bg-red-500/20 border border-red-400/30 text-red-400 rounded-lg hover:bg-red-500/30 hover:border-red-400/50 transition-all duration-300"
+                >
+                  <XIcon className="w-5 h-5" />
+                  <span>Reject Application</span>
+                </button>
+                <button
+                  onClick={() => openStatusModal("Accept")}
+                  className="flex items-center space-x-2 px-6 py-3 bg-green-500/20 border border-green-400/30 text-green-400 rounded-lg hover:bg-green-500/30 hover:border-green-400/50 transition-all duration-300"
+                >
+                  <Check className="w-5 h-5" />
+                  <span>Accept Application</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
         </div>
 
-        {/* Confirmation Modal */}
-        {showConfirmModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[10001]"
-            onClick={() => setShowConfirmModal(false)}
-            style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0 }}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6 max-w-md w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white">
-                  Confirm {statusAction}
-                </h3>
-                <button
-                  onClick={() => setShowConfirmModal(false)}
-                  className="text-gray-400 hover:text-white transition-colors duration-200"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div className="p-4 bg-slate-800/30 rounded-lg border border-cyan-400/10">
-                  <p className="text-white font-medium">
-                    {application.companyName}
-                  </p>
-                  <p className="text-gray-400 text-sm">{application.email}</p>
-                  <p className="text-cyan-400 text-sm">
-                    Bid Amount: ${application.bidAmount?.toLocaleString()}
-                  </p>
-                </div>
-
-                <div className="p-4 bg-yellow-500/10 border border-yellow-400/20 rounded-lg">
-                  <p className="text-yellow-400 text-sm">
-                    Are you sure you want to {statusAction.toLowerCase()} this
-                    application? This action cannot be undone.
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-end space-x-4">
-                  <button
-                    onClick={() => setShowConfirmModal(false)}
-                    className="px-4 py-2 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg hover:bg-slate-800/70 transition-all duration-300"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={confirmStatusChange}
-                    className={`px-4 py-2 border rounded-lg transition-all duration-300 ${
-                      statusAction === "ACCEPT"
-                        ? "bg-green-500/20 border-green-400/30 text-green-400 hover:bg-green-500/30"
-                        : "bg-red-500/20 border-red-400/30 text-red-400 hover:bg-red-500/30"
-                    }`}
-                  >
-                    Yes, {statusAction}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* Status Change Modal */}
+        {/* Reusable Status Change Modal */}
         {showStatusModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[10002]"
-            onClick={() => setShowStatusModal(false)}
-            style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0 }}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6 max-w-md w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white">
-                  {statusAction} Application
-                </h3>
-                <button
-                  onClick={() => setShowStatusModal(false)}
-                  className="text-gray-400 hover:text-white transition-colors duration-200"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div className="p-4 bg-slate-800/30 rounded-lg border border-cyan-400/10">
-                  <p className="text-white font-medium">
-                    {application.companyName}
-                  </p>
-                  <p className="text-gray-400 text-sm">{application.email}</p>
-                  <p className="text-cyan-400 text-sm">
-                    Bid Amount: ${application.bidAmount?.toLocaleString()}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Comment (Optional)
-                  </label>
-                  <textarea
-                    value={statusComment}
-                    onChange={handleCommentChange}
-                    rows={4}
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300 resize-none"
-                    placeholder="Add a comment about this decision..."
-                    autoFocus
-                  />
-                </div>
-
-                <div className="flex items-center justify-end space-x-4">
-                  <button
-                    onClick={() => setShowStatusModal(false)}
-                    className="px-4 py-2 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg hover:bg-slate-800/70 transition-all duration-300"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => handleStatusUpdate(statusComment)}
-                    className={`px-4 py-2 border rounded-lg transition-all duration-300 ${
-                      statusAction === "ACCEPT"
-                        ? "bg-green-500/20 border-green-400/30 text-green-400 hover:bg-green-500/30"
-                        : "bg-red-500/20 border-red-400/30 text-red-400 hover:bg-red-500/30"
-                    }`}
-                  >
-                    {statusAction} Application
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+          <StatusChangeModal
+            application={application}
+            action={statusAction}
+            onClose={() => {
+              setShowStatusModal(false);
+              setStatusAction("");
+            }}
+            onSubmit={submitStatusChange}
+          />
         )}
       </motion.div>
     </motion.div>

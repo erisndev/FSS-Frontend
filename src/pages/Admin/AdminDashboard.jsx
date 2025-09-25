@@ -101,11 +101,11 @@ const AdminDashboard = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "ACTIVE":
+      case "active":
         return "text-green-400 bg-green-400/20";
-      case "CLOSED":
+      case "closed":
         return "text-red-400 bg-red-400/20";
-      case "CANCELLED":
+      case "cancelled":
         return "text-gray-400 bg-gray-400/20";
       default:
         return "text-gray-400 bg-gray-400/20";
@@ -118,42 +118,48 @@ const AdminDashboard = () => {
       value: stats.totalUsers,
       icon: Users,
       color: "from-blue-500 to-cyan-500",
-      change: "+12%",
+      bgColor: "bg-blue-500/10",
+      iconBg: "bg-blue-500/20",
     },
     {
       title: "Active Users",
       value: stats.activeUsers,
       icon: Activity,
       color: "from-green-500 to-emerald-500",
-      change: "+8%",
+      bgColor: "bg-green-500/10",
+      iconBg: "bg-green-500/20",
     },
     {
       title: "Total Tenders",
       value: stats.totalTenders,
       icon: FileText,
       color: "from-purple-500 to-pink-500",
-      change: "+23%",
+      bgColor: "bg-purple-500/10",
+      iconBg: "bg-purple-500/20",
     },
     {
       title: "Active Tenders",
       value: stats.activeTenders,
       icon: TrendingUp,
       color: "from-yellow-500 to-orange-500",
-      change: "+15%",
+      bgColor: "bg-yellow-500/10",
+      iconBg: "bg-yellow-500/20",
     },
     {
       title: "Total Applications",
       value: stats.totalApplications,
       icon: BarChart3,
       color: "from-indigo-500 to-purple-500",
-      change: "+18%",
+      bgColor: "bg-indigo-500/10",
+      iconBg: "bg-indigo-500/20",
     },
     {
       title: "Pending Reviews",
       value: stats.pendingApplications,
       icon: Clock,
       color: "from-red-500 to-pink-500",
-      change: "+5%",
+      bgColor: "bg-red-500/10",
+      iconBg: "bg-red-500/20",
     },
   ];
 
@@ -184,22 +190,21 @@ const AdminDashboard = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:bg-white/10 transition-all duration-300"
+              className={`${stat.bgColor} backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:shadow-lg hover:shadow-cyan-400/10 transition-all duration-300 group`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm">{stat.title}</p>
-                  <p className="text-2xl font-bold text-white mt-1">
-                    {stat.value}
-                  </p>
-                  <p className="text-green-400 text-sm mt-1">
-                    {stat.change} from last month
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-gray-400 text-sm font-medium mb-2">{stat.title}</p>
+                  <p className="text-3xl font-bold text-white">
+                    {stat.value.toLocaleString()}
                   </p>
                 </div>
                 <div
-                  className={`w-12 h-12 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center`}
+                  className={`w-14 h-14 rounded-xl ${stat.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                 >
-                  <stat.icon className="w-6 h-6 text-white" />
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
+                    <stat.icon className="w-5 h-5 text-white" />
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -216,7 +221,10 @@ const AdminDashboard = () => {
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-white">Recent Users</h3>
-              <button className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200">
+              <button 
+                onClick={() => navigate("/admin/users")}
+                className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200"
+              >
                 View All
               </button>
             </div>
@@ -270,7 +278,10 @@ const AdminDashboard = () => {
               <h3 className="text-xl font-semibold text-white">
                 Recent Tenders
               </h3>
-              <button className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200">
+              <button 
+                onClick={() => navigate("/admin/tenders")}
+                className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200"
+              >
                 View All
               </button>
             </div>
@@ -293,7 +304,7 @@ const AdminDashboard = () => {
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
                           <span>By {tender.companyName || "N/A"}</span>
                           <span>
-                            ${tender.budgetMin?.toLocaleString() || "0"}
+                            R{tender.budgetMin?.toLocaleString() || "0"}
                           </span>
                           <span>
                             {tender.applicationsCount || 0} applications
@@ -399,6 +410,13 @@ const AdminDashboard = () => {
             >
               <FileText className="w-5 h-5 text-emerald-400" />
               <span className="text-white font-medium">View Tenders</span>
+            </button>
+            <button
+              onClick={() => navigate("/admin/applications")}
+              className="flex items-center space-x-3 p-4 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-400/30 rounded-lg hover:from-orange-500/30 hover:to-red-500/30 transition-all duration-300"
+            >
+              <Eye className="w-5 h-5 text-orange-400" />
+              <span className="text-white font-medium">View Applications</span>
             </button>
           </div>
         </motion.div>

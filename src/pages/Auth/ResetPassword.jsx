@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Shield, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 const ResetPassword = () => {
   const { resetPassword } = useAuth();
@@ -47,12 +48,14 @@ const ResetPassword = () => {
       await resetPassword(email, otp, formData.password);
       console.log("Email:", email, "otp:", otp, "password:", formData.password);
       console.log("Password reset successful!");
+      toast.success("Password reset successful!");
       setSuccess(true);
       setTimeout(() => {
         navigate("/login");
       }, 2000);
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Password reset failed");
       console.log(err);
     } finally {
       setIsLoading(false);

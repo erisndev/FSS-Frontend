@@ -19,6 +19,7 @@ import { tenderApi } from "../../services/api";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import ConfirmDeleteModal from "../../components/UI/ConfirmDeleteModal";
+import toast from "react-hot-toast";
 
 const ManageTenders = () => {
   const [tenders, setTenders] = useState([]);
@@ -51,9 +52,12 @@ const ManageTenders = () => {
   const handleDeleteTender = async (tenderId) => {
     try {
       await tenderApi.deleteTender(tenderId);
-      fetchTenders();
+      toast.success("Tender deleted successfully");
+      await fetchTenders();
     } catch (error) {
+      toast.error("Failed to delete tender");
       console.error("Error deleting tender:", error);
+      throw error;
     }
   };
 
@@ -224,7 +228,7 @@ const ManageTenders = () => {
                   <div className="flex items-center space-x-2 text-sm">
                     <DollarSign className="w-4 h-4 text-cyan-400" />
                     <span className="text-cyan-400 font-medium">
-                      ${tender.budgetMin?.toLocaleString()}
+                      R{tender.budgetMin?.toLocaleString()}
                     </span>
                     <span className="text-gray-400">budget</span>
                   </div>
@@ -248,7 +252,7 @@ const ManageTenders = () => {
                   <div className="flex items-center space-x-2 text-sm">
                     <Users className="w-4 h-4 text-emerald-400" />
                     <span className="text-emerald-400">
-                      {tender.applicationsCount || 0} applications
+                      {tender.applications.length || 0} applications
                     </span>
                   </div>
 
@@ -308,8 +312,10 @@ const ManageTenders = () => {
       <ConfirmDeleteModal
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
-        onConfirm={() => {
-          if (selectedTender) handleDeleteTender(selectedTender._id);
+        onConfirm={async () => {
+          if (selectedTender) {
+            await handleDeleteTender(selectedTender._id);
+          }
           setSelectedTender(null);
         }}
         itemName={selectedTender?.title}

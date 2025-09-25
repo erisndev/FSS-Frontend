@@ -24,8 +24,11 @@ import DashboardLayout from "../../components/Layout/DashboardLayout";
 import ApplicationModal from "../../components/UI/ApplicationModal";
 import { tenderApi, applicationApi } from "../../services/api";
 import { format } from "date-fns";
+import toast from "react-hot-toast";
+import { useAuth } from "../../contexts/AuthContext";
 
 const ApplicationManagement = () => {
+  const { user } = useAuth();
   const [applications, setApplications] = useState([]);
   const [tenders, setTenders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -89,14 +92,15 @@ const ApplicationManagement = () => {
   };
 
   const handleStatusUpdate = async (applicationId, status, comment = "") => {
+    console.log("ApplicationManagement handleStatusUpdate called with:", { applicationId, status, comment });
     try {
-      await applicationApi.updateApplicationStatus(
-        applicationId,
-        status,
-        comment
-      );
+      const normalizedStatus = status.toLowerCase().replace('accept', 'accepted').replace('reject', 'rejected');
+      console.log("Normalized status:", normalizedStatus);
+      await applicationApi.updateApplicationStatus(applicationId, normalizedStatus, comment);
+      toast.success(`Application ${normalizedStatus} successfully`);
       fetchData();
     } catch (error) {
+      toast.error("Failed to update application status");
       console.error("Error updating application status:", error);
     }
   };
@@ -277,7 +281,7 @@ const ApplicationManagement = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-cyan-400 font-medium">
-                      ${application.bidAmount?.toLocaleString()}
+                      R{application.bidAmount?.toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
                       <span
@@ -334,6 +338,8 @@ const ApplicationManagement = () => {
             setSelectedApplication(null);
           }}
           application={selectedApplication}
+          user={user}
+          onStatusUpdate={handleStatusUpdate}
         />
       </div>
     </DashboardLayout>

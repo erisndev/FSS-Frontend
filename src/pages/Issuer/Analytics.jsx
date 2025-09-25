@@ -92,7 +92,11 @@ const Analytics = () => {
       );
 
       const allApplications = tenderApps.flatMap(({ tender, apps }) =>
-        (apps || []).map((a) => ({ ...a, tenderId: tender._id || tender.id, tenderTitle: tender.title }))
+        (apps || []).map((a) => ({
+          ...a,
+          tenderId: tender._id || tender.id,
+          tenderTitle: tender.title,
+        }))
       );
 
       // 3) Totals
@@ -129,7 +133,11 @@ const Analytics = () => {
       // 4) Monthly series for last 6 months
       const now = new Date();
       const buckets = Array.from({ length: monthsBack }, (_, idx) => {
-        const d = new Date(now.getFullYear(), now.getMonth() - (monthsBack - 1 - idx), 1);
+        const d = new Date(
+          now.getFullYear(),
+          now.getMonth() - (monthsBack - 1 - idx),
+          1
+        );
         const start = new Date(d.getFullYear(), d.getMonth(), 1);
         const end = new Date(d.getFullYear(), d.getMonth() + 1, 1);
         const label = d.toLocaleString(undefined, { month: "short" });
@@ -143,10 +151,19 @@ const Analytics = () => {
       };
 
       const monthly = buckets.map((b) => {
-        const tendersIn = (tenders || []).filter((t) => inBucket(t.createdAt, b.start, b.end));
-        const appsIn = allApplications.filter((a) => inBucket(a.createdAt, b.start, b.end));
-        const acceptedIn = appsIn.filter((a) => (a.status || "").toLowerCase() === "accepted");
-        const budgetIn = tendersIn.reduce((sum, t) => sum + (Number(t.budgetMin) || 0), 0);
+        const tendersIn = (tenders || []).filter((t) =>
+          inBucket(t.createdAt, b.start, b.end)
+        );
+        const appsIn = allApplications.filter((a) =>
+          inBucket(a.createdAt, b.start, b.end)
+        );
+        const acceptedIn = appsIn.filter(
+          (a) => (a.status || "").toLowerCase() === "accepted"
+        );
+        const budgetIn = tendersIn.reduce(
+          (sum, t) => sum + (Number(t.budgetMin) || 0),
+          0
+        );
         return {
           month: b.label,
           tenders: tendersIn.length,
@@ -158,8 +175,18 @@ const Analytics = () => {
 
       setChartData(monthly);
 
-      const last = monthly[monthly.length - 1] || { tenders: 0, applications: 0, accepted: 0, budget: 0 };
-      const prev = monthly[monthly.length - 2] || { tenders: 0, applications: 0, accepted: 0, budget: 0 };
+      const last = monthly[monthly.length - 1] || {
+        tenders: 0,
+        applications: 0,
+        accepted: 0,
+        budget: 0,
+      };
+      const prev = monthly[monthly.length - 2] || {
+        tenders: 0,
+        applications: 0,
+        accepted: 0,
+        budget: 0,
+      };
 
       setChanges({
         tenders: pctChange(last.tenders, prev.tenders),
@@ -264,7 +291,7 @@ const Analytics = () => {
     },
     {
       title: "Total Budget",
-      value: `$${Number(analytics.totalBudget || 0).toLocaleString()}`,
+      value: `R${Number(analytics.totalBudget || 0).toLocaleString()}`,
       icon: DollarSign,
       color: "from-red-500 to-pink-500",
       change: changes.budget,
@@ -273,7 +300,10 @@ const Analytics = () => {
 
   if (loading) {
     return (
-      <DashboardLayout title="Analytics" subtitle="Insights and performance metrics">
+      <DashboardLayout
+        title="Analytics"
+        subtitle="Insights and performance metrics"
+      >
         <div className="flex items-center justify-center h-64">
           <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -282,7 +312,10 @@ const Analytics = () => {
   }
 
   return (
-    <DashboardLayout title="Analytics" subtitle="Insights and performance metrics">
+    <DashboardLayout
+      title="Analytics"
+      subtitle="Insights and performance metrics"
+    >
       <div className="space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -297,10 +330,16 @@ const Analytics = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">{stat.title}</p>
-                  <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
-                  <p className="text-green-400 text-sm mt-1">{stat.change} from last month</p>
+                  <p className="text-2xl font-bold text-white mt-1">
+                    {stat.value}
+                  </p>
+                  <p className="text-green-400 text-sm mt-1">
+                    {stat.change} from last month
+                  </p>
                 </div>
-                <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center`}>
+                <div
+                  className={`w-12 h-12 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center`}
+                >
                   <stat.icon className="w-6 h-6 text-white" />
                 </div>
               </div>
@@ -317,22 +356,31 @@ const Analytics = () => {
             transition={{ delay: 0.3 }}
             className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
           >
-            <h3 className="text-xl font-semibold text-white mb-6">Tender Performance</h3>
+            <h3 className="text-xl font-semibold text-white mb-6">
+              Tender Performance
+            </h3>
             <div className="space-y-4">
               {chartData.map((data, index) => (
-                <div key={`${data.month}-${index}`} className="flex items-center justify-between">
+                <div
+                  key={`${data.month}-${index}`}
+                  className="flex items-center justify-between"
+                >
                   <span className="text-gray-300 w-12">{data.month}</span>
                   <div className="flex-1 mx-4">
                     <div className="bg-slate-800/50 rounded-full h-3 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${((data.tenders || 0) / maxTenders) * 100}%` }}
+                        animate={{
+                          width: `${((data.tenders || 0) / maxTenders) * 100}%`,
+                        }}
                         transition={{ delay: 0.5 + index * 0.1, duration: 0.8 }}
                         className="h-full bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full"
                       />
                     </div>
                   </div>
-                  <span className="text-cyan-400 w-8 text-right">{data.tenders}</span>
+                  <span className="text-cyan-400 w-8 text-right">
+                    {data.tenders}
+                  </span>
                 </div>
               ))}
             </div>
@@ -345,22 +393,33 @@ const Analytics = () => {
             transition={{ delay: 0.4 }}
             className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
           >
-            <h3 className="text-xl font-semibold text-white mb-6">Application Trends</h3>
+            <h3 className="text-xl font-semibold text-white mb-6">
+              Application Trends
+            </h3>
             <div className="space-y-4">
               {chartData.map((data, index) => (
-                <div key={`${data.month}-${index}`} className="flex items-center justify-between">
+                <div
+                  key={`${data.month}-${index}`}
+                  className="flex items-center justify-between"
+                >
                   <span className="text-gray-300 w-12">{data.month}</span>
                   <div className="flex-1 mx-4">
                     <div className="bg-slate-800/50 rounded-full h-3 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${((data.applications || 0) / maxApplications) * 100}%` }}
+                        animate={{
+                          width: `${
+                            ((data.applications || 0) / maxApplications) * 100
+                          }%`,
+                        }}
                         transition={{ delay: 0.6 + index * 0.1, duration: 0.8 }}
                         className="h-full bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full"
                       />
                     </div>
                   </div>
-                  <span className="text-emerald-400 w-8 text-right">{data.applications}</span>
+                  <span className="text-emerald-400 w-8 text-right">
+                    {data.applications}
+                  </span>
                 </div>
               ))}
             </div>
@@ -374,14 +433,18 @@ const Analytics = () => {
           transition={{ delay: 0.5 }}
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
         >
-          <h3 className="text-xl font-semibold text-white mb-6">Performance Metrics</h3>
+          <h3 className="text-xl font-semibold text-white mb-6">
+            Performance Metrics
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-10 h-10 text-white" />
               </div>
               <h4 className="text-white font-semibold mb-2">Success Rate</h4>
-              <p className="text-3xl font-bold text-cyan-400 mb-1">{analytics.completionRate}%</p>
+              <p className="text-3xl font-bold text-cyan-400 mb-1">
+                {analytics.completionRate}%
+              </p>
               <p className="text-gray-400 text-sm">Applications accepted</p>
             </div>
             <div className="text-center">
@@ -389,16 +452,24 @@ const Analytics = () => {
                 <Users className="w-10 h-10 text-white" />
               </div>
               <h4 className="text-white font-semibold mb-2">Engagement</h4>
-              <p className="text-3xl font-bold text-purple-400 mb-1">{analytics.averageApplicationsPerTender}</p>
-              <p className="text-gray-400 text-sm">Avg applications per tender</p>
+              <p className="text-3xl font-bold text-purple-400 mb-1">
+                {analytics.averageApplicationsPerTender}
+              </p>
+              <p className="text-gray-400 text-sm">
+                Avg applications per tender
+              </p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-10 h-10 text-white" />
               </div>
               <h4 className="text-white font-semibold mb-2">Growth</h4>
-              <p className="text-3xl font-bold text-emerald-400 mb-1">{changes.applications}</p>
-              <p className="text-gray-400 text-sm">Applications vs last month</p>
+              <p className="text-3xl font-bold text-emerald-400 mb-1">
+                {changes.applications}
+              </p>
+              <p className="text-gray-400 text-sm">
+                Applications vs last month
+              </p>
             </div>
           </div>
         </motion.div>
@@ -410,13 +481,20 @@ const Analytics = () => {
           transition={{ delay: 0.6 }}
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
         >
-          <h3 className="text-xl font-semibold text-white mb-6">Recent Activity</h3>
+          <h3 className="text-xl font-semibold text-white mb-6">
+            Recent Activity
+          </h3>
           <div className="space-y-4">
             {activity.length === 0 ? (
-              <div className="text-center text-gray-400">No recent activity</div>
+              <div className="text-center text-gray-400">
+                No recent activity
+              </div>
             ) : (
               activity.map((item, index) => (
-                <div key={index} className="flex items-center space-x-4 p-4 bg-slate-800/30 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center space-x-4 p-4 bg-slate-800/30 rounded-lg"
+                >
                   <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full flex items-center justify-center">
                     <item.icon className="w-5 h-5 text-white" />
                   </div>
@@ -424,7 +502,9 @@ const Analytics = () => {
                     <p className="text-white font-medium">{item.action}</p>
                     <p className="text-gray-400 text-sm">{item.tender}</p>
                   </div>
-                  <span className="text-gray-500 text-sm">{timeAgo(item.time)}</span>
+                  <span className="text-gray-500 text-sm">
+                    {timeAgo(item.time)}
+                  </span>
                 </div>
               ))
             )}

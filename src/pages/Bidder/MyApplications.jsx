@@ -7,6 +7,7 @@ import ConfirmDeleteModal from "../../components/UI/ConfirmDeleteModal";
 import EmptyState from "../../components/UI/EmptyState";
 import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import { applicationApi } from "../../services/api";
+import toast from "react-hot-toast";
 
 const MyApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -36,9 +37,11 @@ const MyApplications = () => {
   const handleWithdrawApplication = async (applicationId) => {
     try {
       await applicationApi.withdrawApplication(applicationId);
+      toast.success("Application withdrawn successfully");
       fetchApplications();
     } catch (error) {
       console.error("Error withdrawing application:", error);
+      toast.error("Failed to withdraw application");
     }
   };
 
@@ -105,11 +108,14 @@ const MyApplications = () => {
             setAppToWithdraw(null);
           }}
           onConfirm={() => {
-            if (appToWithdraw) handleWithdrawApplication(appToWithdraw._id || appToWithdraw.id);
+            if (appToWithdraw)
+              handleWithdrawApplication(appToWithdraw._id || appToWithdraw.id);
             setShowWithdrawModal(false);
             setAppToWithdraw(null);
           }}
-          itemName={`your application for "${appToWithdraw?.tender?.title || "this tender"}"`}
+          itemName={`your application for "${
+            appToWithdraw?.tender?.title || "this tender"
+          }"`}
           title="Withdraw Application"
           actionText="Withdraw"
           actionType="withdraw"

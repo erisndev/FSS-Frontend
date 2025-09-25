@@ -66,7 +66,7 @@ const ApplicationCard = ({ application, index, onView, onWithdraw }) => {
         <div className="flex items-center space-x-2 text-sm">
           <DollarSign className="w-4 h-4 text-cyan-400" />
           <span className="text-cyan-400 font-medium">
-            ${application.bidAmount?.toLocaleString()}
+            R{application.bidAmount?.toLocaleString()}
           </span>
           <span className="text-gray-400">proposed</span>
         </div>

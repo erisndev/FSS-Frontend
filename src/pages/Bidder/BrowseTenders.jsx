@@ -52,6 +52,10 @@ const BrowseTenders = () => {
     "Education",
     "Manufacturing",
     "Transportation",
+    "Legal Services",
+    "Financial Services",
+    "Engineering",
+    "Design",
   ];
 
   useEffect(() => {
@@ -115,6 +119,13 @@ const BrowseTenders = () => {
   };
 
   const openApplyModal = (tender) => {
+    // Block apply if closed/archived
+    const s = (tender?.status || "").toLowerCase();
+    if (s === "closed" || s === "archived") {
+      toast.error("This tender is not accepting applications.");
+      return;
+    }
+
     setSelectedTender(tender);
     setApplyForm({
       companyName: "",
@@ -184,6 +195,13 @@ const BrowseTenders = () => {
       };
 
       const tenderId = selectedTender._id || selectedTender.id;
+
+      // Extra guard on submission
+      const status = (selectedTender.status || "").toLowerCase();
+      if (status === "closed" || status === "archived") {
+        throw new Error("This tender is not accepting applications.");
+      }
+
       await applicationApi.applyToTender(tenderId, payload);
 
       toast.success("Application submitted successfully!");

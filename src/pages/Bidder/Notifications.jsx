@@ -1,258 +1,222 @@
-import React, { useState, useEffect } from "react";
-import { Bell, BellOff } from "lucide-react";
+import React, { useEffect, useState, useMemo } from "react";
+import { motion } from "framer-motion";
+import { Bell, BellOff, Check, Trash2, CheckCircle2, Clock } from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
-import NotificationCard from "../../components/UI/NotificationCard";
-import NotificationFilters from "../../components/UI/NotificationFilters";
-import ApplicationModal from "../../components/UI/ApplicationModal";
-import ConfirmDeleteModal from "../../components/UI/ConfirmDeleteModal";
-import EmptyState from "../../components/UI/EmptyState";
-import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import { notificationApi } from "../../services/api";
 import toast from "react-hot-toast";
 
+const formatTime = (date) => {
+  if (!date) return "";
+  const d = typeof date === "string" ? new Date(date) : date;
+  const diff = Date.now() - d.getTime();
+  const sec = Math.floor(diff / 1000);
+  if (sec < 60) return `${sec}s ago`;
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const day = Math.floor(hr / 24);
+  if (day < 30) return `${day}d ago`;
+  const mon = Math.floor(day / 30);
+  if (mon < 12) return `${mon}mo ago`;
+  const yr = Math.floor(mon / 12);
+  return `${yr}y ago`;
+};
+
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
-  const [filteredNotifications, setFilteredNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    category: "all", // all | unread | application | tender | account
-  });
+  const [error, setError] = useState("");
+  const [filter, setFilter] = useState("all"); // all | unread
 
-  // Modal states
-  const [selectedApplication, setSelectedApplication] = useState(null);
-  const [showApplicationModal, setShowApplicationModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [notificationToDelete, setNotificationToDelete] = useState(null);
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.isRead).length,
+    [notifications]
+  );
 
   useEffect(() => {
-    fetchNotifications();
+    let mounted = true;
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const list = await notificationApi.getMyNotifications();
+        const normalized = (list || []).map((n) => ({
+          id: n._id || n.id,
+          title:
+            n.title || (n.type ? String(n.type).replace(/[_:]/g, " ") : "Notification"),
+          message: n.message || n.body || n.description || "",
+          createdAt: n.createdAt || n.time || new Date().toISOString(),
+          isRead: n.isRead === true,
+        }));
+        normalized.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        if (mounted) setNotifications(normalized);
+      } catch (e) {
+        console.error("Failed to load notifications", e);
+        if (mounted) setError("Failed to load notifications");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  useEffect(() => {
-    filterNotifications();
-  }, [notifications, filters]);
-
-  const fetchNotifications = async () => {
+  const handleMarkAsRead = async (n) => {
     try {
-      setLoading(true);
-      const list = await notificationApi.getMyNotifications();
-      const normalized = (list || []).map((n) => ({
-        _id: n._id || n.id,
-        type: n.type || "general",
-        status: n.status || n.category || n.type || "info",
-        newStatus: n.status,
-        message: n.message || n.body || n.description || "",
-        isRead: n.isRead === true,
-        createdAt: n.createdAt || n.time || new Date().toISOString(),
-        tenderTitle: n.tenderTitle,
-        application: n.application,
-        applicationId: n.applicationId,
-      }));
-      // Sort newest first
-      normalized.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setNotifications(normalized);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-      toast.error("Failed to load notifications");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterNotifications = () => {
-    let filtered = [...notifications];
-
-    // Category filter
-    const cat = (filters.category || "all").toLowerCase();
-    if (cat === "unread") {
-      filtered = filtered.filter((n) => !n.isRead);
-    } else if (cat === "application") {
-      filtered = filtered.filter(
-        (n) => (n.category || n.type || "").toLowerCase() === "application"
-      );
-    } else if (cat === "tender") {
-      filtered = filtered.filter(
-        (n) => (n.category || n.type || "").toLowerCase() === "tender"
-      );
-    } else if (cat === "account") {
-      filtered = filtered.filter((n) => {
-        const t = (n.category || n.type || "").toLowerCase();
-        return t === "user" || t === "system";
-      });
-    }
-
-    // Sort by date (newest first)
-    filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    setFilteredNotifications(filtered);
-  };
-
-  const getNotificationCounts = () => {
-    const counts = {
-      // Categories
-      all: notifications.length,
-      unread: notifications.filter((n) => !n.isRead).length,
-      application: notifications.filter(
-        (n) => (n.category || n.type || "").toLowerCase() === "application"
-      ).length,
-      tender: notifications.filter(
-        (n) => (n.category || n.type || "").toLowerCase() === "tender"
-      ).length,
-      account: notifications.filter((n) => {
-        const t = (n.category || n.type || "").toLowerCase();
-        return t === "user" || t === "system";
-      }).length,
-
-      };
-    return counts;
-  };
-
-  const handleFilterChange = async (key, value) => {
-    if (key === "markAllAsRead") {
-      await handleMarkAllAsRead();
-      return;
-    }
-
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
-
-  const handleViewApplication = (notification) => {
-    if (notification.application) {
-      setSelectedApplication(notification.application);
-      setShowApplicationModal(true);
-    }
-  };
-
-  const handleMarkAsRead = async (notification) => {
-    try {
-      await notificationApi.markAsRead(notification._id);
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n._id === notification._id ? { ...n, isRead: true } : n
-        )
-      );
-      toast.success("Notification marked as read");
-    } catch (error) {
-      console.error("Error marking notification as read:", error);
-      toast.error("Failed to mark notification as read");
+      await notificationApi.markAsRead(n.id);
+      setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, isRead: true } : x)));
+      toast.success("Marked as read");
+    } catch (e) {
+      console.error("Failed to mark as read", e);
+      toast.error("Failed to mark as read");
     }
   };
 
   const handleMarkAllAsRead = async () => {
     try {
       await notificationApi.markAllAsRead();
-      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setNotifications((prev) => prev.map((x) => ({ ...x, isRead: true })));
       toast.success("All notifications marked as read");
-    } catch (error) {
-      console.error("Error marking all notifications as read:", error);
-      toast.error("Failed to mark all notifications as read");
+    } catch (e) {
+      console.error("Failed to mark all as read", e);
+      toast.error("Failed to mark all as read");
     }
   };
 
-  const handleDeleteNotification = async (notification) => {
-    setNotificationToDelete(notification);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDeleteNotification = async () => {
-    if (!notificationToDelete) return;
-
+  const handleClearAll = async () => {
     try {
-      // If backend supports single delete, call here
-      // await notificationApi.deleteNotification(notificationToDelete._id);
-
-      setNotifications((prev) =>
-        prev.filter((n) => n._id !== notificationToDelete._id)
-      );
-      toast.success("Notification deleted");
-    } catch (error) {
-      console.error("Error deleting notification:", error);
-      toast.error("Failed to delete notification");
-    } finally {
-      setShowDeleteModal(false);
-      setNotificationToDelete(null);
+      await notificationApi.clearNotifications();
+      setNotifications([]);
+      toast.success("Notifications cleared");
+    } catch (e) {
+      console.error("Failed to clear notifications", e);
+      toast.error("Failed to clear notifications");
     }
   };
 
-  if (loading) {
-    return (
-      <DashboardLayout
-        title="Notifications"
-        subtitle="Stay updated on your application status changes"
-      >
-        <LoadingSpinner />
-      </DashboardLayout>
-    );
-  }
+  const visible = useMemo(() => {
+    if (filter === "unread") return notifications.filter((n) => !n.isRead);
+    return notifications;
+  }, [notifications, filter]);
 
   return (
-    <DashboardLayout
-      title="Notifications"
-      subtitle="Stay updated on your application status changes"
-    >
+    <DashboardLayout title="Notifications" subtitle="Stay updated on your application status changes">
       <div className="space-y-6">
-        {/* Filters */}
-        <NotificationFilters
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          notificationCounts={getNotificationCounts()}
-        />
+        {/* Toolbar */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setFilter("all")}
+              className={`px-3 py-1 rounded-lg border text-sm transition ${
+                filter === "all"
+                  ? "bg-cyan-500/20 border-cyan-400/30 text-cyan-300"
+                  : "bg-slate-800/50 border-cyan-400/20 text-gray-300 hover:bg-slate-800"
+              }`}
+            >
+              All ({notifications.length})
+            </button>
+            <button
+              onClick={() => setFilter("unread")}
+              className={`px-3 py-1 rounded-lg border text-sm transition ${
+                filter === "unread"
+                  ? "bg-cyan-500/20 border-cyan-400/30 text-cyan-300"
+                  : "bg-slate-800/50 border-cyan-400/20 text-gray-300 hover:bg-slate-800"
+              }`}
+            >
+              Unread ({unreadCount})
+            </button>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleMarkAllAsRead}
+              className="px-3 py-1 rounded-lg border border-cyan-400/30 text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 text-sm"
+            >
+              <span className="inline-flex items-center gap-2">
+                <Check className="w-4 h-4" /> Mark all as read
+              </span>
+            </button>
+            <button
+              onClick={handleClearAll}
+              className="px-3 py-1 rounded-lg border border-red-400/30 text-red-300 bg-red-500/10 hover:bg-red-500/20 text-sm"
+            >
+              <span className="inline-flex items-center gap-2">
+                <Trash2 className="w-4 h-4" /> Clear all
+              </span>
+            </button>
+          </div>
+        </div>
 
-        {/* Notifications List */}
-        {filteredNotifications.length === 0 ? (
-          <EmptyState
-            icon={notifications.length === 0 ? BellOff : Bell}
-            title={
-              notifications.length === 0
-                ? "No notifications yet"
-                : "No notifications match your filter"
-            }
-            description={
-              notifications.length === 0
-                ? "You'll receive notifications here when your application statuses change."
-                : "Try adjusting your filter to see more notifications."
-            }
-          />
+        {/* Content */}
+        {loading ? (
+          <div className="p-6 text-center text-gray-400">Loading notifications...</div>
+        ) : error ? (
+          <div className="p-6 text-center text-red-400">{error}</div>
+        ) : visible.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-10 border border-cyan-400/20 rounded-xl bg-white/5">
+            {notifications.length === 0 ? (
+              <BellOff className="w-12 h-12 text-gray-400 mb-3" />
+            ) : (
+              <Bell className="w-12 h-12 text-gray-400 mb-3" />
+            )}
+            <div className="text-white font-semibold mb-1">
+              {notifications.length === 0 ? "No notifications yet" : "No unread notifications"}
+            </div>
+            <div className="text-gray-400 text-sm">
+              {notifications.length === 0
+                ? "You'll receive notifications here as activities occur."
+                : "You're all caught up!"}
+            </div>
+          </div>
         ) : (
-          <div className="space-y-4">
-            {filteredNotifications.map((notification, index) => (
-              <NotificationCard
-                key={notification._id}
-                notification={notification}
-                index={index}
-                onView={handleViewApplication}
-                onMarkAsRead={handleMarkAsRead}
-                onDelete={handleDeleteNotification}
-              />
+          <div className="space-y-3">
+            {visible.map((n, idx) => (
+              <motion.div
+                key={n.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                className={`p-4 rounded-xl border backdrop-blur-xl ${
+                  n.isRead
+                    ? "bg-white/5 border-gray-400/20"
+                    : "bg-cyan-500/10 border-cyan-400/30"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <CheckCircle2 className="w-5 h-5 text-cyan-400" />
+                      <div className="text-white font-medium truncate">
+                        {n.title}
+                      </div>
+                      {!n.isRead && <span className="w-2 h-2 bg-cyan-400 rounded-full" />}
+                    </div>
+                    {n.message && (
+                      <div className="text-gray-300 text-sm leading-relaxed break-words">
+                        {n.message}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-2">
+                      <Clock className="w-3.5 h-3.5" /> {formatTime(n.createdAt)}
+                    </div>
+                  </div>
+                  {!n.isRead && (
+                    <button
+                      onClick={() => handleMarkAsRead(n)}
+                      className="px-3 py-1 rounded-lg border border-cyan-400/30 text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 text-xs flex-shrink-0"
+                    >
+                      Mark as read
+                    </button>
+                  )}
+                </div>
+              </motion.div>
             ))}
           </div>
         )}
-
-        {/* Application Modal */}
-        <ApplicationModal
-          isOpen={showApplicationModal}
-          onClose={() => {
-            setShowApplicationModal(false);
-            setSelectedApplication(null);
-          }}
-          application={selectedApplication}
-        />
-
-        {/* Delete Confirmation Modal */}
-        <ConfirmDeleteModal
-          isOpen={showDeleteModal}
-          onClose={() => {
-            setShowDeleteModal(false);
-            setNotificationToDelete(null);
-          }}
-          onConfirm={confirmDeleteNotification}
-          itemName="this notification"
-          title="Delete Notification"
-          message="Are you sure you want to delete this notification? This action cannot be undone."
-        />
       </div>
     </DashboardLayout>
   );

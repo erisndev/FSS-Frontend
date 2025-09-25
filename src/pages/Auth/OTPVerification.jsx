@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Shield, ArrowLeft } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 const OTPVerification = () => {
   const {
@@ -104,6 +105,7 @@ const OTPVerification = () => {
       if (isRegistration) {
         // Verify registration OTP and get user
         const user = await verifyRegisterOTP(email, otpString);
+        toast.success("Registration successful");
 
         if (user && user.role) {
           const dashboardPath =
@@ -117,6 +119,7 @@ const OTPVerification = () => {
           setError(
             "Registration completed, but user info is missing. Please login."
           );
+          toast.error("Please login to continue");
           navigate("/login", { replace: true });
         }
       } else {

@@ -138,12 +138,12 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                 <span className="text-gray-400">Budget:</span>
                 <span className="text-cyan-400 font-semibold">
                   {tender.budgetMin || tender.budgetMax
-                    ? `$${Number(
+                    ? `R${Number(
                         tender.budgetMin || 0
-                      ).toLocaleString()} - $${Number(
+                      ).toLocaleString()} - R${Number(
                         tender.budgetMax || 0
                       ).toLocaleString()}`
-                    : `$${Number(tender.budget || 0).toLocaleString()}`}
+                    : `R${Number(tender.budget || 0).toLocaleString()}`}
                 </span>
               </div>
               <div className="flex justify-between items-center">

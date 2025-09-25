@@ -14,9 +14,11 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import ApplicationModal from "../../components/UI/ApplicationModal";
+import StatusChangeModal from "../../components/UI/StatusChangeModal";
 import { tenderApi, applicationApi } from "../../services/api";
 import { format } from "date-fns";
 import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 const ReviewApplications = () => {
   const { user } = useAuth();
@@ -109,11 +111,13 @@ const ReviewApplications = () => {
         normalized,
         comment
       );
+      toast.success(`Application status changed successfully`);
       fetchApplications(selectedTender._id || selectedTender.id);
       setShowStatusModal(false);
       setStatusAction("");
       setSelectedApplication(null);
     } catch (error) {
+      toast.error("Failed to update application status");
       console.error("Error updating application status:", error);
     }
   };
@@ -164,105 +168,6 @@ const ReviewApplications = () => {
     const d = new Date(date);
     if (isNaN(d.getTime())) return "Invalid Date";
     return format(d, formatStr);
-  };
-
-  const StatusChangeModal = ({ application, action, onClose, onSubmit }) => {
-    const [localComment, setLocalComment] = useState("");
-    const [submitting, setSubmitting] = useState(false);
-
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-        onClick={onClose}
-      >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6 max-w-md w-full"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-white">
-              {action} Application
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-white transition-colors duration-200"
-            >
-              x
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            <div className="p-4 bg-slate-800/30 rounded-lg border border-cyan-400/10">
-              <p className="text-white font-medium">
-                {application?.companyName}
-              </p>
-              <p className="text-gray-400 text-sm">{application?.email}</p>
-              <p className="text-cyan-400 text-sm">
-                Bid Amount: ${application?.bidAmount?.toLocaleString()}
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Comment (Optional)
-              </label>
-              <textarea
-                value={localComment}
-                onChange={(e) => setLocalComment(e.target.value)}
-                rows={4}
-                className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300 resize-none"
-                placeholder="Add a comment about this decision..."
-              />
-            </div>
-
-            <div className="flex items-center justify-end space-x-4">
-              <button
-                onClick={onClose}
-                disabled={submitting}
-                aria-disabled={submitting}
-                className={`px-4 py-2 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg transition-all duration-300 ${
-                  submitting ? "opacity-60 cursor-not-allowed" : "hover:bg-slate-800/70"
-                }`}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  try {
-                    setSubmitting(true);
-                    await onSubmit(localComment);
-                  } finally {
-                    setSubmitting(false);
-                  }
-                }}
-                disabled={submitting}
-                aria-busy={submitting}
-                className={`px-4 py-2 border rounded-lg transition-all duration-300 flex items-center justify-center ${
-                  action === "Accept"
-                    ? "bg-green-500/20 border-green-400/30 text-green-400 hover:bg-green-500/30"
-                    : "bg-red-500/20 border-red-400/30 text-red-400 hover:bg-red-500/30"
-                } ${submitting ? "opacity-80 cursor-wait" : ""}`}
-              >
-                {submitting ? (
-                  <span className="flex items-center space-x-2">
-                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-                    <span>{action === "Accept" ? "Accepting..." : "Rejecting..."}</span>
-                  </span>
-                ) : (
-                  <span>{action} Application</span>
-                )}
-              </button>
-            </div>
-          </div>
-        </motion.div>
-      </motion.div>
-    );
   };
 
   if (loading) {
@@ -326,7 +231,8 @@ const ReviewApplications = () => {
                   value={tender._id || tender.id}
                   className="bg-slate-800 text-white"
                 >
-                  {tender.title} ({tender.applicationsCount || 0} applications)
+                  {tender.title} ({tender.applications.length || 0}{" "}
+                  applications)
                 </option>
               ))}
             </select>
@@ -389,7 +295,7 @@ const ReviewApplications = () => {
                           <span className="flex items-center space-x-1">
                             <DollarSign className="w-4 h-4 text-cyan-400" />
                             <span className="text-cyan-400">
-                              ${application.bidAmount?.toLocaleString()}
+                              R{application.bidAmount?.toLocaleString()}
                             </span>
                           </span>
                           <span className="flex items-center space-x-1">
@@ -476,13 +382,13 @@ const ReviewApplications = () => {
               setSelectedApplication(null);
               setStatusAction("");
             }}
-            onSubmit={(comment) => {
+            onSubmit={(comment) =>
               handleStatusUpdate(
                 selectedApplication._id || selectedApplication.id,
                 statusAction,
                 comment
-              );
-            }}
+              )
+            }
           />
         )}
       </div>

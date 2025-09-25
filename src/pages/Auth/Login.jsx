@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Shield, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const { user, login, loading, resendRegisterOTP } = useAuth();
@@ -33,6 +34,7 @@ const Login = () => {
 
     try {
       await login(formData.email, formData.password);
+      toast.success("Login successful");
     } catch (err) {
       if (
         err.message.includes("email not verified") ||
@@ -41,6 +43,7 @@ const Login = () => {
         try {
           // Send OTP before redirect
           await resendRegisterOTP(formData.email);
+          toast.success("OTP resent to your email");
         } catch (otpError) {
           console.error("Failed to send OTP:", otpError.message);
         }
@@ -54,7 +57,7 @@ const Login = () => {
         });
         return;
       }
-
+      toast.error("Login failed");
       setError(err.message);
     } finally {
       setIsLoading(false);
