@@ -287,7 +287,10 @@ const ApplyForm = ({
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-3 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg hover:bg-slate-800/70 transition-all duration-300"
+          disabled={loading}
+          className={`px-6 py-3 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg transition-all duration-300 ${
+            loading ? "opacity-50 cursor-not-allowed" : "hover:bg-slate-800/70"
+          }`}
         >
           Cancel
         </button>

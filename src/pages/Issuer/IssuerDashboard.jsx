@@ -14,6 +14,7 @@ import {
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import ViewTenderModal from "../../components/UI/ViewTenderModal";
 import ApplicationModal from "../../components/UI/ApplicationModal";
+import CreateTenderModal from "../../components/UI/CreateTenderModal";
 import { tenderApi, applicationApi } from "../../services/api";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +39,7 @@ const IssuerDashboard = () => {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showTenderModal, setShowTenderModal] = useState(false);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -131,10 +133,11 @@ const IssuerDashboard = () => {
 
   const handleViewApplication = (application) => {
     // Find the tender for this application
-    const tender = recentTenders.find(t => 
-      t._id === application.tenderId || 
-      t.id === application.tenderId ||
-      application.tenderTitle === t.title
+    const tender = recentTenders.find(
+      (t) =>
+        t._id === application.tenderId ||
+        t.id === application.tenderId ||
+        application.tenderTitle === t.title
     );
     console.log("Selected tender for application:", tender);
     setSelectedTender(tender || null);
@@ -143,16 +146,27 @@ const IssuerDashboard = () => {
   };
 
   const handleStatusUpdate = async (applicationId, status, comment = "") => {
-    console.log("IssuerDashboard handleStatusUpdate called with:", { applicationId, status, comment });
+    console.log("IssuerDashboard handleStatusUpdate called with:", {
+      applicationId,
+      status,
+      comment,
+    });
     try {
-      const normalizedStatus = status.toLowerCase().replace('accept', 'accepted').replace('reject', 'rejected');
+      const normalizedStatus = status
+        .toLowerCase()
+        .replace("accept", "accepted")
+        .replace("reject", "rejected");
       console.log("Normalized status:", normalizedStatus);
-      await applicationApi.updateApplicationStatus(applicationId, normalizedStatus, comment);
+      await applicationApi.updateApplicationStatus(
+        applicationId,
+        normalizedStatus,
+        comment
+      );
       toast.success(`Application ${normalizedStatus} successfully`);
-      
+
       // Refresh the dashboard data
       await fetchDashboardData();
-      
+
       // Close the modal
       setShowApplicationModal(false);
       setSelectedApplication(null);
@@ -228,7 +242,9 @@ const IssuerDashboard = () => {
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-gray-400 text-sm font-medium mb-2">{stat.title}</p>
+                  <p className="text-gray-400 text-sm font-medium mb-2">
+                    {stat.title}
+                  </p>
                   <p className="text-3xl font-bold text-white">
                     {stat.value.toLocaleString()}
                   </p>
@@ -236,7 +252,9 @@ const IssuerDashboard = () => {
                 <div
                   className={`w-14 h-14 rounded-xl ${stat.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                 >
-                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
+                  <div
+                    className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}
+                  >
                     <stat.icon className="w-5 h-5 text-white" />
                   </div>
                 </div>
@@ -302,7 +320,7 @@ const IssuerDashboard = () => {
                     </span>
                     <div className="flex items-center space-x-2">
                       <span className="text-gray-400 text-sm">
-                        {tender.applicationsCount || 0} applications
+                        {tender.applications.length || 0} applications
                       </span>
                       <button
                         onClick={() => handleViewTender(tender)}
@@ -400,7 +418,7 @@ const IssuerDashboard = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <button
-              onClick={() => navigate("/issuer/create-tender")}
+              onClick={() => setShowCreateModal(true)}
               className="flex items-center space-x-3 p-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 rounded-lg hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
             >
               <Plus className="w-5 h-5 text-cyan-400" />
@@ -447,6 +465,15 @@ const IssuerDashboard = () => {
         tender={selectedTender}
         user={user}
         onStatusUpdate={handleStatusUpdate}
+      />
+
+      <CreateTenderModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={() => {
+          fetchDashboardData();
+          toast.success("Tender created successfully!");
+        }}
       />
     </DashboardLayout>
   );

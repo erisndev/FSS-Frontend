@@ -84,6 +84,8 @@ const TenderManagement = () => {
         return "text-green-400 bg-green-400/20 border-green-400/30";
       case "closed":
         return "text-red-400 bg-red-400/20 border-red-400/30";
+      case "archived":
+        return "text-blue-400 bg-blue-400/20 border-blue-400/30";
       case "cancelled":
         return "text-gray-400 bg-gray-400/20 border-gray-400/30";
       default:
@@ -158,6 +160,7 @@ const TenderManagement = () => {
                 <option value="">All Status</option>
                 <option value="ACTIVE">Active</option>
                 <option value="CLOSED">Closed</option>
+                <option value="ARCHIVED">Archived</option>
                 <option value="CANCELLED">Cancelled</option>
               </select>
             </div>

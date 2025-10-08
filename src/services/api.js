@@ -107,10 +107,6 @@ export const tenderApi = {
     return res.data;
   },
   updateTender: async (id, formData) => {
-    console.log("FormData contents:");
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
     const res = await api.put(`/tenders/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -165,9 +161,7 @@ export const applicationApi = {
       payload.comment = comment;
       payload.message = comment;
     }
-    console.log("Sending update to API:", { id, payload });
     const res = await api.put(`/applications/${id}/status`, payload);
-    console.log("API response:", res.data);
     return res.data;
   },
   withdrawApplication: async (id) => {
@@ -214,6 +208,44 @@ export const notificationApi = {
   },
   clearNotifications: async () => {
     const res = await api.delete("/notifications/clear");
+    return res.data;
+  },
+};
+
+// ---------------- VERIFICATION CODE API ----------------
+export const verificationCodeApi = {
+  // Bidder actions
+  requestCode: async (tenderId) => {
+    const res = await api.post(`/verification-code/request/${tenderId}`);
+    return res.data;
+  },
+  verifyCode: async (tenderId, code) => {
+    const res = await api.post(`/verification-code/verify/${tenderId}`, {
+      verificationCode: code,
+    });
+    return res.data;
+  },
+
+  checkStatus: async (tenderId) => {
+    const res = await api.get(`/verification-code/status/${tenderId}`);
+    return res.data;
+  },
+  getMyRequests: async () => {
+    const res = await api.get(`/verification-code/my-requests`);
+    return res.data;
+  },
+
+  // Admin/Issuer actions
+  getAllRequests: async () => {
+    const res = await api.get(`/verification-code/requests`);
+    return res.data;
+  },
+  approveRequest: async (requestId) => {
+    const res = await api.put(`/verification-code/approve/${requestId}`);
+    return res.data;
+  },
+  rejectRequest: async (requestId) => {
+    const res = await api.put(`/verification-code/reject/${requestId}`);
     return res.data;
   },
 };

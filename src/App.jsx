@@ -17,15 +17,16 @@ import ResetPassword from "./pages/Auth/ResetPassword";
 import BidderDashboard from "./pages/Bidder/BidderDashboard";
 import BrowseTenders from "./pages/Bidder/BrowseTenders";
 import MyApplications from "./pages/Bidder/MyApplications";
+import MyVerificationRequests from "./pages/Bidder/MyVerificationRequests";
 import Notifications from "./pages/Bidder/Notifications";
 
 // Issuer Pages
 import IssuerDashboard from "./pages/Issuer/IssuerDashboard";
-import CreateTender from "./pages/Issuer/CreateTender";
 import ManageTenders from "./pages/Issuer/ManageTenders";
 import ReviewApplications from "./pages/Issuer/ReviewApplications";
 import Analytics from "./pages/Issuer/Analytics";
 import EditTender from "./components/UI/EditTender";
+import IssuerVerificationRequests from "./pages/Issuer/VerificationRequests";
 
 // Admin Pages
 import AdminDashboard from "./pages/Admin/AdminDashboard";
@@ -35,6 +36,7 @@ import ApplicationManagement from "./pages/Admin/ApplicationManagement";
 import SystemSettings from "./pages/Admin/SystemSettings";
 import AdminNotifications from "./pages/Admin/Notifications";
 import IssuerNotifications from "./pages/Issuer/Notifications";
+import AdminVerificationRequests from "./pages/Admin/VerificationRequests";
 
 // Shared Pages
 import Profile from "./pages/Profile/Profile";
@@ -78,6 +80,14 @@ function App() {
             }
           />
           <Route
+            path="/bidder/verification-requests"
+            element={
+              <ProtectedRoute roles={["bidder"]}>
+                <MyVerificationRequests />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/bidder/profile"
             element={
               <ProtectedRoute roles={["bidder"]}>
@@ -100,14 +110,6 @@ function App() {
             element={
               <ProtectedRoute roles={["issuer"]}>
                 <IssuerDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/issuer/create-tender"
-            element={
-              <ProtectedRoute roles={["issuer"]}>
-                <CreateTender />
               </ProtectedRoute>
             }
           />
@@ -157,6 +159,14 @@ function App() {
             element={
               <ProtectedRoute roles={["issuer"]}>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/issuer/verification-requests"
+            element={
+              <ProtectedRoute roles={["issuer"]}>
+                <IssuerVerificationRequests />
               </ProtectedRoute>
             }
           />
@@ -215,6 +225,14 @@ function App() {
             element={
               <ProtectedRoute roles={["admin"]}>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/verification-requests"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminVerificationRequests />
               </ProtectedRoute>
             }
           />

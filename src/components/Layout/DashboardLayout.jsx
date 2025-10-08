@@ -16,12 +16,18 @@ const DashboardLayout = ({ children, title, subtitle }) => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Sidebar />
 
-      {/* Main content */}
+      {/* Main content - Responsive padding and margins */}
       <div
-        className={`${isMobile ? "ml-0" : "ml-64"} transition-all duration-300`}
+        className={`${
+          isMobile ? "ml-0" : "ml-64"
+        } transition-all duration-300 min-h-screen`}
       >
         <Header title={title} subtitle={subtitle} />
-        <main className="p-4 sm:p-6">{children}</main>
+        <main className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
+          <div className="w-full max-w-[1920px] mx-auto">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import {
   User,
   Menu,
   X,
+  ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import NotificationBadge from "../UI/NotificationBadge";
@@ -52,6 +53,11 @@ const Sidebar = () => {
             path: "/bidder/applications",
             icon: FileText,
           },
+          {
+            name: "Verification Requests",
+            path: "/bidder/verification-requests",
+            icon: ShieldCheck,
+          },
           { name: "Notifications", path: "/bidder/notifications", icon: Bell },
           { name: "Profile", path: "/bidder/profile", icon: User },
         ];
@@ -59,11 +65,15 @@ const Sidebar = () => {
         return [
           { name: "Dashboard", path: "/issuer", icon: Home },
           { name: "My Tenders", path: "/issuer/tenders", icon: FileText },
-          { name: "Create Tender", path: "/issuer/create-tender", icon: Plus },
           {
             name: "Applications",
             path: "/issuer/applications",
             icon: Briefcase,
+          },
+          {
+            name: "Verification Requests",
+            path: "/issuer/verification-requests",
+            icon: ShieldCheck,
           },
           { name: "Analytics", path: "/issuer/analytics", icon: BarChart3 },
           { name: "Notifications", path: "/issuer/notifications", icon: Bell },
@@ -82,6 +92,11 @@ const Sidebar = () => {
             name: "Applications",
             path: "/admin/applications",
             icon: Briefcase,
+          },
+          {
+            name: "Verification Requests",
+            path: "/admin/verification-requests",
+            icon: ShieldCheck,
           },
           { name: "Notifications", path: "/admin/notifications", icon: Bell },
           { name: "Profile", path: "/admin/profile", icon: User },
@@ -126,8 +141,9 @@ const Sidebar = () => {
     <div
       className={`${
         isMobileVersion ? "p-4 pt-16" : "p-6"
-      } h-full overflow-y-auto`}
+      } h-full flex flex-col`}
     >
+      <div className="flex-1 overflow-y-auto">
       {/* Logo */}
       <div className="flex items-center space-x-3 mb-6 lg:mb-8">
         <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
@@ -185,18 +201,17 @@ const Sidebar = () => {
                   {item.name}
                 </span>
               </div>
-              {item.name === "Notifications" && (
-                <NotificationBadge />
-              )}
+              {item.name === "Notifications" && <NotificationBadge />}
             </NavLink>
           );
         })}
       </nav>
 
+      </div>
       {/* Logout Button */}
       <button
         onClick={() => setShowLogoutModal(true)}
-        className="flex items-center space-x-3 p-2.5 lg:p-3 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 active:bg-red-500/20 transition-all duration-300 mt-6 lg:mt-8 w-full touch-manipulation"
+        className="flex items-center space-x-3 p-2.5 lg:p-3 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 active:bg-red-500/20 transition-all duration-300 w-full touch-manipulation"
       >
         <LogOut className="w-5 h-5 flex-shrink-0" />
         <span className="font-medium text-sm lg:text-base">Logout</span>
@@ -231,6 +246,13 @@ const Sidebar = () => {
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border-r border-cyan-400/20 shadow-2xl z-50 lg:hidden"
             >
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close sidebar"
+                className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-cyan-400/20 text-cyan-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
               <SidebarContent isMobileVersion={true} />
             </motion.div>
           </>

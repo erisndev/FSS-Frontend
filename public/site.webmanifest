@@ -1,0 +1,17 @@
+{
+  "name": "TenderFlow Management System",
+  "short_name": "TenderFlow",
+  "description": "The Future of Tender Management - Streamline your procurement process",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#00bcd4",
+  "background_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

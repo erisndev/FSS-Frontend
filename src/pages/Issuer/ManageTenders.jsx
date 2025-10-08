@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import ViewTenderModal from "../../components/UI/ViewTenderModal";
+import CreateTenderModal from "../../components/UI/CreateTenderModal";
 import { tenderApi } from "../../services/api";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +31,7 @@ const ManageTenders = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedTender, setSelectedTender] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     fetchTenders();
@@ -68,6 +70,8 @@ const ManageTenders = () => {
         return "text-green-400 bg-green-400/20 border-green-400/30";
       case "closed":
         return "text-red-400 bg-red-400/20 border-red-400/30";
+      case "archived":
+        return "text-blue-400 bg-blue-400/20 border-blue-400/30";
       case "cancelled":
         return "text-gray-400 bg-gray-400/20 border-gray-400/30";
       default:
@@ -150,13 +154,14 @@ const ManageTenders = () => {
                 <option value="">All Status</option>
                 <option value="ACTIVE">Active</option>
                 <option value="CLOSED">Closed</option>
+                <option value="ARCHIVED">Archived</option>
                 <option value="CANCELLED">Cancelled</option>
               </select>
             </div>
           </div>
 
           <button
-            onClick={() => navigate("/issuer/create-tender")}
+            onClick={() => setShowCreateModal(true)}
             className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300"
           >
             <Plus className="w-5 h-5" />
@@ -325,6 +330,15 @@ const ManageTenders = () => {
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
         tender={selectedTender}
+      />
+
+      <CreateTenderModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={() => {
+          fetchTenders();
+          toast.success("Tender created successfully!");
+        }}
       />
     </DashboardLayout>
   );

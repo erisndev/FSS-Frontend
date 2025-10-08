@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Search, X, FileText } from "lucide-react";
+import { Bell, X, FileText } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { notificationApi } from "../../services/api";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +36,6 @@ const Header = ({ title, subtitle }) => {
       : "/bidder/notifications";
 
   const [isMobile, setIsMobile] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const [notifications, setNotifications] = useState([]);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -157,7 +156,7 @@ const Header = ({ title, subtitle }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             ref={notifMenuRef}
-            className="absolute right-0 mt-2 w-80 sm:w-96 z-[9999]"
+            className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto mt-2 w-80 sm:w-96 z-[9000]"
           >
             <div className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden">
               <div className="px-4 py-3 border-b border-cyan-400/10 flex items-center justify-between">
@@ -255,7 +254,7 @@ const Header = ({ title, subtitle }) => {
     <motion.header
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="lg:sticky lg:top-0 z-[200] bg-gradient-to-r from-slate-800/50 to-purple-900/30 backdrop-blur-xl border-b border-cyan-400/20 p-3 sm:p-4 lg:p-6"
+      className="relative lg:sticky lg:top-0 z-40 bg-gradient-to-r from-slate-800/50 to-purple-900/30 backdrop-blur-xl border-b border-cyan-400/20 p-3 sm:p-4 lg:p-6"
     >
       {/* Mobile Layout */}
       {isMobile ? (
@@ -306,48 +305,7 @@ const Header = ({ title, subtitle }) => {
             )}
           </div>
 
-          {/* Search row */}
-          <div className="flex justify-center">
-            <AnimatePresence>
-              {!isSearchOpen ? (
-                <motion.button
-                  key="search-button"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ delay: 0.2 }}
-                  onClick={() => setIsSearchOpen(true)}
-                  className="p-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300 active:scale-95"
-                >
-                  <Search className="w-5 h-5 text-cyan-400" />
-                </motion.button>
-              ) : (
-                <motion.div
-                  key="search-input"
-                  initial={{ opacity: 0, width: 0 }}
-                  animate={{ opacity: 1, width: "100%" }}
-                  exit={{ opacity: 0, width: 0 }}
-                  className="relative flex items-center max-w-sm"
-                >
-                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2 z-10" />
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    autoFocus
-                    className="w-full bg-slate-800/50 border border-cyan-400/20 rounded-lg pl-10 pr-10 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-                    onBlur={() => setIsSearchOpen(false)}
-                  />
-                  <button
-                    onClick={() => setIsSearchOpen(false)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
+                  </div>
       ) : (
         /* Desktop Layout */
         <div className="flex items-center justify-between">
@@ -372,21 +330,7 @@ const Header = ({ title, subtitle }) => {
             )}
           </div>
           <div className="flex items-center space-x-4">
-            {/* Search - Desktop */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="relative"
-            >
-              <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="bg-slate-800/50 border border-cyan-400/20 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-              />
-            </motion.div>
-
+            
             {/* Notifications - Desktop */}
             <NotificationBell />
 

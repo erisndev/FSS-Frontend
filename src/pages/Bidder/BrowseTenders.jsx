@@ -5,6 +5,7 @@ import ViewTenderModal from "../../components/UI/ViewTenderModal";
 import TenderFilters from "../../components/UI/TenderFilters";
 import TenderCard from "../../components/UI/TenderCard";
 import ApplyModal from "../../components/UI/ApplyModal";
+import VerificationModal from "../../components/UI/VerificationModal";
 import EmptyState from "../../components/UI/EmptyState";
 import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import { tenderApi, applicationApi } from "../../services/api";
@@ -25,6 +26,8 @@ const BrowseTenders = () => {
   const [selectedTender, setSelectedTender] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showApplyModal, setShowApplyModal] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
   const [applyForm, setApplyForm] = useState({
     companyName: "", // bidder's name or company name
@@ -42,6 +45,7 @@ const BrowseTenders = () => {
 
   const [applyLoading, setApplyLoading] = useState(false);
   const [applyError, setApplyError] = useState("");
+  const [appliedTenderIds, setAppliedTenderIds] = useState(new Set());
 
   const categories = [
     "Construction",
@@ -74,6 +78,22 @@ const BrowseTenders = () => {
     }
   };
 
+  const fetchMyApplications = async () => {
+    try {
+      const apps = await applicationApi.getMyApplications();
+      const ids = (apps || [])
+        .map((a) => a?.tender?._id || a?.tender?.id || a?.tenderId)
+        .filter(Boolean);
+      setAppliedTenderIds(new Set(ids));
+    } catch (error) {
+      console.error("Error fetching my applications:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMyApplications();
+  }, []);
+
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({
       ...prev,
@@ -97,6 +117,8 @@ const BrowseTenders = () => {
         return "text-green-400 bg-green-400/20";
       case "CLOSED":
         return "text-red-400 bg-red-400/20";
+      case "ARCHIVED":
+        return "text-blue-400 bg-blue-400/20";
       case "CANCELLED":
         return "text-gray-400 bg-gray-400/20";
       default:
@@ -126,20 +148,61 @@ const BrowseTenders = () => {
       return;
     }
 
+    const tenderId = tender?._id || tender?.id;
+    if (!tenderId) {
+      toast.error("Invalid tender.");
+      return;
+    }
+
+    // Prevent re-applying if already applied
+    if (appliedTenderIds.has(tenderId)) {
+      toast.success("You have already applied to this tender.");
+      return;
+    }
+
     setSelectedTender(tender);
-    setApplyForm({
-      companyName: "",
-      registrationNumber: "",
-      bbeeLevel: "",
-      cidbGrading: "",
-      contactPerson: "",
-      email: "",
-      phone: "",
-      bidAmount: "",
-      timeframe: "",
-      message: "",
-      files: [],
-    });
+    setIsVerified(false);
+
+    // Show verification modal first
+    setShowVerificationModal(true);
+  };
+
+  const handleVerificationSuccess = () => {
+    setIsVerified(true);
+    setShowVerificationModal(false);
+
+    // Now open the apply modal
+    const tenderId = selectedTender?._id || selectedTender?.id;
+
+    // Try to restore draft
+    const draftKey = `applyDraft:${tenderId}`;
+    let restored = null;
+    try {
+      const saved = localStorage.getItem(draftKey);
+      if (saved) restored = JSON.parse(saved);
+    } catch (e) {
+      console.error("Failed to parse saved apply draft", e);
+    }
+
+    if (restored) {
+      setApplyForm({ ...restored, files: [] });
+      toast.success("Draft restored from your last session.");
+    } else {
+      setApplyForm({
+        companyName: "",
+        registrationNumber: "",
+        bbeeLevel: "",
+        cidbGrading: "",
+        contactPerson: "",
+        email: "",
+        phone: "",
+        bidAmount: "",
+        timeframe: "",
+        message: "",
+        files: [],
+      });
+    }
+
     setApplyError("");
     setShowApplyModal(true);
   };
@@ -207,6 +270,17 @@ const BrowseTenders = () => {
       toast.success("Application submitted successfully!");
       setShowApplyModal(false);
 
+      // Clear saved draft and mark as applied
+      try {
+        const draftKey = `applyDraft:${tenderId}`;
+        localStorage.removeItem(draftKey);
+      } catch {}
+      setAppliedTenderIds((prev) => {
+        const next = new Set(prev);
+        next.add(tenderId);
+        return next;
+      });
+
       // Reset form
       setApplyForm({
         companyName: "",
@@ -240,6 +314,19 @@ const BrowseTenders = () => {
     return (bytes / Math.pow(k, i)).toFixed(2) + " " + sizes[i];
   };
 
+  // Persist apply form draft per tender while modal is open (exclude files)
+  useEffect(() => {
+    if (!showApplyModal || !selectedTender) return;
+    const tenderId = selectedTender._id || selectedTender.id;
+    const draftKey = `applyDraft:${tenderId}`;
+    const { files, ...rest } = applyForm || {};
+    try {
+      localStorage.setItem(draftKey, JSON.stringify(rest));
+    } catch (e) {
+      console.error("Failed to save apply draft", e);
+    }
+  }, [applyForm, showApplyModal, selectedTender]);
+
   return (
     <DashboardLayout
       title="Browse Tenders"
@@ -268,6 +355,7 @@ const BrowseTenders = () => {
                 index={index}
                 onView={openViewModal}
                 onApply={openApplyModal}
+                isApplied={appliedTenderIds.has(tender._id || tender.id)}
               />
             ))}
           </div>
@@ -287,6 +375,13 @@ const BrowseTenders = () => {
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
         tender={selectedTender}
+      />
+
+      <VerificationModal
+        isOpen={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+        tender={selectedTender}
+        onVerified={handleVerificationSuccess}
       />
 
       <ApplyModal
