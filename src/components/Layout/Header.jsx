@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, X, FileText } from "lucide-react";
+import { Bell, X, FileText, User, LogOut } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { notificationApi } from "../../services/api";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +25,7 @@ function timeAgo(date) {
 }
 
 const Header = ({ title, subtitle }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const role = (user?.role || "").toLowerCase();
   const navigate = useNavigate();
   const notificationsPath =
@@ -44,6 +44,11 @@ const Header = ({ title, subtitle }) => {
 
   const notifBtnRef = useRef(null);
   const notifMenuRef = useRef(null);
+  const userBtnRef = useRef(null);
+  const userMenuRef = useRef(null);
+
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Check if device is mobile
   useEffect(() => {
@@ -69,6 +74,20 @@ const Header = ({ title, subtitle }) => {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [notifOpen]);
+
+  // Click outside to close user menu
+  useEffect(() => {
+    const handler = (e) => {
+      if (!userMenuOpen) return;
+      const btn = userBtnRef.current;
+      const menu = userMenuRef.current;
+      if (btn && btn.contains(e.target)) return;
+      if (menu && menu.contains(e.target)) return;
+      setUserMenuOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [userMenuOpen]);
 
   // Fetch notifications via API
   const fetchNotifications = async () => {
@@ -106,16 +125,45 @@ const Header = ({ title, subtitle }) => {
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
-
-  useEffect(() => {
+    
     const interval = setInterval(() => {
       fetchNotifications();
-    }, 5000);
+    }, 30000); // Changed to 30 seconds to reduce re-renders
+    
     return () => clearInterval(interval);
   }, []);
 
   const unreadCount = useMemo(() => notifications.length, [notifications]);
+
+  // Get user initials
+  const getUserInitials = (name) => {
+    if (!name) return "U";
+    const parts = name.trim().split(" ");
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  };
+
+  const handleLogout = () => {
+    setUserMenuOpen(false);
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    logout();
+    setShowLogoutModal(false);
+    navigate("/login");
+  };
+
+  const handleProfile = () => {
+    setUserMenuOpen(false);
+    const profilePath =
+      role === "admin"
+        ? "/admin/profile"
+        : role === "issuer"
+        ? "/issuer/profile"
+        : "/bidder/profile";
+    navigate(profilePath);
+  };
 
   const handleViewNotification = (n) => {
     setNotifOpen(false);
@@ -133,9 +181,13 @@ const Header = ({ title, subtitle }) => {
   };
 
   const NotificationBell = () => (
-    <div className="relative" ref={notifBtnRef}>
+    <div className="relative">
       <button
-        onClick={() => setNotifOpen((v) => !v)}
+        ref={notifBtnRef}
+        onClick={(e) => {
+          e.stopPropagation();
+          setNotifOpen((v) => !v);
+        }}
         aria-haspopup="true"
         aria-expanded={notifOpen}
         className="relative p-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
@@ -149,16 +201,18 @@ const Header = ({ title, subtitle }) => {
       </button>
 
       {/* Dropdown */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {notifOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
             ref={notifMenuRef}
-            className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto mt-2 w-80 sm:w-96 z-[9000]"
+            className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto lg:mt-2 w-80 sm:w-96 z-[9999]"
+            style={{ pointerEvents: 'auto' }}
           >
-            <div className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden">
+            <div className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
               <div className="px-4 py-3 border-b border-cyan-400/10 flex items-center justify-between">
                 <span className="text-white font-semibold">Notifications</span>
                 <button
@@ -250,12 +304,86 @@ const Header = ({ title, subtitle }) => {
     </div>
   );
 
+  const UserMenu = () => (
+    <div className="relative">
+      <button
+        ref={userBtnRef}
+        onClick={(e) => {
+          e.stopPropagation();
+          setUserMenuOpen((v) => !v);
+        }}
+        aria-haspopup="true"
+        aria-expanded={userMenuOpen}
+        className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm hover:ring-2 hover:ring-cyan-400/50 transition-all duration-300"
+      >
+        {getUserInitials(user?.name)}
+      </button>
+
+      {/* Dropdown */}
+      <AnimatePresence mode="wait">
+        {userMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            ref={userMenuRef}
+            className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto lg:mt-2 w-72 z-[9999]"
+            style={{ pointerEvents: 'auto' }}
+          >
+            <div className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              {/* User Info Section */}
+              <div className="px-4 py-4 border-b border-cyan-400/10">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
+                    {getUserInitials(user?.name)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-semibold truncate">
+                      {user?.name}
+                    </p>
+                    <p className="text-cyan-400/70 text-sm capitalize">
+                      {user?.role}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-cyan-400/10">
+                  <p className="text-gray-400 text-xs">Email</p>
+                  <p className="text-white text-sm truncate">{user?.email}</p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="p-2">
+                <button
+                  onClick={handleProfile}
+                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-cyan-400/10 transition-colors text-left"
+                >
+                  <User className="w-5 h-5 text-cyan-400" />
+                  <span className="text-white font-medium">Profile</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-red-500/10 transition-colors text-left"
+                >
+                  <LogOut className="w-5 h-5 text-red-400" />
+                  <span className="text-white font-medium">Logout</span>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+
   return (
-    <motion.header
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative lg:sticky lg:top-0 z-40 bg-gradient-to-r from-slate-800/50 to-purple-900/30 backdrop-blur-xl border-b border-cyan-400/20 p-3 sm:p-4 lg:p-6"
-    >
+    <>
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative lg:sticky lg:top-0 z-40 bg-gradient-to-r from-slate-800/50 to-purple-900/30 backdrop-blur-xl border-b border-cyan-400/20 p-3 sm:p-4 lg:p-6"
+      >
       {/* Mobile Layout */}
       {isMobile ? (
         <div className="space-y-3">
@@ -269,17 +397,13 @@ const Header = ({ title, subtitle }) => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex items-center space-x-2 flex-1 justify-end min-w-0"
+              className="flex items-center space-x-2"
             >
-              <div className="text-right min-w-0 flex-1 max-w-[200px] sm:max-w-none">
-                <p className="text-white font-medium text-sm truncate">
-                  {user?.name}
-                </p>
-                <p className="text-cyan-400/70 text-xs">{user?.role}</p>
-              </div>
-
               {/* Notifications - Mobile */}
               <NotificationBell />
+              
+              {/* User Menu - Mobile */}
+              <UserMenu />
             </motion.div>
           </div>
 
@@ -334,20 +458,62 @@ const Header = ({ title, subtitle }) => {
             {/* Notifications - Desktop */}
             <NotificationBell />
 
-            {/* User Info - Desktop */}
+            {/* User Menu - Desktop */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-right"
             >
-              <p className="text-white font-medium">{user?.name}</p>
-              <p className="text-cyan-400/70 text-sm">{user?.role}</p>
+              <UserMenu />
             </motion.div>
           </div>
         </div>
       )}
-    </motion.header>
+
+      </motion.header>
+
+      {/* Logout Confirmation Modal - Outside header to avoid positioning issues */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000]"
+            onClick={() => setShowLogoutModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              className="bg-slate-900 p-6 rounded-xl w-80 max-w-[90vw] text-center border border-cyan-400/20 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-xl font-semibold text-white mb-4">
+                Confirm Logout
+              </h2>
+              <p className="text-gray-300 mb-6">
+                Are you sure you want to logout?
+              </p>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmLogout}
+                  className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+                >
+                  Logout
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

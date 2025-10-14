@@ -128,28 +128,29 @@ const ManageTenders = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0"
+          className="space-y-4"
         >
-          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 flex-1">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-cyan-400" />
-              <input
-                type="text"
-                placeholder="Search tenders..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-              />
-            </div>
+          {/* Search Bar - Full Width on Mobile */}
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-cyan-400" />
+            <input
+              type="text"
+              placeholder="Search tenders..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
+            />
+          </div>
 
+          {/* Filter and Create Button Row */}
+          <div className="flex flex-col sm:flex-row gap-3">
             {/* Status Filter */}
-            <div className="relative">
+            <div className="relative flex-1 sm:max-w-xs">
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-400" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="pl-10 pr-8 py-3 bg-slate-800/50 border border-purple-400/20 rounded-lg text-white focus:outline-none focus:border-purple-400/50 focus:bg-slate-800/70 transition-all duration-300"
+                className="w-full pl-10 pr-8 py-3 bg-slate-800/50 border border-purple-400/20 rounded-lg text-white focus:outline-none focus:border-purple-400/50 focus:bg-slate-800/70 transition-all duration-300 appearance-none cursor-pointer"
               >
                 <option value="">All Status</option>
                 <option value="ACTIVE">Active</option>
@@ -157,16 +158,22 @@ const ManageTenders = () => {
                 <option value="ARCHIVED">Archived</option>
                 <option value="CANCELLED">Cancelled</option>
               </select>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
-          </div>
 
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Create New Tender</span>
-          </button>
+            {/* Create Button */}
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg shadow-purple-500/20 whitespace-nowrap"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Create Tender</span>
+            </button>
+          </div>
         </motion.div>
 
         {/* Tenders Grid */}
@@ -233,7 +240,13 @@ const ManageTenders = () => {
                   <div className="flex items-center space-x-2 text-sm">
                     <DollarSign className="w-4 h-4 text-cyan-400" />
                     <span className="text-cyan-400 font-medium">
-                      R{tender.budgetMin?.toLocaleString()}
+                      {tender.budgetMin || tender.budgetMax
+                        ? `R${Number(
+                            tender.budgetMin || 0
+                          ).toLocaleString()} - R${Number(
+                            tender.budgetMax || 0
+                          ).toLocaleString()}`
+                        : `R${Number(tender.budget || 0).toLocaleString()}`}
                     </span>
                     <span className="text-gray-400">budget</span>
                   </div>

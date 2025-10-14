@@ -155,7 +155,6 @@ const CreateTender = () => {
 
       await tenderApi.createTender(formData);
 
-      toast.success("Tender created successfully!");
       setSuccess("Tender created successfully!");
       clearSavedData();
 

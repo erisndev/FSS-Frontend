@@ -50,32 +50,32 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
     return s === "closed" || s === "archived";
   };
 
-  const applyLabel = isClosedOrArchived() ? tender.status || "Closed" : "Apply";
+  const daysLeft = getDaysUntilDeadline(tender.deadline);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4 sm:p-5 md:p-6 hover:bg-white/10 hover:border-cyan-400/40 transition-all duration-300"
+      className="bg-slate-800/50 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-5 hover:bg-slate-800/70 hover:border-cyan-400/40 transition-all duration-300"
     >
-      {/* Header - Responsive */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
-        <div className="flex-1 min-w-0">
-          <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2 line-clamp-2">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+        <div className="flex-1">
+          <h3 className="text-lg font-bold text-white mb-2">
             {tender.title}
           </h3>
-          <p className="text-gray-400 text-xs sm:text-sm">{tender.category}</p>
+          <p className="text-cyan-400 text-sm">{tender.category}</p>
         </div>
-        <div className="flex flex-row sm:flex-col items-start sm:items-end gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {tender.isUrgent && (
-            <span className="flex items-center space-x-1 px-2 py-1 bg-red-500/20 text-red-400 text-xs rounded-full">
+            <span className="flex items-center gap-1 px-2 py-1 bg-red-500/20 text-red-400 text-xs font-medium rounded-full border border-red-400/30">
               <AlertCircle className="w-3 h-3" />
               <span>Urgent</span>
             </span>
           )}
           <span
-            className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
+            className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(
               tender.status
             )}`}
           >
@@ -84,82 +84,96 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
         </div>
       </div>
 
-      {/* Description - Responsive text */}
-      <p className="text-gray-300 text-xs sm:text-sm mb-4 line-clamp-2 sm:line-clamp-3">
+      {/* Description */}
+      <p className="text-gray-300 text-sm mb-4 line-clamp-2">
         {tender.description}
       </p>
 
-      {/* Details - Responsive grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4">
-        <div className="flex items-center space-x-2 text-xs sm:text-sm">
-          <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400 flex-shrink-0" />
-          <span className="text-cyan-400 font-medium truncate">
-            {tender.budgetMin || tender.budgetMax
-              ? `R${Number(tender.budgetMin || 0).toLocaleString()} - R${Number(
-                  tender.budgetMax || 0
-                ).toLocaleString()}`
-              : `R${Number(tender.budget || 0).toLocaleString()}`}
-          </span>
+      {/* Details */}
+      <div className="space-y-3 mb-4">
+        {/* Budget */}
+        <div className="flex items-start gap-3">
+          <DollarSign className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-xs text-gray-400 mb-0.5">Budget</p>
+            <p className="text-sm font-semibold text-cyan-400">
+              {tender.budgetMin || tender.budgetMax
+                ? `R${Number(tender.budgetMin || 0).toLocaleString()} - R${Number(
+                    tender.budgetMax || 0
+                  ).toLocaleString()}`
+                : `R${Number(tender.budget || 0).toLocaleString()}`}
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs sm:text-sm">
-          <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400 flex-shrink-0" />
-          <span className="text-white truncate">{formatDate(tender.deadline)}</span>
-          <span
-            className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full whitespace-nowrap ${
-              getDaysUntilDeadline(tender.deadline) <= 7
-                ? "bg-red-500/20 text-red-400"
-                : "bg-green-500/20 text-green-400"
-            }`}
-          >
-            {getDaysUntilDeadline(tender.deadline)}d left
-          </span>
+        {/* Deadline */}
+        <div className="flex items-start gap-3">
+          <Calendar className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-xs text-gray-400 mb-0.5">Deadline</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-sm font-semibold text-white">
+                {formatDate(tender.deadline)}
+              </p>
+              <span
+                className={`text-xs px-2 py-0.5 rounded-full ${
+                  daysLeft <= 7
+                    ? "bg-red-500/20 text-red-400"
+                    : "bg-green-500/20 text-green-400"
+                }`}
+              >
+                {daysLeft}d left
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs sm:text-sm">
-          <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
-          <span className="text-gray-400 truncate">
-            Posted {formatDate(tender.createdAt, "MMM dd")}
-          </span>
-        </div>
-
-        <div className="flex items-center space-x-2 text-xs sm:text-sm">
-          <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400 flex-shrink-0" />
-          <span className="text-emerald-400">
-            {tender.documents?.length || 0} documents
-          </span>
+        {/* Posted & Documents */}
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-gray-400" />
+            <span className="text-xs text-gray-400">
+              Posted {formatDate(tender.createdAt, "MMM dd")}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FileText className="w-4 h-4 text-emerald-400" />
+            <span className="text-xs text-emerald-400">
+              {tender.documents?.length || 0} document{tender.documents?.length !== 1 ? 's' : ''}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Footer - Responsive */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t border-cyan-400/10">
-        <div className="text-xs sm:text-sm text-gray-400 truncate max-w-[200px]">
-          By {tender.companyName}
+      {/* Footer */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t border-cyan-400/20">
+        <div className="text-sm text-gray-400">
+          By <span className="text-white font-medium">{tender.companyName}</span>
         </div>
+
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             onClick={() => onView(tender)}
-            className="p-1.5 sm:p-2 bg-slate-800/50 border border-cyan-400/20 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
+            className="p-2 bg-slate-700/50 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all"
             aria-label="View tender details"
           >
-            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <Eye className="w-4 h-4" />
           </button>
+          
           {isClosedOrArchived() ? (
             <div
-              role="status"
-              title="This tender is not accepting applications"
-              className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border select-none text-xs sm:text-sm ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
                 (tender.status || "").toLowerCase() === "archived"
-                  ? "bg-gray-600/30 text-gray-200 border-gray-400/30"
-                  : "bg-red-600/20 text-red-200 border-red-400/30"
+                  ? "bg-gray-600/30 text-gray-300"
+                  : "bg-red-600/20 text-red-300"
               }`}
             >
               {(tender.status || "").toLowerCase() === "archived" ? (
-                <Archive className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Archive className="w-4 h-4" />
               ) : (
-                <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Lock className="w-4 h-4" />
               )}
-              <span className="hidden xs:inline">
+              <span>
                 {(tender.status || "").toLowerCase() === "archived"
                   ? "Archived"
                   : "Closed"}
@@ -167,16 +181,14 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
             </div>
           ) : isApplied ? (
             <div
-              role="status"
-              title="You have already applied"
-              className="flex-1 sm:flex-initial text-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-emerald-400/30 bg-emerald-500/20 text-emerald-300 select-none text-xs sm:text-sm"
+              className="flex-1 sm:flex-initial text-center px-4 py-2 rounded-lg bg-emerald-500/20 text-emerald-300 text-sm font-medium"
             >
-              Applied
+              ✓ Applied
             </div>
           ) : (
             <button
               onClick={() => onApply(tender)}
-              className="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 text-xs sm:text-sm font-medium"
+              className="flex-1 sm:flex-initial px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all text-sm font-medium"
             >
               Apply Now
             </button>

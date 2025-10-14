@@ -476,22 +476,22 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           className="relative w-full max-w-5xl max-h-[92vh] bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Header with gradient */}
-          <div className="relative bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 p-6 border-b border-cyan-400/10">
+          <div className="relative bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 p-3 border-b border-cyan-400/10">
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 animate-pulse" />
             <div className="relative flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                  className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg"
+                  className="w-9 h-9 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center shadow-lg"
                 >
-                  <Sparkles className="w-6 h-6 text-white" />
+                  <Sparkles className="w-5 h-5 text-white" />
                 </motion.div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">
+                  <h3 className="text-lg font-bold text-white">
                     Create New Tender
                   </h3>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400">
                     Complete all steps to publish your tender
                   </p>
                 </div>
@@ -499,15 +499,15 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
               <button
                 onClick={handleClose}
                 disabled={isSubmitting || isSavingDraft}
-                className="p-2 hover:bg-white/10 rounded-lg transition-all duration-200 disabled:opacity-50 group"
+                className="p-1.5 hover:bg-white/10 rounded-lg transition-all duration-200 disabled:opacity-50 group"
               >
-                <X className="w-5 h-5 text-gray-400 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+                <X className="w-4 h-4 text-gray-400 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
               </button>
             </div>
 
             {/* Overall Progress Bar */}
-            <div className="mt-4">
-              <div className="flex items-center justify-between mb-2">
+            <div className="mt-2">
+              <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-gray-400">Overall Progress</span>
                 <span className="text-xs text-cyan-400 font-medium">{getOverallProgress()}%</span>
               </div>
@@ -523,7 +523,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           {/* Step Navigation */}
-          <div className="px-6 py-4 bg-slate-900/50 border-b border-cyan-400/10">
+          <div className="px-4 py-2 bg-slate-900/50 border-b border-cyan-400/10">
             <div className="flex items-center justify-between">
               {stepInfo.map((step, index) => (
                 <div
@@ -533,7 +533,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                   <button
                     onClick={() => handleStepClick(step.number)}
                     disabled={step.number > currentStep && !completedSteps.includes(step.number - 1)}
-                    className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 ${
+                    className={`flex items-center space-x-2 p-2 rounded-lg transition-all duration-300 ${
                       currentStep === step.number
                         ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30"
                         : completedSteps.includes(step.number)
@@ -544,7 +544,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                     }`}
                   >
                     <div className={`relative ${currentStep === step.number ? "animate-pulse" : ""}`}>
-                      <step.icon className={`w-5 h-5 ${
+                      <step.icon className={`w-4 h-4 ${
                         currentStep === step.number
                           ? "text-cyan-400"
                           : completedSteps.includes(step.number)
@@ -552,20 +552,19 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           : "text-gray-400"
                       }`} />
                       {completedSteps.includes(step.number) && (
-                        <CheckCircle className="absolute -top-1 -right-1 w-3 h-3 text-green-400" />
+                        <CheckCircle className="absolute -top-1 -right-1 w-2.5 h-2.5 text-green-400" />
                       )}
                     </div>
                     <div className="hidden lg:block text-left">
-                      <p className={`text-sm font-medium ${
+                      <p className={`text-xs font-medium ${
                         currentStep === step.number ? "text-white" : "text-gray-400"
                       }`}>
                         {step.title}
                       </p>
-                      <p className="text-xs text-gray-500">{step.description}</p>
                     </div>
                   </button>
                   {index < stepInfo.length - 1 && (
-                    <ArrowRight className={`w-4 h-4 mx-2 ${
+                    <ArrowRight className={`w-3 h-3 mx-1 ${
                       completedSteps.includes(step.number) ? "text-green-400" : "text-gray-600"
                     }`} />
                   )}
@@ -574,7 +573,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
 
             {/* Step Progress */}
-            <div className="mt-3">
+            <div className="mt-2">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-gray-400">Step {currentStep} Progress</span>
                 <span className="text-xs text-purple-400 font-medium">{getStepProgress()}%</span>
@@ -1296,8 +1295,8 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           {/* Footer - Fixed at bottom */}
-          <div className="flex items-center justify-between p-6 border-t border-cyan-400/10 bg-gradient-to-r from-slate-900 to-slate-950">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-between p-3 border-t border-cyan-400/10 bg-gradient-to-r from-slate-900 to-slate-950">
+            <div className="flex items-center space-x-2">
               {currentStep > 1 && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -1305,9 +1304,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                   type="button"
                   onClick={handleBack}
                   disabled={isSubmitting || isSavingDraft}
-                  className="flex items-center space-x-2 px-4 py-2 text-gray-300 hover:text-white transition-colors disabled:opacity-50"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-white transition-colors disabled:opacity-50"
                 >
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Back</span>
                 </motion.button>
               )}
@@ -1318,16 +1317,16 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                   type="button"
                   onClick={handleSaveDraft}
                   disabled={isSubmitting || isSavingDraft}
-                  className="flex items-center space-x-2 px-4 py-2 bg-slate-800/50 border border-gray-600/50 text-gray-300 rounded-lg hover:bg-slate-800/70 hover:text-white transition-all duration-200 disabled:opacity-50"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 text-sm bg-slate-800/50 border border-gray-600/50 text-gray-300 rounded-lg hover:bg-slate-800/70 hover:text-white transition-all duration-200 disabled:opacity-50"
                 >
                   {isSavingDraft ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-3.5 h-3.5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
                       <span>Saving...</span>
                     </>
                   ) : (
                     <>
-                      <Save className="w-4 h-4" />
+                      <Save className="w-3.5 h-3.5" />
                       <span>Save as Draft</span>
                     </>
                   )}
@@ -1335,14 +1334,14 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
               )}
             </div>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={handleClose}
                 disabled={isSubmitting || isSavingDraft}
-                className="px-4 py-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                className="px-3 py-1.5 text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50"
               >
                 Cancel
               </motion.button>
@@ -1353,10 +1352,10 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                   whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={handleNext}
-                  className="flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="flex items-center space-x-1.5 px-4 py-1.5 text-sm bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   <span>Next</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </motion.button>
               ) : (
                 <motion.button
@@ -1364,16 +1363,16 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                   whileTap={{ scale: 0.95 }}
                   onClick={handleSubmit}
                   disabled={isSubmitting || isSavingDraft}
-                  className="flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-emerald-700 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                  className="flex items-center space-x-1.5 px-4 py-1.5 text-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-emerald-700 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       <span>Creating...</span>
                     </>
                   ) : (
                     <>
-                      <CheckCircle className="w-5 h-5" />
+                      <CheckCircle className="w-4 h-4" />
                       <span>Create Tender</span>
                     </>
                   )}

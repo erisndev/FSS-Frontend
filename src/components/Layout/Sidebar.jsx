@@ -71,7 +71,7 @@ const Sidebar = () => {
             icon: Briefcase,
           },
           {
-            name: "Verification Requests",
+            name: "Application Requests",
             path: "/issuer/verification-requests",
             icon: ShieldCheck,
           },
@@ -144,20 +144,20 @@ const Sidebar = () => {
       } h-full flex flex-col`}
     >
       <div className="flex-1 overflow-y-auto">
-      {/* Logo */}
-      <div className="flex items-center space-x-3 mb-6 lg:mb-8">
-        <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
-          <Shield className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+        {/* Logo */}
+        <div className="flex items-center space-x-3 mb-6 lg:mb-8">
+          <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
+            <Shield className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-lg lg:text-xl font-bold text-white">
+              TenderFlow
+            </h1>
+            <p className="text-xs text-cyan-400/70">Management System</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-lg lg:text-xl font-bold text-white">
-            TenderFlow
-          </h1>
-          <p className="text-xs text-cyan-400/70">Management System</p>
-        </div>
-      </div>
 
-      {/* User Info */}
+        {/* User Info
       <div
         className={`p-3 lg:p-4 rounded-xl bg-gradient-to-r ${getRoleColor()} mb-4 lg:mb-6 relative overflow-hidden`}
       >
@@ -173,40 +173,39 @@ const Sidebar = () => {
             {user?.role}
           </span>
         </div>
-      </div>
+      </div> */}
 
-      {/* Navigation */}
-      <nav className="space-y-1 lg:space-y-2">
-        {menuItems.map((item, index) => {
-          const isActive = location.pathname === item.path;
-          return (
-            <NavLink
-              key={item.name}
-              to={item.path}
-              className={`flex items-center justify-between p-2.5 lg:p-3 rounded-lg transition-all duration-300 group touch-manipulation ${
-                isActive
-                  ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 text-cyan-400"
-                  : "text-gray-300 hover:text-white hover:bg-white/5 active:bg-white/10"
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <item.icon
-                  className={`w-5 h-5 flex-shrink-0 ${
-                    isActive
-                      ? "text-cyan-400"
-                      : "text-gray-400 group-hover:text-white"
-                  }`}
-                />
-                <span className="font-medium text-sm lg:text-base truncate">
-                  {item.name}
-                </span>
-              </div>
-              {item.name === "Notifications" && <NotificationBadge />}
-            </NavLink>
-          );
-        })}
-      </nav>
-
+        {/* Navigation */}
+        <nav className="space-y-1 lg:space-y-2">
+          {menuItems.map((item, index) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <NavLink
+                key={item.name}
+                to={item.path}
+                className={`flex items-center justify-between p-2.5 lg:p-3 rounded-lg transition-all duration-300 group touch-manipulation ${
+                  isActive
+                    ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 text-cyan-400"
+                    : "text-gray-300 hover:text-white hover:bg-white/5 active:bg-white/10"
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <item.icon
+                    className={`w-5 h-5 flex-shrink-0 ${
+                      isActive
+                        ? "text-cyan-400"
+                        : "text-gray-400 group-hover:text-white"
+                    }`}
+                  />
+                  <span className="font-medium text-sm lg:text-base truncate">
+                    {item.name}
+                  </span>
+                </div>
+                {item.name === "Notifications" && <NotificationBadge />}
+              </NavLink>
+            );
+          })}
+        </nav>
       </div>
       {/* Logout Button */}
       <button

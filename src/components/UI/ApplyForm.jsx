@@ -21,7 +21,9 @@ const ApplyForm = ({
   formatFileSize
 }) => {
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="flex flex-col flex-1 overflow-hidden">
+      {/* Content - Scrollable */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
       {/* Error Display */}
       {error && (
         <motion.div
@@ -37,13 +39,13 @@ const ApplyForm = ({
       )}
 
       {/* Company Information Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
-      >
-        <h4 className="text-lg font-semibold text-cyan-400 mb-4">Company Information</h4>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
+        >
+          <h4 className="text-base font-semibold text-cyan-400 mb-3">Company Information</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Company Name *</label>
@@ -103,13 +105,13 @@ const ApplyForm = ({
       </motion.div>
 
       {/* Contact Information Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
-      >
-        <h4 className="text-lg font-semibold text-cyan-400 mb-4">Contact Information</h4>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
+        >
+          <h4 className="text-base font-semibold text-cyan-400 mb-3">Contact Information</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Contact Person *</label>
@@ -153,13 +155,13 @@ const ApplyForm = ({
       </motion.div>
 
       {/* Bid Details Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
-      >
-        <h4 className="text-lg font-semibold text-cyan-400 mb-4">Bid Details</h4>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
+        >
+          <h4 className="text-base font-semibold text-cyan-400 mb-3">Bid Details</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Proposed Amount *</label>
@@ -197,13 +199,13 @@ const ApplyForm = ({
       </motion.div>
 
       {/* Cover Letter Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
-      >
-        <h4 className="text-lg font-semibold text-cyan-400 mb-4">Cover Letter</h4>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
+        >
+          <h4 className="text-base font-semibold text-cyan-400 mb-3">Cover Letter</h4>
         <textarea
           name="message"
           value={formData.message}
@@ -216,13 +218,13 @@ const ApplyForm = ({
       </motion.div>
 
       {/* Supporting Documents Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-6"
-      >
-        <h4 className="text-lg font-semibold text-cyan-400 mb-4">Supporting Documents</h4>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
+        >
+          <h4 className="text-base font-semibold text-cyan-400 mb-3">Supporting Documents</h4>
         <div className="border-2 border-dashed border-cyan-400/20 rounded-lg p-6 hover:border-cyan-400/40 transition-all duration-300">
           <div className="text-center">
             <Upload className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
@@ -248,8 +250,8 @@ const ApplyForm = ({
         </div>
 
         {formData.files?.length > 0 && (
-          <div className="mt-6 space-y-3">
-            <h5 className="text-white font-medium">Uploaded Documents ({formData.files.length})</h5>
+          <div className="mt-4 space-y-3">
+            <h5 className="text-sm text-white font-medium">Uploaded Documents ({formData.files.length})</h5>
             {formData.files.map((doc) => (
               <div
                 key={doc.id}
@@ -275,40 +277,40 @@ const ApplyForm = ({
             ))}
           </div>
         )}
-      </motion.div>
+        </motion.div>
+      </div>
 
-      {/* Submit Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="flex items-center justify-between pt-6 border-t border-cyan-400/10"
-      >
-        <button
+      {/* Footer - Fixed at bottom */}
+      <div className="flex items-center justify-between p-3 border-t border-cyan-400/10 bg-gradient-to-r from-slate-900 to-slate-950">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           type="button"
           onClick={onCancel}
           disabled={loading}
-          className={`px-6 py-3 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg transition-all duration-300 ${
+          className={`px-3 py-1.5 text-sm bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg transition-all duration-300 ${
             loading ? "opacity-50 cursor-not-allowed" : "hover:bg-slate-800/70"
           }`}
         >
           Cancel
-        </button>
-        <button
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           type="submit"
           disabled={loading}
-          className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium"
+          className="px-4 py-1.5 text-sm bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium"
         >
           {loading ? (
-            <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Submitting Application...</span>
+            <div className="flex items-center space-x-1.5">
+              <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Submitting...</span>
             </div>
           ) : (
             "Submit Application"
           )}
-        </button>
-      </motion.div>
+        </motion.button>
+      </div>
     </form>
   );
 };

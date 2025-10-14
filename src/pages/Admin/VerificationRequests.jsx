@@ -161,7 +161,7 @@ const VerificationRequests = () => {
 
   return (
     <DashboardLayout
-      title="Verification Requests"
+      title="Application Requests"
       subtitle="Manage tender verification code requests"
     >
       {/* Stats Cards */}

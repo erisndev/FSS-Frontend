@@ -24,7 +24,7 @@
  * @property {string} issuerId
  * @property {string} issuerName
  * @property {string} createdAt
- * @property {number} [applicationsCount]
+ * @property {number} [applications.length]
  */
 
 /**

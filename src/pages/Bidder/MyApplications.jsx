@@ -7,9 +7,11 @@ import ConfirmDeleteModal from "../../components/UI/ConfirmDeleteModal";
 import EmptyState from "../../components/UI/EmptyState";
 import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import { applicationApi } from "../../services/api";
+import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
 
 const MyApplications = () => {
+  const { user } = useAuth();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -99,6 +101,8 @@ const MyApplications = () => {
             setSelectedApplication(null);
           }}
           application={selectedApplication}
+          tender={selectedApplication?.tender}
+          user={user}
         />
 
         <ConfirmDeleteModal

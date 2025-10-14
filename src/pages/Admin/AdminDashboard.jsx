@@ -194,7 +194,9 @@ const AdminDashboard = () => {
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-gray-400 text-sm font-medium mb-2">{stat.title}</p>
+                  <p className="text-gray-400 text-sm font-medium mb-2">
+                    {stat.title}
+                  </p>
                   <p className="text-3xl font-bold text-white">
                     {stat.value.toLocaleString()}
                   </p>
@@ -202,7 +204,9 @@ const AdminDashboard = () => {
                 <div
                   className={`w-14 h-14 rounded-xl ${stat.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                 >
-                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
+                  <div
+                    className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}
+                  >
                     <stat.icon className="w-5 h-5 text-white" />
                   </div>
                 </div>
@@ -221,7 +225,7 @@ const AdminDashboard = () => {
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-white">Recent Users</h3>
-              <button 
+              <button
                 onClick={() => navigate("/admin/users")}
                 className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200"
               >
@@ -278,7 +282,7 @@ const AdminDashboard = () => {
               <h3 className="text-xl font-semibold text-white">
                 Recent Tenders
               </h3>
-              <button 
+              <button
                 onClick={() => navigate("/admin/tenders")}
                 className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200"
               >
@@ -307,7 +311,7 @@ const AdminDashboard = () => {
                             R{tender.budgetMin?.toLocaleString() || "0"}
                           </span>
                           <span>
-                            {tender.applicationsCount || 0} applications
+                            {tender.applications.length || 0} applications
                           </span>
                         </div>
                       </div>

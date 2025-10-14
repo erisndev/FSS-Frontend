@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, FileText } from "lucide-react";
 import ApplyForm from "./ApplyForm";
 
 const ApplyModal = ({
@@ -30,21 +30,30 @@ const ApplyModal = ({
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-2xl font-bold text-white mb-2">Apply to Tender</h3>
-            <p className="text-cyan-400 font-medium">"{tender.title}"</p>
+        <div className="relative bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 p-3 border-b border-cyan-400/10">
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 animate-pulse" />
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center shadow-lg">
+                <FileText className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-white">Apply to Tender</h3>
+                <p className="text-xs text-cyan-400 font-medium truncate">"{tender.title}"</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="text-gray-400 hover:text-white transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-lg group disabled:opacity-50"
+            >
+              <X className="w-4 h-4 group-hover:rotate-90 transition-all duration-300" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors duration-200 p-2 hover:bg-white/10 rounded-lg"
-          >
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
         <ApplyForm
@@ -58,6 +67,24 @@ const ApplyModal = ({
           error={error}
           formatFileSize={formatFileSize}
         />
+
+        {/* Custom scrollbar styles */}
+        <style jsx>{`
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #06b6d4, #a855f7);
+            border-radius: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #0891b2, #9333ea);
+          }
+        `}</style>
       </motion.div>
     </motion.div>
   );
