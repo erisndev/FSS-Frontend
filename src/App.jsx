@@ -8,10 +8,12 @@ import LandingPage from "./pages/Landing/LandingPage";
 
 // Auth Pages
 import Login from "./pages/Auth/Login";
+import TeamLogin from "./pages/Auth/TeamLogin";
 import Register from "./pages/Auth/Register";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import OTPVerification from "./pages/Auth/OTPVerification";
 import ResetPassword from "./pages/Auth/ResetPassword";
+import AcceptInvitation from "./pages/Auth/AcceptInvitation";
 
 // Bidder Pages
 import BidderDashboard from "./pages/Bidder/BidderDashboard";
@@ -27,6 +29,7 @@ import ReviewApplications from "./pages/Issuer/ReviewApplications";
 import Analytics from "./pages/Issuer/Analytics";
 import EditTender from "./components/UI/EditTender";
 import IssuerVerificationRequests from "./pages/Issuer/VerificationRequests";
+import TeamManagement from "./pages/Issuer/TeamManagement";
 
 // Admin Pages
 import AdminDashboard from "./pages/Admin/AdminDashboard";
@@ -49,10 +52,12 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/team-login" element={<TeamLogin />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-otp" element={<OTPVerification />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/accept-invitation/:token" element={<AcceptInvitation />} />
 
           {/* Bidder Routes */}
           <Route
@@ -167,6 +172,14 @@ function App() {
             element={
               <ProtectedRoute roles={["issuer"]}>
                 <IssuerVerificationRequests />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/issuer/team"
+            element={
+              <ProtectedRoute roles={["issuer"]}>
+                <TeamManagement />
               </ProtectedRoute>
             }
           />

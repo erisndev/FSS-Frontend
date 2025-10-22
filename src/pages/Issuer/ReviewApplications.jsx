@@ -20,6 +20,7 @@ import { tenderApi, applicationApi } from "../../services/api";
 import { format } from "date-fns";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
+import { canPerformApplicationAction } from "../../utils/permissions";
 
 const ReviewApplications = () => {
   const { user } = useAuth();
@@ -140,13 +141,17 @@ const ReviewApplications = () => {
     setShowStatusModal(true);
   };
 
+  // Use permissions from user object if available
+  const userPermissions = user?.permissions;
+
+  // Check if user can view applications
+  const canViewApp = canPerformApplicationAction(user, userPermissions, selectedTender, 'view');
+
+  // Check if user can accept/reject applications
+  const canAcceptRejectApp = canPerformApplicationAction(user, userPermissions, selectedTender, 'accept');
+
   const canChangeStatus = (application) => {
-    // Check if user is admin or tender creator
-    return (
-      user?.role === "admin" ||
-      selectedTender?.createdBy === user?.id ||
-      selectedTender?.userId === user?.id
-    );
+    return canAcceptRejectApp;
   };
 
   const getStatusColor = (status) => {
@@ -322,16 +327,18 @@ const ReviewApplications = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 justify-end lg:justify-start">
-                        <button
-                          onClick={() => {
-                            setSelectedApplication(application);
-                            setShowModal(true);
-                          }}
-                          className="p-1.5 sm:p-2 bg-slate-700/50 border border-cyan-400/20 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
-                          title="View details"
-                        >
-                          <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        </button>
+                        {canViewApp && (
+                          <button
+                            onClick={() => {
+                              setSelectedApplication(application);
+                              setShowModal(true);
+                            }}
+                            className="p-1.5 sm:p-2 bg-slate-700/50 border border-cyan-400/20 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
+                            title="View details"
+                          >
+                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </button>
+                        )}
                         {application.status === "pending" &&
                           canChangeStatus(application) && (
                             <>

@@ -24,7 +24,7 @@ function timeAgo(date) {
   return `${yr}y ago`;
 }
 
-const Header = ({ title, subtitle }) => {
+const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { user, logout } = useAuth();
   const role = (user?.role || "").toLowerCase();
   const navigate = useNavigate();
@@ -382,7 +382,14 @@ const Header = ({ title, subtitle }) => {
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative lg:sticky lg:top-0 z-40 bg-gradient-to-r from-slate-800/50 to-purple-900/30 backdrop-blur-xl border-b border-cyan-400/20 p-3 sm:p-4 lg:p-6"
+        onClick={() => {
+          if (isMobile && isMobileMenuOpen) {
+            setIsMobileMenuOpen(false);
+          }
+        }}
+        className={`relative lg:sticky lg:top-0 z-40 bg-gradient-to-r from-slate-800/50 to-purple-900/30 backdrop-blur-xl border-b border-cyan-400/20 p-3 sm:p-4 lg:p-6 transition-all duration-300 ${
+          isMobile && isMobileMenuOpen ? 'blur-sm pointer-events-auto cursor-pointer' : ''
+        }`}
       >
       {/* Mobile Layout */}
       {isMobile ? (

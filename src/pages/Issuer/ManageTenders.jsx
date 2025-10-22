@@ -21,8 +21,11 @@ import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import ConfirmDeleteModal from "../../components/UI/ConfirmDeleteModal";
 import toast from "react-hot-toast";
+import { useAuth } from "../../contexts/AuthContext";
+import { canPerformTenderAction } from "../../utils/permissions";
 
 const ManageTenders = () => {
+  const { user, permissions } = useAuth();
   const [tenders, setTenders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,6 +35,18 @@ const ManageTenders = () => {
   const [selectedTender, setSelectedTender] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Use permissions from user object if available, otherwise fallback to context permissions
+  const userPermissions = user?.permissions || permissions;
+
+  // Check if user can create tenders
+  const canCreate =
+    user?.role === "admin" ||
+    !user?.organizationId ||
+    userPermissions?.canCreateTenders;
+
+  console.log("=== IssuerDashboard Permissions Debug ===");
+  console.log("User:", user);
 
   useEffect(() => {
     fetchTenders();
@@ -57,7 +72,9 @@ const ManageTenders = () => {
       toast.success("Tender deleted successfully");
       await fetchTenders();
     } catch (error) {
-      toast.error("Failed to delete tender");
+      if (error.response?.status !== 403) {
+        toast.error("Failed to delete tender");
+      }
       console.error("Error deleting tender:", error);
       throw error;
     }
@@ -159,20 +176,32 @@ const ManageTenders = () => {
                 <option value="CANCELLED">Cancelled</option>
               </select>
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-4 h-4 text-purple-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </div>
             </div>
 
-            {/* Create Button */}
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg shadow-purple-500/20 whitespace-nowrap"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Create Tender</span>
-            </button>
+            {/* Create Button - Only show if user has permission */}
+            {canCreate && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg shadow-purple-500/20 whitespace-nowrap"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Create Tender</span>
+              </button>
+            )}
           </div>
         </motion.div>
 
@@ -288,37 +317,58 @@ const ManageTenders = () => {
                     Created {formatDate(tender.createdAt, "MMM dd")}
                   </div>
                   <div className="flex items-center space-x-2">
-                    {/* View Tender */}
-                    <button
-                      onClick={() => {
-                        setSelectedTender(tender);
-                        setShowViewModal(true);
-                      }}
-                      className="p-2 bg-slate-800/50 border border-cyan-400/20 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
+                    {/* View Tender - Only show if user has permission */}
+                    {canPerformTenderAction(
+                      user,
+                      userPermissions,
+                      tender,
+                      "view"
+                    ) && (
+                      <button
+                        onClick={() => {
+                          setSelectedTender(tender);
+                          setShowViewModal(true);
+                        }}
+                        className="p-2 bg-slate-800/50 border border-cyan-400/20 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    )}
 
-                    {/* Edit Tender */}
-                    <button
-                      onClick={() =>
-                        navigate(`/issuer/edit-tender/${tender._id}`)
-                      }
-                      className="p-2 bg-slate-800/50 border border-purple-400/20 text-purple-400 rounded-lg hover:bg-purple-400/10 hover:border-purple-400/50 transition-all duration-300"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
+                    {/* Edit Tender - Only show if user has permission */}
+                    {canPerformTenderAction(
+                      user,
+                      userPermissions,
+                      tender,
+                      "edit"
+                    ) && (
+                      <button
+                        onClick={() =>
+                          navigate(`/issuer/edit-tender/${tender._id}`)
+                        }
+                        className="p-2 bg-slate-800/50 border border-purple-400/20 text-purple-400 rounded-lg hover:bg-purple-400/10 hover:border-purple-400/50 transition-all duration-300"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    )}
 
-                    {/* Delete Tender */}
-                    <button
-                      onClick={() => {
-                        setSelectedTender(tender);
-                        setDeleteModalOpen(true);
-                      }}
-                      className="p-2 bg-slate-800/50 border border-red-400/20 text-red-400 rounded-lg hover:bg-red-400/10 hover:border-red-400/50 transition-all duration-300"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {/* Delete Tender - Only show if user has permission */}
+                    {canPerformTenderAction(
+                      user,
+                      userPermissions,
+                      tender,
+                      "delete"
+                    ) && (
+                      <button
+                        onClick={() => {
+                          setSelectedTender(tender);
+                          setDeleteModalOpen(true);
+                        }}
+                        className="p-2 bg-slate-800/50 border border-red-400/20 text-red-400 rounded-lg hover:bg-red-400/10 hover:border-red-400/50 transition-all duration-300"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -345,14 +395,15 @@ const ManageTenders = () => {
         tender={selectedTender}
       />
 
-      <CreateTenderModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSuccess={() => {
-          fetchTenders();
-          toast.success("Tender created successfully!");
-        }}
-      />
+      {canCreate && (
+        <CreateTenderModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            fetchTenders();
+          }}
+        />
+      )}
     </DashboardLayout>
   );
 };

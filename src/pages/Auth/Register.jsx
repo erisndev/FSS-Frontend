@@ -10,9 +10,14 @@ import {
   EyeOff,
   Users,
   Building,
+  Phone,
+  FileText,
+  Award,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import { authApi } from "../../services/api";
 import toast from "react-hot-toast";
+import { handleApiError, logError } from "../../utils/errorHandler";
 
 const Register = () => {
   const { user, loading, register } = useAuth();
@@ -24,6 +29,8 @@ const Register = () => {
     password: "",
     confirmPassword: "",
     role: "bidder",
+    // Issuer-specific fields
+    contactPhone: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -69,21 +76,63 @@ const Register = () => {
     try {
       console.log("Registering user...");
       console.log(formData);
-      // Use AuthContext register function
-      await register(
-        formData.name,
-        formData.email,
-        formData.company,
-        formData.password,
-        formData.role
-      );
+
+      // Prepare registration data
+      const registrationData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        company: formData.company,
+      };
+
+      // Add issuer-specific fields if role is issuer
+      if (formData.role === "issuer") {
+        registrationData.contactPhone = formData.contactPhone;
+      }
+
+      // Call API directly with all fields
+      const response = await authApi.register(registrationData);
+
+      if (response.token && response.user) {
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.user));
+      }
 
       // Registration successful → redirect to OTP verification
       toast.success("Registration successful! Please verify your email.");
       setIsRegistered(true);
     } catch (err) {
-      setError(err.message || "Registration failed");
-      toast.error(err.message || "Registration failed");
+      console.error("Registration error:", err);
+
+      // Extract error message from response
+      let errorMessage = "Registration failed";
+
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      // Handle specific error cases
+      if (
+        errorMessage.toLowerCase().includes("email") &&
+        errorMessage.toLowerCase().includes("exist")
+      ) {
+        errorMessage =
+          "This email is already registered. Please use a different email or login.";
+      } else if (err.response?.status === 400) {
+        // Generic 400 error
+        if (errorMessage === "Registration failed") {
+          errorMessage =
+            "Invalid registration data. Please check your information and try again.";
+        }
+      }
+
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -142,7 +191,7 @@ const Register = () => {
             onSubmit={handleSubmit}
             className="space-y-3 sm:space-y-4 md:space-y-5"
           >
-            {error && (
+            {/* {error && (
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -150,7 +199,7 @@ const Register = () => {
               >
                 {error}
               </motion.div>
-            )}
+            )} */}
 
             {/* Name Field */}
             <div>
@@ -228,6 +277,30 @@ const Register = () => {
                 </select>
               </div>
             </div>
+
+            {/* Issuer-specific fields */}
+            {formData.role === "issuer" && (
+              <>
+                {/* Contact Phone */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-1.5 md:mb-2">
+                    Contact Phone
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
+                    <input
+                      type="tel"
+                      name="contactPhone"
+                      value={formData.contactPhone}
+                      onChange={handleChange}
+                      required
+                      className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
+                      placeholder="Contact phone number"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Password Field */}
             <div>

@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Shield, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import {
+  Shield,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  Users,
+  ArrowRight,
+} from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
+import { handleApiError, logError } from "../../utils/errorHandler";
 
 const Login = () => {
   const { user, login, loading, resendRegisterOTP } = useAuth();
@@ -33,12 +42,38 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      await login(formData.email, formData.password);
+      const result = await login(formData.email, formData.password);
+
+      // Check if this is a redirect response (team member trying to use regular login)
+      if (result?.redirectToTeamLogin) {
+        toast(
+          result.message ||
+            "This email is associated with an organization. Redirecting to Organization Login...",
+          {
+            duration: 4000,
+            icon: "ℹ️",
+          }
+        );
+
+        // Redirect to team login
+        setTimeout(() => {
+          navigate("/team-login");
+        }, 1000);
+        return;
+      }
+
+      // Normal login success
       toast.success("Login successful");
     } catch (err) {
+      logError("Login", err);
+
+      const errorMessage =
+        err.response?.data?.message || err.message || "Login failed";
+
+      // Check for email verification error
       if (
-        err.message.includes("email not verified") ||
-        err.message.includes("Email not verified")
+        errorMessage.toLowerCase().includes("email not verified") ||
+        errorMessage.toLowerCase().includes("not verified")
       ) {
         try {
           // Send OTP before redirect
@@ -57,8 +92,10 @@ const Login = () => {
         });
         return;
       }
-      toast.error("Login failed");
-      setError(err.message);
+
+      // Use error handler for user-friendly messages
+      const friendlyError = handleApiError(err, toast, "Login failed");
+      setError(friendlyError);
     } finally {
       setIsLoading(false);
     }
@@ -98,8 +135,12 @@ const Login = () => {
               <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white">Welcome Back</h2>
-          <p className="text-cyan-400/70 mt-1 sm:mt-2 text-sm sm:text-base">Sign in to TenderFlow System</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white">
+            Welcome Back
+          </h2>
+          <p className="text-cyan-400/70 mt-1 sm:mt-2 text-sm sm:text-base">
+            Sign in to TenderFlow System
+          </p>
         </motion.div>
 
         {/* Login Form */}
@@ -110,7 +151,7 @@ const Login = () => {
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-2xl p-5 sm:p-8 shadow-2xl"
         >
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-            {error && (
+            {/* {error && (
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -118,7 +159,7 @@ const Login = () => {
               >
                 {error}
               </motion.div>
-            )}
+            )} */}
 
             {/* Email Field */}
             <div>
@@ -198,8 +239,45 @@ const Login = () => {
             </motion.button>
           </form>
 
+          {/* Team Login Option */}
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-600"></div>
+              </div>
+              <div className="relative flex justify-center text-xs sm:text-sm">
+                <span className="px-2 bg-slate-900/50 text-gray-400">Or</span>
+              </div>
+            </div>
+
+            <Link to="/team-login">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="mt-4 p-4 bg-gradient-to-r from-cyan-500/10 to-purple-600/10 border border-cyan-400/30 rounded-lg hover:border-cyan-400/50 transition-all duration-200 cursor-pointer"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
+                      <Users className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-white font-medium text-sm">
+                        Issuer Organization Login
+                      </p>
+                      <p className="text-gray-400 text-xs">
+                        For issuer companies with team members
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-cyan-400" />
+                </div>
+              </motion.div>
+            </Link>
+          </div>
+
           {/* Register Link */}
-          <div className="mt-4 sm:mt-6 text-center">
+          <div className="mt-6 text-center">
             <p className="text-xs sm:text-sm text-gray-400">
               Don't have an account?{" "}
               <Link

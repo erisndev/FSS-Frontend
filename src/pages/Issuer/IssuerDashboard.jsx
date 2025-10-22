@@ -22,7 +22,20 @@ import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
 
 const IssuerDashboard = () => {
-  const { user } = useAuth();
+  const { user, permissions } = useAuth();
+
+  // Use permissions from user object if available, otherwise fallback to context permissions
+  const userPermissions = user?.permissions || permissions;
+
+  // Check if user can create tenders
+  const canCreate =
+    user?.role === "admin" ||
+    !user?.organizationId ||
+    userPermissions?.canCreateTenders;
+
+  console.log("=== IssuerDashboard Permissions Debug ===");
+  console.log("User:", user);
+
   const [stats, setStats] = useState({
     totalTenders: 0,
     activeTenders: 0,
@@ -416,14 +429,22 @@ const IssuerDashboard = () => {
           <h3 className="text-xl font-semibold text-white mb-6">
             Quick Actions
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center space-x-3 p-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 rounded-lg hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
-            >
-              <Plus className="w-5 h-5 text-cyan-400" />
-              <span className="text-white font-medium">Create New Tender</span>
-            </button>
+          <div
+            className={`grid grid-cols-1 ${
+              canCreate ? "md:grid-cols-3" : "md:grid-cols-2"
+            } gap-4`}
+          >
+            {canCreate && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center space-x-3 p-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 rounded-lg hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
+              >
+                <Plus className="w-5 h-5 text-cyan-400" />
+                <span className="text-white font-medium">
+                  Create New Tender
+                </span>
+              </button>
+            )}
             <button
               onClick={() => navigate("/issuer/tenders")}
               className="flex items-center space-x-3 p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300"
@@ -467,14 +488,15 @@ const IssuerDashboard = () => {
         onStatusUpdate={handleStatusUpdate}
       />
 
-      <CreateTenderModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSuccess={() => {
-          fetchDashboardData();
-          toast.success("Tender created successfully!");
-        }}
-      />
+      {canCreate && (
+        <CreateTenderModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            fetchDashboardData();
+          }}
+        />
+      )}
     </DashboardLayout>
   );
 };

@@ -4,6 +4,7 @@ import Header from "./Header";
 
 const DashboardLayout = ({ children, title, subtitle }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const checkIsMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -14,7 +15,10 @@ const DashboardLayout = ({ children, title, subtitle }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <Sidebar />
+      <Sidebar 
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
 
       {/* Main content - Responsive padding and margins */}
       <div
@@ -22,7 +26,12 @@ const DashboardLayout = ({ children, title, subtitle }) => {
           isMobile ? "ml-0" : "ml-64"
         } transition-all duration-300 min-h-screen`}
       >
-        <Header title={title} subtitle={subtitle} />
+        <Header 
+          title={title} 
+          subtitle={subtitle}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
         <main className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
           <div className="w-full max-w-[1920px] mx-auto">
             {children}

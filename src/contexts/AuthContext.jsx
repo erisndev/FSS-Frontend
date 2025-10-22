@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { authApi } from "../services/api";
+import { authApi, teamAuthApi, teamMemberApi } from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -11,19 +11,56 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [permissions, setPermissions] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchPermissions = async (userData) => {
+    if (!userData?.organizationId) {
+      setPermissions(null);
+      return;
+    }
+
+    try {
+      const members = await teamMemberApi.getTeamMembers(userData.organizationId);
+      const current = members?.find(
+        m => m.user?._id === userData._id || 
+             m.userId === userData._id || 
+             m._id === userData?.memberId
+      );
+      setPermissions(current?.permissions || null);
+    } catch (e) {
+      console.error('Failed to load permissions', e);
+      setPermissions(null);
+    }
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem("token");
+        const tokenExpiry = localStorage.getItem("tokenExpiry");
+        
         if (token) {
+          // Check if token has expired
+          if (tokenExpiry && new Date().getTime() > parseInt(tokenExpiry)) {
+            console.log("Token has expired, logging out");
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            localStorage.removeItem("tokenExpiry");
+            setPermissions(null);
+            setLoading(false);
+            return;
+          }
+          
           const userData = await authApi.me();
           setUser(userData);
+          await fetchPermissions(userData);
         }
       } catch (error) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        localStorage.removeItem("tokenExpiry");
+        setPermissions(null);
       } finally {
         setLoading(false);
       }
@@ -34,32 +71,89 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const res = await authApi.login(email, password);
+      
+      // Check if this is a redirect response (not an error, but a redirect instruction)
+      if (res.redirectToTeamLogin) {
+        // Return the redirect data instead of throwing an error
+        return {
+          redirectToTeamLogin: true,
+          organizationEmail: res.organizationEmail,
+          organizationName: res.organizationName,
+          message: res.message
+        };
+      }
+      
       if (!res.token || !res.user) throw new Error("Invalid login response");
 
+      // Set token expiry to 24 hours from now
+      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+      
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
+      localStorage.setItem("tokenExpiry", expiryTime.toString());
       setUser(res.user);
+      await fetchPermissions(res.user);
 
       return res.user;
     } catch (error) {
       let message =
         error?.response?.data?.message || error.message || "Login failed";
       console.error("Login error:", message);
+      // Throw the original error object so we can access response data
+      throw error;
+    }
+  };
+
+  const teamLogin = async (email, memberId, password) => {
+    try {
+      const res = await teamAuthApi.teamLogin(email, memberId, password);
+      if (!res.token || !res.user) throw new Error("Invalid login response");
+
+      // Set token expiry to 24 hours from now
+      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
+      localStorage.setItem("tokenExpiry", expiryTime.toString());
+      setUser(res.user);
+      await fetchPermissions(res.user);
+
+      return res.user;
+    } catch (error) {
+      let message =
+        error?.response?.data?.message || error.message || "Team login failed";
+      console.error("Team login error:", message);
       throw new Error(message);
     }
   };
 
-  const register = async (name, email, password, role) => {
+  const getTeamMembers = async (email) => {
     try {
-      const { user: userData, token } = await authApi.register(
-        name,
-        email,
-        password,
-        role
-      );
+      const res = await teamAuthApi.getTeamMembersForLogin(email);
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const hasPermission = (permission) => {
+    if (!user || !user.permissions) return false;
+    return user.permissions[permission] === true;
+  };
+
+  const isTeamLeader = () => {
+    // Check if user has memberRole set to team_leader
+    // Only return true if memberRole is explicitly "team_leader"
+    return user?.memberRole === "team_leader";
+  };
+
+  const register = async (userData) => {
+    try {
+      const { user: registeredUser, token } = await authApi.register(userData);
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(userData));
-      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(registeredUser));
+      setUser(registeredUser);
+      await fetchPermissions(registeredUser);
     } catch (error) {
       throw new Error(error?.response?.data?.message || "Registration failed");
     }
@@ -68,7 +162,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("tokenExpiry");
     setUser(null);
+    setPermissions(null);
     console.log("User logged out");
   };
 
@@ -89,9 +185,15 @@ export const AuthProvider = ({ children }) => {
         email,
         otp
       );
+      
+      // Set token expiry to 24 hours from now
+      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+      
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("tokenExpiry", expiryTime.toString());
       setUser(userData);
+      await fetchPermissions(userData);
       return userData;
     } catch (error) {
       throw new Error(
@@ -147,6 +249,7 @@ export const AuthProvider = ({ children }) => {
       if (data.user) {
         localStorage.setItem("user", JSON.stringify(data.user));
         setUser(data.user);
+        await fetchPermissions(data.user);
       }
       return data.user;
     } catch (error) {
@@ -158,18 +261,24 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    permissions,
     setUser,
     login,
+    teamLogin,
+    getTeamMembers,
     register,
     logout,
     forgotPassword,
-    verifyRegisterOTP, // ✅ updated
-    verifyResetOTP, // ✅ updated
+    verifyRegisterOTP,
+    verifyResetOTP,
     resetPassword,
     loading,
     resendRegisterOTP,
     resendResetOTP,
     updateProfile,
+    hasPermission,
+    isTeamLeader,
+    fetchPermissions,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

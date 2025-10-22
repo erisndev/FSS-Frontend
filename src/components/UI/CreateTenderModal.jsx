@@ -30,6 +30,7 @@ import { tenderApi } from "../../services/api";
 import toast from "react-hot-toast";
 
 const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
+  const contentRef = React.useRef(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -129,19 +130,24 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     }
   }, [isOpen]);
 
+  // Clean stray artifacts: ensure file has no rogue text nodes around this line
   const validateField = (name, value) => {
     let error = "";
 
     switch (name) {
       case "title":
         if (!value.trim()) error = "Title is required";
-        else if (value.length < 10) error = "Title must be at least 10 characters";
-        else if (value.length > 100) error = "Title must be less than 100 characters";
+        else if (value.length < 10)
+          error = "Title must be at least 10 characters";
+        else if (value.length > 100)
+          error = "Title must be less than 100 characters";
         break;
       case "description":
         if (!value.trim()) error = "Description is required";
-        else if (value.length < 50) error = "Description must be at least 50 characters";
-        else if (value.length > 2000) error = "Description must be less than 2000 characters";
+        else if (value.length < 50)
+          error = "Description must be at least 50 characters";
+        else if (value.length > 2000)
+          error = "Description must be less than 2000 characters";
         break;
       case "category":
         if (!value) error = "Category is required";
@@ -156,7 +162,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
       case "budgetMax":
         if (!value) error = "Maximum budget is required";
         else if (Number(value) < 0) error = "Budget cannot be negative";
-        else if (Number(value) < Number(formData.budgetMin)) 
+        else if (Number(value) < Number(formData.budgetMin))
           error = "Maximum budget must be greater than minimum";
         break;
       case "deadline":
@@ -165,16 +171,18 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           const deadlineDate = new Date(value);
           const minDate = new Date();
           minDate.setDate(minDate.getDate() + 7); // Minimum 7 days from now
-          if (deadlineDate <= new Date()) error = "Deadline must be in the future";
-          else if (deadlineDate < minDate) error = "Deadline must be at least 7 days from now";
+          if (deadlineDate <= new Date())
+            error = "Deadline must be in the future";
+          else if (deadlineDate < minDate)
+            error = "Deadline must be at least 7 days from now";
         }
         break;
       case "contactEmail":
-        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) 
+        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
           error = "Invalid email format";
         break;
       case "contactPhone":
-        if (value && !/^[\d\s\-\+\(\)]+$/.test(value)) 
+        if (value && !/^[\d\s\-\+\(\)]+$/.test(value))
           error = "Invalid phone number format";
         break;
       default:
@@ -188,7 +196,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     const newErrors = {};
     const fieldsToValidate = getStepFields(step);
 
-    fieldsToValidate.forEach(field => {
+    fieldsToValidate.forEach((field) => {
       const error = validateField(field, formData[field]);
       if (error) newErrors[field] = error;
     });
@@ -215,7 +223,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
   const handleNext = () => {
     const stepFields = getStepFields(currentStep);
     const newTouched = {};
-    stepFields.forEach(field => {
+    stepFields.forEach((field) => {
       newTouched[field] = true;
     });
     setTouched({ ...touched, ...newTouched });
@@ -223,6 +231,10 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     if (validateStep(currentStep)) {
       setCompletedSteps([...completedSteps, currentStep]);
       setCurrentStep(currentStep + 1);
+      // Scroll to top of form
+      if (contentRef.current) {
+        contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } else {
       toast.error("Please fix the errors before proceeding", {
         icon: "⚠️",
@@ -232,6 +244,10 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleBack = () => {
     setCurrentStep(currentStep - 1);
+    // Scroll to top of form
+    if (contentRef.current) {
+      contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleStepClick = (step) => {
@@ -243,7 +259,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked : value;
-    
+
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
@@ -284,8 +300,8 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
   const addFiles = (files) => {
     const maxSize = 10 * 1024 * 1024; // 10MB
     const validFiles = [];
-    
-    files.forEach(file => {
+
+    files.forEach((file) => {
       if (file.size > maxSize) {
         toast.error(`${file.name} is too large. Maximum size is 10MB`);
       } else {
@@ -343,7 +359,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate all steps
     let hasErrors = false;
     for (let step = 1; step <= 2; step++) {
@@ -367,19 +383,22 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
         ...formData,
         budgetMin: Number(formData.budgetMin),
         budgetMax: Number(formData.budgetMax),
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+        tags: formData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
       };
 
       await tenderApi.createTender(submitData);
-      
+
       // Success animation
       toast.success("Tender created successfully! 🎉", {
         duration: 4000,
       });
-      
+
       // Clear draft from localStorage
       localStorage.removeItem("tenderDraft");
-      
+
       // Reset form
       setFormData({
         title: "",
@@ -405,7 +424,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
       setErrors({});
       setTouched({});
       setCompletedSteps([]);
-      
+
       onSuccess?.();
       onClose();
     } catch (error) {
@@ -420,9 +439,13 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleClose = () => {
     if (isSubmitting || isSavingDraft) return;
-    
+
     // Check if form has significant data
-    const hasData = formData.title || formData.description || formData.category || formData.companyName;
+    const hasData =
+      formData.title ||
+      formData.description ||
+      formData.category ||
+      formData.companyName;
     if (hasData) {
       const confirmClose = window.confirm(
         "You have unsaved changes. Do you want to save them as a draft before closing?"
@@ -432,27 +455,38 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
         return;
       }
     }
-    
+
     onClose();
   };
 
   const getStepProgress = () => {
     const totalFields = getStepFields(currentStep).length;
     if (totalFields === 0) return 100;
-    
+
     const filledFields = getStepFields(currentStep).filter(
-      field => formData[field] && formData[field].toString().trim()
+      (field) => formData[field] && formData[field].toString().trim()
     ).length;
-    
+
     return Math.round((filledFields / totalFields) * 100);
   };
 
   const getOverallProgress = () => {
-    const requiredFields = ["title", "category", "description", "companyName", "budgetMin", "budgetMax", "deadline"];
-    const filledFields = requiredFields.filter(field => formData[field] && formData[field].toString().trim()).length;
+    const requiredFields = [
+      "title",
+      "category",
+      "description",
+      "companyName",
+      "budgetMin",
+      "budgetMax",
+      "deadline",
+    ];
+    const filledFields = requiredFields.filter(
+      (field) => formData[field] && formData[field].toString().trim()
+    ).length;
     return Math.round((filledFields / requiredFields.length) * 100);
   };
 
+  // Guard render
   if (!isOpen) return null;
 
   return (
@@ -509,7 +543,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
             <div className="mt-2">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-gray-400">Overall Progress</span>
-                <span className="text-xs text-cyan-400 font-medium">{getOverallProgress()}%</span>
+                <span className="text-xs text-cyan-400 font-medium">
+                  {getOverallProgress()}%
+                </span>
               </div>
               <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
                 <motion.div
@@ -526,13 +562,13 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="px-4 py-2 bg-slate-900/50 border-b border-cyan-400/10">
             <div className="flex items-center justify-between">
               {stepInfo.map((step, index) => (
-                <div
-                  key={step.number}
-                  className="flex items-center flex-1"
-                >
+                <div key={step.number} className="flex items-center flex-1">
                   <button
                     onClick={() => handleStepClick(step.number)}
-                    disabled={step.number > currentStep && !completedSteps.includes(step.number - 1)}
+                    disabled={
+                      step.number > currentStep &&
+                      !completedSteps.includes(step.number - 1)
+                    }
                     className={`flex items-center space-x-2 p-2 rounded-lg transition-all duration-300 ${
                       currentStep === step.number
                         ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30"
@@ -543,30 +579,44 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         : "opacity-50 cursor-not-allowed"
                     }`}
                   >
-                    <div className={`relative ${currentStep === step.number ? "animate-pulse" : ""}`}>
-                      <step.icon className={`w-4 h-4 ${
-                        currentStep === step.number
-                          ? "text-cyan-400"
-                          : completedSteps.includes(step.number)
-                          ? "text-green-400"
-                          : "text-gray-400"
-                      }`} />
+                    <div
+                      className={`relative ${
+                        currentStep === step.number ? "animate-pulse" : ""
+                      }`}
+                    >
+                      <step.icon
+                        className={`w-4 h-4 ${
+                          currentStep === step.number
+                            ? "text-cyan-400"
+                            : completedSteps.includes(step.number)
+                            ? "text-green-400"
+                            : "text-gray-400"
+                        }`}
+                      />
                       {completedSteps.includes(step.number) && (
                         <CheckCircle className="absolute -top-1 -right-1 w-2.5 h-2.5 text-green-400" />
                       )}
                     </div>
                     <div className="hidden lg:block text-left">
-                      <p className={`text-xs font-medium ${
-                        currentStep === step.number ? "text-white" : "text-gray-400"
-                      }`}>
+                      <p
+                        className={`text-xs font-medium ${
+                          currentStep === step.number
+                            ? "text-white"
+                            : "text-gray-400"
+                        }`}
+                      >
                         {step.title}
                       </p>
                     </div>
                   </button>
                   {index < stepInfo.length - 1 && (
-                    <ArrowRight className={`w-3 h-3 mx-1 ${
-                      completedSteps.includes(step.number) ? "text-green-400" : "text-gray-600"
-                    }`} />
+                    <ArrowRight
+                      className={`w-3 h-3 mx-1 ${
+                        completedSteps.includes(step.number)
+                          ? "text-green-400"
+                          : "text-gray-600"
+                      }`}
+                    />
                   )}
                 </div>
               ))}
@@ -575,8 +625,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
             {/* Step Progress */}
             <div className="mt-2">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-gray-400">Step {currentStep} Progress</span>
-                <span className="text-xs text-purple-400 font-medium">{getStepProgress()}%</span>
+                <span className="text-xs text-gray-400">
+                  Step {currentStep} Progress
+                </span>
+                <span className="text-xs text-purple-400 font-medium">
+                  {getStepProgress()}%
+                </span>
               </div>
               <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
                 <motion.div
@@ -591,7 +645,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           {/* Content - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+          <div ref={contentRef} className="flex-1 overflow-y-auto p-6 custom-scrollbar">
             <form onSubmit={handleSubmit}>
               <AnimatePresence mode="wait">
                 {/* Step 1: Basic Information */}
@@ -608,9 +662,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       <div className="flex items-start space-x-3">
                         <Info className="w-5 h-5 text-cyan-400 mt-0.5" />
                         <div>
-                          <p className="text-sm text-cyan-400 font-medium">Quick Tip</p>
+                          <p className="text-sm text-cyan-400 font-medium">
+                            Quick Tip
+                          </p>
                           <p className="text-xs text-gray-400 mt-1">
-                            A clear and descriptive title helps bidders quickly understand your tender requirements.
+                            A clear and descriptive title helps bidders quickly
+                            understand your tender requirements.
                           </p>
                         </div>
                       </div>
@@ -628,7 +685,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         onBlur={handleBlur}
                         placeholder="e.g., Construction of Office Building in Johannesburg"
                         className={`w-full px-4 py-3 bg-slate-800/50 border ${
-                          touched.title && errors.title ? "border-red-400/50" : "border-cyan-400/20"
+                          touched.title && errors.title
+                            ? "border-red-400/50"
+                            : "border-cyan-400/20"
                         } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                       />
                       {touched.title && errors.title && (
@@ -657,7 +716,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           onChange={handleInputChange}
                           onBlur={handleBlur}
                           className={`w-full px-4 py-3 bg-slate-800/50 border ${
-                            touched.category && errors.category ? "border-red-400/50" : "border-cyan-400/20"
+                            touched.category && errors.category
+                              ? "border-red-400/50"
+                              : "border-cyan-400/20"
                           } rounded-lg text-white focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                         >
                           <option value="">Select a category</option>
@@ -693,7 +754,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             onBlur={handleBlur}
                             placeholder="Your company name"
                             className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
-                              touched.companyName && errors.companyName ? "border-red-400/50" : "border-cyan-400/20"
+                              touched.companyName && errors.companyName
+                                ? "border-red-400/50"
+                                : "border-cyan-400/20"
                             } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                           />
                         </div>
@@ -722,7 +785,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         rows={5}
                         placeholder="Provide a detailed description of the tender requirements, scope of work, and expectations..."
                         className={`w-full px-4 py-3 bg-slate-800/50 border ${
-                          touched.description && errors.description ? "border-red-400/50" : "border-cyan-400/20"
+                          touched.description && errors.description
+                            ? "border-red-400/50"
+                            : "border-cyan-400/20"
                         } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200 resize-none`}
                       />
                       {touched.description && errors.description && (
@@ -756,7 +821,8 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         />
                       </div>
                       <p className="mt-1 text-xs text-gray-500">
-                        Separate tags with commas to help bidders find your tender
+                        Separate tags with commas to help bidders find your
+                        tender
                       </p>
                     </div>
 
@@ -769,9 +835,14 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         onChange={handleInputChange}
                         className="w-5 h-5 text-red-400 bg-slate-800 border-red-400/20 rounded focus:ring-red-400/50"
                       />
-                      <label htmlFor="isUrgent" className="flex items-center space-x-2 cursor-pointer">
+                      <label
+                        htmlFor="isUrgent"
+                        className="flex items-center space-x-2 cursor-pointer"
+                      >
                         <AlertCircle className="w-5 h-5 text-red-400" />
-                        <span className="text-sm text-gray-300">Mark as urgent tender</span>
+                        <span className="text-sm text-gray-300">
+                          Mark as urgent tender
+                        </span>
                       </label>
                     </div>
                   </motion.div>
@@ -791,9 +862,13 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       <div className="flex items-start space-x-3">
                         <Info className="w-5 h-5 text-purple-400 mt-0.5" />
                         <div>
-                          <p className="text-sm text-purple-400 font-medium">Budget Guidelines</p>
+                          <p className="text-sm text-purple-400 font-medium">
+                            Budget Guidelines
+                          </p>
                           <p className="text-xs text-gray-400 mt-1">
-                            Set realistic budget ranges to attract qualified bidders. Consider market rates and project complexity.
+                            Set realistic budget ranges to attract qualified
+                            bidders. Consider market rates and project
+                            complexity.
                           </p>
                         </div>
                       </div>
@@ -802,7 +877,8 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Minimum Budget (R) <span className="text-red-400">*</span>
+                          Minimum Budget (R){" "}
+                          <span className="text-red-400">*</span>
                         </label>
                         <div className="relative">
                           <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -815,7 +891,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             placeholder="0"
                             min="0"
                             className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
-                              touched.budgetMin && errors.budgetMin ? "border-red-400/50" : "border-cyan-400/20"
+                              touched.budgetMin && errors.budgetMin
+                                ? "border-red-400/50"
+                                : "border-cyan-400/20"
                             } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                           />
                         </div>
@@ -833,7 +911,8 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Maximum Budget (R) <span className="text-red-400">*</span>
+                          Maximum Budget (R){" "}
+                          <span className="text-red-400">*</span>
                         </label>
                         <div className="relative">
                           <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -846,7 +925,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             placeholder="0"
                             min="0"
                             className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
-                              touched.budgetMax && errors.budgetMax ? "border-red-400/50" : "border-cyan-400/20"
+                              touched.budgetMax && errors.budgetMax
+                                ? "border-red-400/50"
+                                : "border-cyan-400/20"
                             } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                           />
                         </div>
@@ -870,14 +951,19 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         className="p-4 bg-cyan-500/10 border border-cyan-400/20 rounded-lg"
                       >
                         <p className="text-sm text-cyan-400">
-                          Budget Range: <span className="font-bold">R{Number(formData.budgetMin).toLocaleString()} - R{Number(formData.budgetMax).toLocaleString()}</span>
+                          Budget Range:{" "}
+                          <span className="font-bold">
+                            R{Number(formData.budgetMin).toLocaleString()} - R
+                            {Number(formData.budgetMax).toLocaleString()}
+                          </span>
                         </p>
                       </motion.div>
                     )}
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Submission Deadline <span className="text-red-400">*</span>
+                        Submission Deadline{" "}
+                        <span className="text-red-400">*</span>
                       </label>
                       <div className="relative">
                         <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -887,9 +973,10 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           value={formData.deadline}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          min={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16)}
                           className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
-                            touched.deadline && errors.deadline ? "border-red-400/50" : "border-cyan-400/20"
+                            touched.deadline && errors.deadline
+                              ? "border-red-400/50"
+                              : "border-cyan-400/20"
                           } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                         />
                       </div>
@@ -912,11 +999,16 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           <div className="flex items-center space-x-2">
                             <Clock className="w-4 h-4 text-purple-400" />
                             <p className="text-sm text-purple-400">
-                              Deadline: {new Date(formData.deadline).toLocaleString()}
+                              Deadline:{" "}
+                              {new Date(formData.deadline).toLocaleString()}
                             </p>
                           </div>
                           <p className="text-xs text-gray-400 mt-1">
-                            {Math.ceil((new Date(formData.deadline) - new Date()) / (1000 * 60 * 60 * 24))} days from now
+                            {Math.ceil(
+                              (new Date(formData.deadline) - new Date()) /
+                                (1000 * 60 * 60 * 24)
+                            )}{" "}
+                            days from now
                           </p>
                         </motion.div>
                       )}
@@ -932,9 +1024,13 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
                       >
-                        <option value="active">Active - Open for applications</option>
+                        <option value="active">
+                          Active - Open for applications
+                        </option>
                         <option value="draft">Draft - Save for later</option>
-                        <option value="closed">Closed - Not accepting applications</option>
+                        <option value="closed">
+                          Closed - Not accepting applications
+                        </option>
                       </select>
                     </div>
                   </motion.div>
@@ -954,9 +1050,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       <div className="flex items-start space-x-3">
                         <Info className="w-5 h-5 text-emerald-400 mt-0.5" />
                         <div>
-                          <p className="text-sm text-emerald-400 font-medium">Company Information</p>
+                          <p className="text-sm text-emerald-400 font-medium">
+                            Company Information
+                          </p>
                           <p className="text-xs text-gray-400 mt-1">
-                            These details help establish credibility and enable bidders to verify your organization.
+                            These details help establish credibility and enable
+                            bidders to verify your organization.
                           </p>
                         </div>
                       </div>
@@ -1017,7 +1116,18 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white focus:outline-none focus:border-cyan-400/50 transition-all duration-200 appearance-none"
                         >
                           <option value="">Select CIDB Grading</option>
-                          {["1GB", "2GB", "3GB", "4GB", "5GB", "6GB", "7GB", "8GB", "9GB", "10GB"].map((grade) => (
+                          {[
+                            "1GB",
+                            "2GB",
+                            "3GB",
+                            "4GB",
+                            "5GB",
+                            "6GB",
+                            "7GB",
+                            "8GB",
+                            "9GB",
+                            "10GB",
+                          ].map((grade) => (
                             <option key={grade} value={grade}>
                               {grade}
                             </option>
@@ -1031,7 +1141,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         <User className="w-4 h-4" />
                         <span>Contact Information</span>
                       </h4>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                           Contact Person
@@ -1064,7 +1174,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                               onBlur={handleBlur}
                               placeholder="contact@example.com"
                               className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
-                                touched.contactEmail && errors.contactEmail ? "border-red-400/50" : "border-cyan-400/20"
+                                touched.contactEmail && errors.contactEmail
+                                  ? "border-red-400/50"
+                                  : "border-cyan-400/20"
                               } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                             />
                           </div>
@@ -1094,7 +1206,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                               onBlur={handleBlur}
                               placeholder="+27 12 345 6789"
                               className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
-                                touched.contactPhone && errors.contactPhone ? "border-red-400/50" : "border-cyan-400/20"
+                                touched.contactPhone && errors.contactPhone
+                                  ? "border-red-400/50"
+                                  : "border-cyan-400/20"
                               } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                             />
                           </div>
@@ -1137,7 +1251,8 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200 resize-none"
                       />
                       <p className="mt-1 text-xs text-gray-500">
-                        Be specific about mandatory requirements vs. preferred qualifications
+                        Be specific about mandatory requirements vs. preferred
+                        qualifications
                       </p>
                     </div>
 
@@ -1177,7 +1292,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             <Upload className="w-12 h-12 text-cyan-400 mb-3" />
                           </motion.div>
                           <span className="text-white font-medium text-lg">
-                            {isDragging ? "Drop files here" : "Upload Documents"}
+                            {isDragging
+                              ? "Drop files here"
+                              : "Upload Documents"}
                           </span>
                           <span className="text-gray-400 text-sm mt-2">
                             Click to browse or drag and drop
@@ -1208,7 +1325,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                               <div className="flex items-center space-x-3">
                                 <FileText className="w-5 h-5 text-cyan-400" />
                                 <div>
-                                  <p className="text-white text-sm font-medium">{doc.name}</p>
+                                  <p className="text-white text-sm font-medium">
+                                    {doc.name}
+                                  </p>
                                   <p className="text-gray-500 text-xs">
                                     {formatFileSize(doc.size)}
                                   </p>
@@ -1242,23 +1361,35 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         <div className="space-y-2">
                           <p className="text-gray-300">
                             <span className="text-gray-500">Title:</span>{" "}
-                            <span className="text-white font-medium">{formData.title || "Not set"}</span>
+                            <span className="text-white font-medium">
+                              {formData.title || "Not set"}
+                            </span>
                           </p>
                           <p className="text-gray-300">
                             <span className="text-gray-500">Company:</span>{" "}
-                            <span className="text-white font-medium">{formData.companyName || "Not set"}</span>
+                            <span className="text-white font-medium">
+                              {formData.companyName || "Not set"}
+                            </span>
                           </p>
                           <p className="text-gray-300">
                             <span className="text-gray-500">Category:</span>{" "}
-                            <span className="text-white font-medium">{formData.category || "Not set"}</span>
+                            <span className="text-white font-medium">
+                              {formData.category || "Not set"}
+                            </span>
                           </p>
                           <p className="text-gray-300">
                             <span className="text-gray-500">Status:</span>{" "}
-                            <span className={`font-medium ${
-                              formData.status === 'active' ? 'text-green-400' : 
-                              formData.status === 'draft' ? 'text-yellow-400' : 'text-gray-400'
-                            }`}>
-                              {formData.status.charAt(0).toUpperCase() + formData.status.slice(1)}
+                            <span
+                              className={`font-medium ${
+                                formData.status === "active"
+                                  ? "text-green-400"
+                                  : formData.status === "draft"
+                                  ? "text-yellow-400"
+                                  : "text-gray-400"
+                              }`}
+                            >
+                              {formData.status.charAt(0).toUpperCase() +
+                                formData.status.slice(1)}
                             </span>
                           </p>
                         </div>
@@ -1266,18 +1397,27 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           <p className="text-gray-300">
                             <span className="text-gray-500">Budget:</span>{" "}
                             <span className="text-cyan-400 font-medium">
-                              R{Number(formData.budgetMin || 0).toLocaleString()} - R{Number(formData.budgetMax || 0).toLocaleString()}
+                              R
+                              {Number(formData.budgetMin || 0).toLocaleString()}{" "}
+                              - R
+                              {Number(formData.budgetMax || 0).toLocaleString()}
                             </span>
                           </p>
                           <p className="text-gray-300">
                             <span className="text-gray-500">Deadline:</span>{" "}
                             <span className="text-white font-medium">
-                              {formData.deadline ? new Date(formData.deadline).toLocaleDateString() : 'Not set'}
+                              {formData.deadline
+                                ? new Date(
+                                    formData.deadline
+                                  ).toLocaleDateString()
+                                : "Not set"}
                             </span>
                           </p>
                           <p className="text-gray-300">
                             <span className="text-gray-500">Documents:</span>{" "}
-                            <span className="text-white font-medium">{formData.documents.length} file(s)</span>
+                            <span className="text-white font-medium">
+                              {formData.documents.length} file(s)
+                            </span>
                           </p>
                           {formData.isUrgent && (
                             <p className="text-red-400 font-medium flex items-center space-x-1">
@@ -1310,7 +1450,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                   <span>Back</span>
                 </motion.button>
               )}
-              {currentStep === 4 && formData.status === 'active' && (
+              {currentStep === 4 && formData.status === "active" && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -1333,7 +1473,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                 </motion.button>
               )}
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -1345,7 +1485,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
               >
                 Cancel
               </motion.button>
-              
+
               {currentStep < 4 ? (
                 <motion.button
                   whileHover={{ scale: 1.05 }}

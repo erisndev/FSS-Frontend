@@ -174,7 +174,10 @@ const EditTender = () => {
       console.error(err);
       const msg = err.response?.data?.message || "Failed to update tender";
       setError(msg);
-      toast.error(msg);
+      // Don't show toast if it's a permission error (403) - API interceptor handles it
+      if (err.response?.status !== 403) {
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }

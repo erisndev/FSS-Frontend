@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import StatusChangeModal from "./StatusChangeModal";
+import { canPerformApplicationAction } from "../../utils/permissions";
 
 const ApplicationModal = ({
   isOpen,
@@ -30,20 +31,17 @@ const ApplicationModal = ({
   const [statusAction, setStatusAction] = useState("");
   const [showStatusModal, setShowStatusModal] = useState(false);
 
+  // Use permissions from user object if available
+  const userPermissions = user?.permissions;
+
+  // Check if user can view applications
+  const canView = canPerformApplicationAction(user, userPermissions, tender, 'view');
+
+  // Check if user can accept/reject applications
+  const canAcceptReject = canPerformApplicationAction(user, userPermissions, tender, 'accept');
+
   const canChangeStatus = () => {
-    if (user?.role === "admin") return true;
-    if (user?.role === "issuer") {
-      const userId = user?.id || user?._id;
-      return (
-        tender?.createdBy === userId ||
-        tender?.userId === userId ||
-        tender?.issuerId === userId ||
-        tender?.issuer === userId ||
-        tender?.user === userId ||
-        !tender
-      );
-    }
-    return false;
+    return canAcceptReject;
   };
 
   const formatDate = (date) => {

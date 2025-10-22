@@ -20,10 +20,9 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import NotificationBadge from "../UI/NotificationBadge";
 
-const Sidebar = () => {
-  const { user, logout } = useAuth();
+const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
+  const { user, logout, isTeamLeader } = useAuth();
   const location = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -62,7 +61,7 @@ const Sidebar = () => {
           { name: "Profile", path: "/bidder/profile", icon: User },
         ];
       case "issuer":
-        return [
+        const issuerMenu = [
           { name: "Dashboard", path: "/issuer", icon: Home },
           { name: "My Tenders", path: "/issuer/tenders", icon: FileText },
           {
@@ -76,9 +75,23 @@ const Sidebar = () => {
             icon: ShieldCheck,
           },
           { name: "Analytics", path: "/issuer/analytics", icon: BarChart3 },
-          { name: "Notifications", path: "/issuer/notifications", icon: Bell },
-          { name: "Profile", path: "/issuer/profile", icon: User },
         ];
+
+        // Add Team Management for team leaders
+        if (isTeamLeader()) {
+          issuerMenu.push({
+            name: "Team Management",
+            path: "/issuer/team",
+            icon: Users,
+          });
+        }
+
+        issuerMenu.push(
+          { name: "Notifications", path: "/issuer/notifications", icon: Bell },
+          { name: "Profile", path: "/issuer/profile", icon: User }
+        );
+
+        return issuerMenu;
       case "admin":
         return [
           { name: "Dashboard", path: "/admin", icon: Home },
@@ -176,14 +189,14 @@ const Sidebar = () => {
       </div> */}
 
         {/* Navigation */}
-        <nav className="space-y-1 lg:space-y-2">
+        <nav className="space-y-2 md:space-y-2 lg:space-y-2">
           {menuItems.map((item, index) => {
             const isActive = location.pathname === item.path;
             return (
               <NavLink
                 key={item.name}
                 to={item.path}
-                className={`flex items-center justify-between p-2.5 lg:p-3 rounded-lg transition-all duration-300 group touch-manipulation ${
+                className={`flex items-center justify-between p-3.5 md:p-3 lg:p-3 rounded-lg transition-all duration-300 group touch-manipulation min-h-[48px] ${
                   isActive
                     ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 text-cyan-400"
                     : "text-gray-300 hover:text-white hover:bg-white/5 active:bg-white/10"
@@ -191,13 +204,13 @@ const Sidebar = () => {
               >
                 <div className="flex items-center space-x-3">
                   <item.icon
-                    className={`w-5 h-5 flex-shrink-0 ${
+                    className={`w-5 h-5 md:w-5 md:h-5 lg:w-5 lg:h-5 flex-shrink-0 ${
                       isActive
                         ? "text-cyan-400"
                         : "text-gray-400 group-hover:text-white"
                     }`}
                   />
-                  <span className="font-medium text-sm lg:text-base truncate">
+                  <span className="font-medium text-base md:text-base lg:text-base truncate">
                     {item.name}
                   </span>
                 </div>
@@ -210,10 +223,12 @@ const Sidebar = () => {
       {/* Logout Button */}
       <button
         onClick={() => setShowLogoutModal(true)}
-        className="flex items-center space-x-3 p-2.5 lg:p-3 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 active:bg-red-500/20 transition-all duration-300 w-full touch-manipulation"
+        className="flex items-center space-x-3 p-3.5 md:p-3 lg:p-3 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 active:bg-red-500/20 transition-all duration-300 w-full touch-manipulation min-h-[48px]"
       >
-        <LogOut className="w-5 h-5 flex-shrink-0" />
-        <span className="font-medium text-sm lg:text-base">Logout</span>
+        <LogOut className="w-5 h-5 md:w-5 md:h-5 lg:w-5 lg:h-5 flex-shrink-0" />
+        <span className="font-medium text-base md:text-base lg:text-base">
+          Logout
+        </span>
       </button>
     </div>
   );
@@ -243,12 +258,12 @@ const Sidebar = () => {
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border-r border-cyan-400/20 shadow-2xl z-50 lg:hidden"
+              className="fixed left-0 top-0 h-full w-full sm:w-80 sm:max-w-[85vw] bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border-r border-cyan-400/20 shadow-2xl z-50 lg:hidden"
             >
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 aria-label="Close sidebar"
-                className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-cyan-400/20 text-cyan-400"
+                className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-cyan-400/20 text-cyan-400 z-10"
               >
                 <X className="w-5 h-5" />
               </button>

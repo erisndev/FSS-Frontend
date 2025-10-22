@@ -103,8 +103,8 @@ const TenderManagement = () => {
 
   const filteredTenders = tenders.filter((tender) => {
     const matchesSearch =
-      tender.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tender.companyName.toLowerCase().includes(searchTerm.toLowerCase());
+      (tender.title?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (tender.companyName?.toLowerCase() || "").includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "" || tender.status === statusFilter;
     const matchesCategory =
       categoryFilter === "" || tender.category === categoryFilter;

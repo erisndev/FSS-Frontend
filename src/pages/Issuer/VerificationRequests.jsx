@@ -16,11 +16,16 @@ import {
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import EmptyState from "../../components/UI/EmptyState";
+import ConfirmActionModal from "../../components/UI/ConfirmActionModal";
+import RejectionReasonModal from "../../components/UI/RejectionReasonModal";
 import { verificationCodeApi } from "../../services/api";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
+import { useAuth } from "../../contexts/AuthContext";
+import { canManageVerifications } from "../../utils/permissions";
 
 const VerificationRequests = () => {
+  const { user } = useAuth();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,6 +33,15 @@ const VerificationRequests = () => {
   const [tenderFilter, setTenderFilter] = useState("all");
   const [processingId, setProcessingId] = useState(null);
   const [uniqueTenders, setUniqueTenders] = useState([]);
+
+  // Modal states
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
+
+  // Check if user can manage verification requests
+  const userPermissions = user?.permissions;
+  const canManage = canManageVerifications(user, userPermissions);
 
   useEffect(() => {
     fetchRequests();
@@ -58,20 +72,38 @@ const VerificationRequests = () => {
     }
   };
 
-  const handleApprove = async (requestId) => {
+  const handleApproveClick = (request) => {
+    setSelectedRequest(request);
+    setShowApproveModal(true);
+  };
+
+  const handleRejectClick = (request) => {
+    setSelectedRequest(request);
+    setShowRejectModal(true);
+  };
+
+  const confirmApprove = async () => {
+    if (!selectedRequest) return;
+
     try {
-      setProcessingId(requestId);
-      await verificationCodeApi.approveRequest(requestId);
+      setProcessingId(selectedRequest._id);
+
+      // Backend automatically logs this action as 'approve_verification_request'
+      await verificationCodeApi.approveRequest(selectedRequest._id);
+
       toast.success("Request approved successfully");
 
       // Update local state
       setRequests((prev) =>
         prev.map((req) =>
-          req._id === requestId
+          req._id === selectedRequest._id
             ? { ...req, status: "approved", approvedAt: new Date() }
             : req
         )
       );
+
+      setShowApproveModal(false);
+      setSelectedRequest(null);
     } catch (error) {
       console.error("Error approving request:", error);
       toast.error("Failed to approve request");
@@ -80,20 +112,28 @@ const VerificationRequests = () => {
     }
   };
 
-  const handleReject = async (requestId) => {
+  const confirmReject = async (reason) => {
+    if (!selectedRequest) return;
+
     try {
-      setProcessingId(requestId);
-      await verificationCodeApi.rejectRequest(requestId);
+      setProcessingId(selectedRequest._id);
+
+      // Backend automatically logs this action as 'reject_verification_request'
+      await verificationCodeApi.rejectRequest(selectedRequest._id, reason);
+
       toast.success("Request rejected");
 
       // Update local state
       setRequests((prev) =>
         prev.map((req) =>
-          req._id === requestId
+          req._id === selectedRequest._id
             ? { ...req, status: "rejected", rejectedAt: new Date() }
             : req
         )
       );
+
+      setShowRejectModal(false);
+      setSelectedRequest(null);
     } catch (error) {
       console.error("Error rejecting request:", error);
       toast.error("Failed to reject request");
@@ -149,8 +189,13 @@ const VerificationRequests = () => {
   const filteredRequests = requests.filter((request) => {
     const matchesSearch =
       searchTerm === "" ||
-      request.bidder?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.bidder?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.requestedBy?.company
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      request.requestedBy?.name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      request.requestedBy?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.tender?.title?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
@@ -266,7 +311,7 @@ const VerificationRequests = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by bidder name, email, or tender title..."
+              placeholder="Search by bidder company, email, or tender title..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50"
@@ -355,7 +400,9 @@ const VerificationRequests = () => {
                         </div>
                         <div>
                           <p className="text-white font-medium">
-                            {request.requestedBy?.name || "Unknown"}
+                            {request.requestedBy?.company ||
+                              request.requestedBy?.name ||
+                              "Unknown"}
                           </p>
                           <p className="text-gray-400 text-sm">
                             {request.requestedBy?.email || "No email"}
@@ -386,36 +433,32 @@ const VerificationRequests = () => {
                     </td>
                     <td className="px-6 py-4">
                       {(request.status || "pending").toLowerCase() ===
-                      "pending" ? (
+                        "pending" && canManage ? (
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => handleApprove(request._id)}
+                            onClick={() => handleApproveClick(request)}
                             disabled={processingId === request._id}
                             className="p-2 bg-green-500/20 border border-green-400/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Approve Request"
                           >
-                            {processingId === request._id ? (
-                              <div className="w-4 h-4 border-2 border-green-400 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <Check className="w-4 h-4" />
-                            )}
+                            <Check className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleReject(request._id)}
+                            onClick={() => handleRejectClick(request)}
                             disabled={processingId === request._id}
                             className="p-2 bg-red-500/20 border border-red-400/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Reject Request"
                           >
-                            {processingId === request._id ? (
-                              <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <X className="w-4 h-4" />
-                            )}
+                            <X className="w-4 h-4" />
                           </button>
                         </div>
                       ) : (
                         <span className="text-gray-500 text-sm">
-                          {(request.status || "").toLowerCase() === "approved"
+                          {(request.status || "pending").toLowerCase() ===
+                            "pending" && !canManage
+                            ? "No permission"
+                            : (request.status || "").toLowerCase() ===
+                              "approved"
                             ? "Approved"
                             : "Rejected"}
                         </span>
@@ -428,6 +471,36 @@ const VerificationRequests = () => {
           </div>
         </div>
       )}
+
+      {/* Modals */}
+      <ConfirmActionModal
+        isOpen={showApproveModal}
+        onClose={() => {
+          setShowApproveModal(false);
+          setSelectedRequest(null);
+        }}
+        onConfirm={confirmApprove}
+        title="Approve Verification Request"
+        message={`Are you sure you want to approve the verification request from ${
+          selectedRequest?.requestedBy?.company ||
+          selectedRequest?.requestedBy?.name ||
+          "this bidder"
+        } for "${
+          selectedRequest?.tender?.title || "this tender"
+        }"? This will grant them access to apply for the tender.`}
+        actionType="approve"
+        isLoading={processingId === selectedRequest?._id}
+      />
+
+      <RejectionReasonModal
+        isOpen={showRejectModal}
+        onClose={() => {
+          setShowRejectModal(false);
+          setSelectedRequest(null);
+        }}
+        onSubmit={confirmReject}
+        isLoading={processingId === selectedRequest?._id}
+      />
     </DashboardLayout>
   );
 };
