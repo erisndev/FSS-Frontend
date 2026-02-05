@@ -53,14 +53,23 @@ const LandingPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Check if EmailJS credentials are configured
-    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY || 
-        EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
-      toast.error("Email service is not configured. Please contact us directly.", {
-        duration: 5000,
-      });
-      console.error("EmailJS credentials not configured in environment variables");
+    if (
+      !EMAILJS_SERVICE_ID ||
+      !EMAILJS_TEMPLATE_ID ||
+      !EMAILJS_PUBLIC_KEY ||
+      EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY"
+    ) {
+      toast.error(
+        "Email service is not configured. Please contact us directly.",
+        {
+          duration: 5000,
+        },
+      );
+      console.error(
+        "EmailJS credentials not configured in environment variables",
+      );
       return;
     }
 
@@ -75,15 +84,18 @@ const LandingPage = () => {
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
         formRef.current,
-        EMAILJS_PUBLIC_KEY
+        EMAILJS_PUBLIC_KEY,
       );
 
       if (result.status === 200) {
-        toast.success("Message sent successfully! We'll get back to you soon.", {
-          duration: 5000,
-          icon: "✉️",
-        });
-        
+        toast.success(
+          "Message sent successfully! We'll get back to you soon.",
+          {
+            duration: 5000,
+            icon: "✉️",
+          },
+        );
+
         // Reset form
         setFormData({
           name: "",
@@ -95,9 +107,12 @@ const LandingPage = () => {
       }
     } catch (error) {
       console.error("EmailJS error:", error);
-      toast.error("Failed to send message. Please try again or contact us directly.", {
-        duration: 5000,
-      });
+      toast.error(
+        "Failed to send message. Please try again or contact us directly.",
+        {
+          duration: 5000,
+        },
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -475,8 +490,8 @@ const LandingPage = () => {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Have questions about TenderFlow? We're here to help. Send us a message
-              and we'll respond as soon as possible.
+              Have questions about TenderFlow? We're here to help. Send us a
+              message and we'll respond as soon as possible.
             </p>
           </motion.div>
 
@@ -493,7 +508,8 @@ const LandingPage = () => {
                   Contact Information
                 </h3>
                 <p className="text-gray-300 mb-8">
-                  Fill out the form and our team will get back to you within 24 hours.
+                  Fill out the form and our team will get back to you within 24
+                  hours.
                 </p>
               </div>
 
@@ -527,8 +543,10 @@ const LandingPage = () => {
                   <div>
                     <h4 className="text-white font-semibold mb-1">Office</h4>
                     <p className="text-gray-300">
-                      123 Business Park<br />
-                      Sandton, Johannesburg<br />
+                      123 Business Park
+                      <br />
+                      Sandton, Johannesburg
+                      <br />
                       South Africa, 2196
                     </p>
                   </div>
@@ -536,7 +554,9 @@ const LandingPage = () => {
               </div>
 
               <div className="p-6 bg-gradient-to-r from-cyan-500/10 to-purple-600/10 rounded-xl border border-cyan-400/20">
-                <h4 className="text-white font-semibold mb-3">Business Hours</h4>
+                <h4 className="text-white font-semibold mb-3">
+                  Business Hours
+                </h4>
                 <div className="space-y-2 text-gray-300">
                   <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
                   <p>Saturday: 9:00 AM - 1:00 PM</p>
@@ -624,7 +644,9 @@ const LandingPage = () => {
                       <option value="general">General Inquiry</option>
                       <option value="support">Technical Support</option>
                       <option value="sales">Sales Question</option>
-                      <option value="partnership">Partnership Opportunity</option>
+                      <option value="partnership">
+                        Partnership Opportunity
+                      </option>
                       <option value="feedback">Feedback</option>
                       <option value="other">Other</option>
                     </select>
@@ -696,13 +718,6 @@ const LandingPage = () => {
               streamline their tender management.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/register"
-                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
-              >
-                Start Free Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
               <a
                 href="#contact"
                 className="inline-flex items-center px-8 py-4 bg-white/10 backdrop-blur-sm border border-cyan-400/30 text-white font-semibold rounded-lg hover:bg-white/20 transition-all duration-300"
@@ -819,7 +834,10 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-cyan-400/20 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 TenderFlow. All rights reserved.</p>
+            <p>
+              &copy; {new Date().getFullYear()} Erisn Africa. All rights
+              reserved.
+            </p>
           </div>
         </div>
       </footer>
