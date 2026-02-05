@@ -4,6 +4,7 @@ import { Bell, BellOff, Check, Trash2, CheckCircle2, Clock } from "lucide-react"
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import { notificationApi } from "../../services/api";
 import toast from "react-hot-toast";
+import { emitNotificationsChanged } from "../../utils/notificationsBus";
 
 const formatTime = (date) => {
   if (!date) return "";
@@ -70,6 +71,7 @@ const Notifications = () => {
     try {
       await notificationApi.markAsRead(n.id);
       setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, isRead: true } : x)));
+      emitNotificationsChanged({ action: "markAsRead", id: n.id });
       toast.success("Marked as read");
     } catch (e) {
       console.error("Failed to mark as read", e);
@@ -81,6 +83,7 @@ const Notifications = () => {
     try {
       await notificationApi.markAllAsRead();
       setNotifications((prev) => prev.map((x) => ({ ...x, isRead: true })));
+      emitNotificationsChanged({ action: "markAllAsRead" });
       toast.success("All notifications marked as read");
     } catch (e) {
       console.error("Failed to mark all as read", e);
@@ -92,6 +95,7 @@ const Notifications = () => {
     try {
       await notificationApi.clearNotifications();
       setNotifications([]);
+      emitNotificationsChanged({ action: "clear" });
       toast.success("Notifications cleared");
     } catch (e) {
       console.error("Failed to clear notifications", e);

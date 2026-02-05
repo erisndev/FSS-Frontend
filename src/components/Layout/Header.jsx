@@ -4,6 +4,7 @@ import { Bell, X, FileText, User, LogOut } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { notificationApi } from "../../services/api";
 import { useNavigate } from "react-router-dom";
+import { onNotificationsChanged } from "../../utils/notificationsBus";
 
 // Relative time helper
 function timeAgo(date) {
@@ -32,8 +33,8 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
     role === "admin"
       ? "/admin/notifications"
       : role === "issuer"
-      ? "/issuer/notifications"
-      : "/bidder/notifications";
+        ? "/issuer/notifications"
+        : "/bidder/notifications";
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -89,11 +90,18 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
     return () => document.removeEventListener("mousedown", handler);
   }, [userMenuOpen]);
 
-  // Fetch notifications via API
-  const fetchNotifications = async () => {
+  const fetchInFlightRef = useRef(false);
+
+  // Fetch notifications via API (deduped)
+  // silent: avoids showing dropdown loading state for background refreshes
+  const fetchNotifications = async ({ silent = false } = {}) => {
+    if (fetchInFlightRef.current) return;
+
     try {
-      setNotifLoading(true);
+      fetchInFlightRef.current = true;
+      if (!silent) setNotifLoading(true);
       setNotifError("");
+
       const list = await notificationApi.getMyNotifications();
       const items = (list || []).map((n) => ({
         id: n._id || n.id,
@@ -104,13 +112,13 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
         time: n.createdAt
           ? new Date(n.createdAt)
           : n.time
-          ? new Date(n.time)
-          : new Date(),
+            ? new Date(n.time)
+            : new Date(),
         icon: FileText,
         isRead: n.isRead === true,
       }));
       items.sort(
-        (a, b) => (b.time?.getTime?.() || 0) - (a.time?.getTime?.() || 0)
+        (a, b) => (b.time?.getTime?.() || 0) - (a.time?.getTime?.() || 0),
       );
       const onlyUnread = items.filter((x) => !x.isRead);
       const limited = onlyUnread.slice(0, 10);
@@ -119,19 +127,53 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
       console.error("Error loading notifications:", err);
       setNotifError("Failed to load notifications");
     } finally {
-      setNotifLoading(false);
+      fetchInFlightRef.current = false;
+      if (!silent) setNotifLoading(false);
     }
   };
 
+  // Fetch once on mount (best-effort) and again when auth user is known
+  // Some app states set `user` after initial render, but token is already present.
   useEffect(() => {
-    fetchNotifications();
-    
-    const interval = setInterval(() => {
-      fetchNotifications();
-    }, 30000); // Changed to 30 seconds to reduce re-renders
-    
-    return () => clearInterval(interval);
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetchNotifications({ silent: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!user?._id) return;
+    fetchNotifications({ silent: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id]);
+
+  // Refetch when returning to the tab / window, or when other pages mutate notifications
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        fetchNotifications({ silent: true });
+      }
+    };
+
+    const onFocus = () => {
+      fetchNotifications({ silent: true });
+    };
+
+    const offBus = onNotificationsChanged(() => {
+      fetchNotifications({ silent: true });
+    });
+
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      offBus();
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("focus", onFocus);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id]);
 
   const unreadCount = useMemo(() => notifications.length, [notifications]);
 
@@ -140,7 +182,9 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
     if (!name) return "U";
     const parts = name.trim().split(" ");
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    return (
+      parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
+    ).toUpperCase();
   };
 
   const handleLogout = () => {
@@ -160,8 +204,8 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
       role === "admin"
         ? "/admin/profile"
         : role === "issuer"
-        ? "/issuer/profile"
-        : "/bidder/profile";
+          ? "/issuer/profile"
+          : "/bidder/profile";
     navigate(profilePath);
   };
 
@@ -186,7 +230,12 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
         ref={notifBtnRef}
         onClick={(e) => {
           e.stopPropagation();
-          setNotifOpen((v) => !v);
+          setNotifOpen((v) => {
+            const next = !v;
+            // Refetch when user opens the notifications UI
+            if (next) fetchNotifications();
+            return next;
+          });
         }}
         aria-haspopup="true"
         aria-expanded={notifOpen}
@@ -210,9 +259,12 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
             transition={{ duration: 0.15 }}
             ref={notifMenuRef}
             className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto lg:mt-2 w-80 sm:w-96 z-[9999]"
-            style={{ pointerEvents: 'auto' }}
+            style={{ pointerEvents: "auto" }}
           >
-            <div className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="px-4 py-3 border-b border-cyan-400/10 flex items-center justify-between">
                 <span className="text-white font-semibold">Notifications</span>
                 <button
@@ -329,9 +381,12 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
             transition={{ duration: 0.15 }}
             ref={userMenuRef}
             className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto lg:mt-2 w-72 z-[9999]"
-            style={{ pointerEvents: 'auto' }}
+            style={{ pointerEvents: "auto" }}
           >
-            <div className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* User Info Section */}
               <div className="px-4 py-4 border-b border-cyan-400/10">
                 <div className="flex items-center space-x-3">
@@ -388,95 +443,94 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
           }
         }}
         className={`relative lg:sticky lg:top-0 z-40 bg-gradient-to-r from-slate-800/50 to-purple-900/30 backdrop-blur-xl border-b border-cyan-400/20 p-3 sm:p-4 lg:p-6 transition-all duration-300 ${
-          isMobile && isMobileMenuOpen ? 'blur-sm pointer-events-auto cursor-pointer' : ''
+          isMobile && isMobileMenuOpen
+            ? "blur-sm pointer-events-auto cursor-pointer"
+            : ""
         }`}
       >
-      {/* Mobile Layout */}
-      {isMobile ? (
-        <div className="space-y-3">
-          {/* Top row with hamburger space and user info */}
+        {/* Mobile Layout */}
+        {isMobile ? (
+          <div className="space-y-3">
+            {/* Top row with hamburger space and user info */}
+            <div className="flex items-center justify-between">
+              {/* Left space for hamburger (positioned by Sidebar component) */}
+              <div className="w-10 h-10 flex-shrink-0"></div>
+
+              {/* User Info - Compact on mobile */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex items-center space-x-2"
+              >
+                {/* Notifications - Mobile */}
+                <NotificationBell />
+
+                {/* User Menu - Mobile */}
+                <UserMenu />
+              </motion.div>
+            </div>
+
+            {/* Title row */}
+            <div className="text-center">
+              <motion.h1
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-xl font-bold text-white"
+              >
+                {title}
+              </motion.h1>
+              {subtitle && (
+                <motion.p
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-cyan-400/70 mt-1 text-sm"
+                >
+                  {subtitle}
+                </motion.p>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* Desktop Layout */
           <div className="flex items-center justify-between">
-            {/* Left space for hamburger (positioned by Sidebar component) */}
-            <div className="w-10 h-10 flex-shrink-0"></div>
-
-            {/* User Info - Compact on mobile */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-              className="flex items-center space-x-2"
-            >
-              {/* Notifications - Mobile */}
+            <div>
+              <motion.h1
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-2xl font-bold text-white"
+              >
+                {title}
+              </motion.h1>
+              {subtitle && (
+                <motion.p
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-cyan-400/70 mt-1"
+                >
+                  {subtitle}
+                </motion.p>
+              )}
+            </div>
+            <div className="flex items-center space-x-4">
+              {/* Notifications - Desktop */}
               <NotificationBell />
-              
-              {/* User Menu - Mobile */}
-              <UserMenu />
-            </motion.div>
-          </div>
 
-          {/* Title row */}
-          <div className="text-center">
-            <motion.h1
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-xl font-bold text-white"
-            >
-              {title}
-            </motion.h1>
-            {subtitle && (
-              <motion.p
-                initial={{ opacity: 0, x: -20 }}
+              {/* User Menu - Desktop */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-cyan-400/70 mt-1 text-sm"
+                transition={{ delay: 0.4 }}
               >
-                {subtitle}
-              </motion.p>
-            )}
+                <UserMenu />
+              </motion.div>
+            </div>
           </div>
-
-                  </div>
-      ) : (
-        /* Desktop Layout */
-        <div className="flex items-center justify-between">
-          <div>
-            <motion.h1
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-2xl font-bold text-white"
-            >
-              {title}
-            </motion.h1>
-            {subtitle && (
-              <motion.p
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-cyan-400/70 mt-1"
-              >
-                {subtitle}
-              </motion.p>
-            )}
-          </div>
-          <div className="flex items-center space-x-4">
-            
-            {/* Notifications - Desktop */}
-            <NotificationBell />
-
-            {/* User Menu - Desktop */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <UserMenu />
-            </motion.div>
-          </div>
-        </div>
-      )}
-
+        )}
       </motion.header>
 
       {/* Logout Confirmation Modal */}
@@ -523,7 +577,8 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
               {/* Message */}
               <div className="p-4 rounded-lg border border-red-400/20 bg-gradient-to-r from-red-500/10 to-orange-500/10 mb-6">
                 <p className="text-gray-300 text-sm leading-relaxed">
-                  Are you sure you want to logout? You'll need to sign in again to access your account.
+                  Are you sure you want to logout? You'll need to sign in again
+                  to access your account.
                 </p>
               </div>
 
