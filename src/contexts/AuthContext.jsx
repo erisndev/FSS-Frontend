@@ -21,15 +21,18 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const members = await teamMemberApi.getTeamMembers(userData.organizationId);
+      const members = await teamMemberApi.getTeamMembers(
+        userData.organizationId,
+      );
       const current = members?.find(
-        m => m.user?._id === userData._id || 
-             m.userId === userData._id || 
-             m._id === userData?.memberId
+        (m) =>
+          m.user?._id === userData._id ||
+          m.userId === userData._id ||
+          m._id === userData?.memberId,
       );
       setPermissions(current?.permissions || null);
     } catch (e) {
-      console.error('Failed to load permissions', e);
+      console.error("Failed to load permissions", e);
       setPermissions(null);
     }
   };
@@ -39,7 +42,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem("token");
         const tokenExpiry = localStorage.getItem("tokenExpiry");
-        
+
         if (token) {
           // Check if token has expired
           if (tokenExpiry && new Date().getTime() > parseInt(tokenExpiry)) {
@@ -51,7 +54,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
             return;
           }
-          
+
           const userData = await authApi.me();
           setUser(userData);
           await fetchPermissions(userData);
@@ -72,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const normalizedEmail = email.toLowerCase().trim();
       const res = await authApi.login(normalizedEmail, password);
-      
+
       // Check if this is a redirect response (not an error, but a redirect instruction)
       if (res.redirectToTeamLogin) {
         // Return the redirect data instead of throwing an error
@@ -80,15 +83,15 @@ export const AuthProvider = ({ children }) => {
           redirectToTeamLogin: true,
           organizationEmail: res.organizationEmail,
           organizationName: res.organizationName,
-          message: res.message
+          message: res.message,
         };
       }
-      
+
       if (!res.token || !res.user) throw new Error("Invalid login response");
 
       // Set token expiry to 24 hours from now
-      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000);
-      
+      const expiryTime = new Date().getTime() + 24 * 60 * 60 * 1000;
+
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
       localStorage.setItem("tokenExpiry", expiryTime.toString());
@@ -108,11 +111,15 @@ export const AuthProvider = ({ children }) => {
   const teamLogin = async (email, memberId, password) => {
     try {
       const normalizedEmail = email.toLowerCase().trim();
-      const res = await teamAuthApi.teamLogin(normalizedEmail, memberId, password);
+      const res = await teamAuthApi.teamLogin(
+        normalizedEmail,
+        memberId,
+        password,
+      );
       if (!res.token || !res.user) throw new Error("Invalid login response");
 
       // Set token expiry to 24 hours from now
-      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+      const expiryTime = new Date().getTime() + 24 * 60 * 60 * 1000;
 
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
@@ -152,6 +159,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
+      console.log("Registering user with data:", userData);
       const { user: registeredUser, token } = await authApi.register(userData);
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(registeredUser));
@@ -177,7 +185,7 @@ export const AuthProvider = ({ children }) => {
       await authApi.forgotPassword(normalizedEmail);
     } catch (error) {
       throw new Error(
-        error?.response?.data?.message || "Failed to send reset email"
+        error?.response?.data?.message || "Failed to send reset email",
       );
     }
   };
@@ -188,12 +196,12 @@ export const AuthProvider = ({ children }) => {
       const normalizedEmail = email.toLowerCase().trim();
       const { user: userData, token } = await authApi.verifyRegisterOTP(
         normalizedEmail,
-        otp
+        otp,
       );
-      
+
       // Set token expiry to 24 hours from now
-      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000);
-      
+      const expiryTime = new Date().getTime() + 24 * 60 * 60 * 1000;
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("tokenExpiry", expiryTime.toString());
@@ -202,7 +210,7 @@ export const AuthProvider = ({ children }) => {
       return userData;
     } catch (error) {
       throw new Error(
-        error?.response?.data?.message || "Invalid registration OTP"
+        error?.response?.data?.message || "Invalid registration OTP",
       );
     }
   };
@@ -227,7 +235,7 @@ export const AuthProvider = ({ children }) => {
       console.log("Password reset successful");
     } catch (error) {
       throw new Error(
-        error?.response?.data?.message || "Password reset failed"
+        error?.response?.data?.message || "Password reset failed",
       );
     }
   };
@@ -247,7 +255,7 @@ export const AuthProvider = ({ children }) => {
       return await authApi.resendResetOTP(normalizedEmail);
     } catch (error) {
       throw new Error(
-        error?.response?.data?.message || "Failed to resend reset OTP"
+        error?.response?.data?.message || "Failed to resend reset OTP",
       );
     }
   };
@@ -263,7 +271,7 @@ export const AuthProvider = ({ children }) => {
       return data.user;
     } catch (error) {
       throw new Error(
-        error?.response?.data?.message || "Profile update failed"
+        error?.response?.data?.message || "Profile update failed",
       );
     }
   };
