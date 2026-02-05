@@ -40,15 +40,17 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
     try {
       // First check if user has already verified this tender via status API
       try {
-        const statusResponse = await verificationCodeApi.checkStatus(tender._id);
+        const statusResponse = await verificationCodeApi.checkStatus(
+          tender._id
+        );
         console.log("Verification status check:", statusResponse);
-        
+
         if (statusResponse.isVerified || statusResponse.codeUsed) {
           // User has already verified this tender
           setIsAlreadyVerified(true);
           setRequestStatus("verified");
           setHasRequestedCode(true);
-          
+
           // Automatically proceed to application after a brief delay
           setTimeout(() => {
             onVerified();
@@ -69,9 +71,13 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
       if (foundRequest) {
         setHasRequestedCode(true);
         const status = foundRequest.status?.toLowerCase() || "pending";
-        
+
         // Double-check if the code was already used
-        if (foundRequest.codeUsed || foundRequest.isUsed || foundRequest.verified) {
+        if (
+          foundRequest.codeUsed ||
+          foundRequest.isUsed ||
+          foundRequest.verified
+        ) {
           setRequestStatus("verified");
           setIsAlreadyVerified(true);
           // Auto proceed after a brief delay
@@ -181,15 +187,15 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
 
     try {
       await verificationCodeApi.verifyCode(tender._id, codeString);
-      
+
       toast.success(
         "Verification successful! You can now apply for this tender."
       );
-      
+
       // Mark as verified locally
       setIsAlreadyVerified(true);
       setRequestStatus("verified");
-      
+
       // Proceed to application
       onVerified();
     } catch (error) {
@@ -243,54 +249,65 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
-        {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
+        onClick={onClose}
+      >
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        />
-
-        {/* Modal */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+          onClick={(e) => e.stopPropagation()}
           className="relative w-full max-w-md bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-xl sm:rounded-2xl shadow-2xl max-h-[95vh] sm:max-h-[92vh] overflow-y-auto"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-3 sm:p-4 md:p-6 border-b border-cyan-400/10">
-            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1 pr-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </div>
+          <div className="flex items-start justify-between p-4 sm:p-6 border-b border-cyan-400/10">
+            <div className="flex items-center space-x-3 min-w-0 flex-1 pr-2">
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-cyan-400/30"
+              >
+                <Shield className="w-6 h-6 text-cyan-400" />
+              </motion.div>
               <div className="min-w-0 flex-1">
-                <h3 className="text-base sm:text-lg font-semibold text-white truncate">
+                <h3 className="text-lg font-bold text-white truncate">
                   Tender Verification
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-400 truncate">
-                  Verify access to apply for this tender
+                <p className="text-xs text-gray-400 truncate">
+                  Secure access verification required
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 sm:p-2 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0 group"
+              className="p-1 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0 group"
             >
-              <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+              <X className="w-5 h-5 text-gray-400 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
             </button>
           </div>
 
           {/* Content */}
           <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
             {/* Tender Info */}
-            <div className="p-3 sm:p-4 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-              <h4 className="text-xs sm:text-sm font-medium text-cyan-400 mb-1">
-                Applying for:
-              </h4>
-              <p className="text-sm sm:text-base text-white font-medium break-words">{tender?.title}</p>
+            <div className="p-4 bg-gradient-to-r from-slate-800/50 to-slate-800/30 border border-cyan-400/10 rounded-xl">
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                  <Lock className="w-5 h-5 text-cyan-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-xs font-semibold text-cyan-400 mb-1">
+                    Applying for:
+                  </h4>
+                  <p className="text-sm text-white font-semibold break-words">
+                    {tender?.title}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Status Badge */}
@@ -300,17 +317,20 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
 
                 {/* Display code if approved and available */}
                 {requestStatus === "approved" && existingRequest?.code && (
-                  <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-slate-900/50 border border-green-400/30 rounded-lg">
-                    <p className="text-xs sm:text-sm text-gray-400 mb-2 text-center">
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="mt-4 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl"
+                  >
+                    <p className="text-xs text-gray-400 mb-3 text-center font-medium">
                       Your Verification Code
                     </p>
                     <div className="text-center">
-                      <p className="text-xl sm:text-2xl font-mono font-bold text-green-400 tracking-wider break-all">
-                        **{existingRequest.code}**
+                      <p className="text-2xl font-mono font-bold text-green-400 tracking-widest break-all bg-slate-900/50 py-3 px-4 rounded-lg border border-green-400/20">
+                        {existingRequest.code}
                       </p>
-                      <div className="w-24 sm:w-32 h-px bg-green-400/30 mt-2 mx-auto"></div>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
               </>
             )}
@@ -338,7 +358,8 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                     Already Verified
                   </p>
                   <p className="text-xs sm:text-sm text-gray-400 px-2">
-                    You have already verified access to this tender. Proceeding to application form...
+                    You have already verified access to this tender. Proceeding
+                    to application form...
                   </p>
                 </div>
               </div>
@@ -349,16 +370,18 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
             ) : (
               <>
                 {/* Code Input Section - Show only if approved but not yet verified */}
-                {(hasRequestedCode && requestStatus === "approved" && !isAlreadyVerified) ||
+                {(hasRequestedCode &&
+                  requestStatus === "approved" &&
+                  !isAlreadyVerified) ||
                 (requestStatus === null && !isAlreadyVerified) ? (
                   <div className="space-y-3 sm:space-y-4">
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2 sm:mb-3 text-center">
                         Enter 8-character verification code
                       </label>
-                      <div className="flex justify-center gap-1 sm:gap-1.5 flex-wrap">
+                      <div className="flex justify-center gap-2 flex-wrap">
                         {code.map((digit, index) => (
-                          <input
+                          <motion.input
                             key={index}
                             id={`verify-code-${index}`}
                             type="text"
@@ -371,7 +394,8 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                               )
                             }
                             onKeyDown={(e) => handleKeyDown(index, e)}
-                            className="w-8 h-10 sm:w-10 sm:h-12 text-center text-base sm:text-lg font-bold bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300 uppercase"
+                            whileFocus={{ scale: 1.1 }}
+                            className="w-10 h-12 text-center text-lg font-bold bg-slate-800/50 border-2 border-cyan-400/20 rounded-xl text-white focus:outline-none focus:border-cyan-400/60 focus:bg-slate-800/70 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 uppercase shadow-lg"
                             placeholder="-"
                           />
                         ))}
@@ -403,7 +427,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                       <button
                         onClick={handleVerifyCode}
                         disabled={isLoading || code.join("").length !== 8}
-                        className="flex-1 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                        className="flex-1 py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
                       >
                         {isLoading ? (
                           <div className="flex items-center justify-center space-x-2">
@@ -455,16 +479,18 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                 ) : null}
 
                 {/* Help Text */}
-                {!hasRequestedCode && requestStatus === null && !isAlreadyVerified && (
-                  <p className="text-center text-gray-400 text-xs sm:text-sm px-2">
-                    Don't have a code? Click "Request Code" to get one.
-                  </p>
-                )}
+                {!hasRequestedCode &&
+                  requestStatus === null &&
+                  !isAlreadyVerified && (
+                    <p className="text-center text-gray-400 text-xs sm:text-sm px-2">
+                      Don't have a code? Click "Request Code" to get one.
+                    </p>
+                  )}
               </>
             )}
           </div>
         </motion.div>
-      </div>
+      </motion.div>
     </AnimatePresence>
   );
 };

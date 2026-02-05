@@ -1,5 +1,6 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertTriangle, Trash2, X } from "lucide-react";
 
 const ConfirmDeleteModal = ({
   isOpen,
@@ -17,10 +18,10 @@ const ConfirmDeleteModal = ({
   const getActionColor = () => {
     switch (actionType) {
       case "withdraw":
-        return "bg-yellow-500 hover:bg-yellow-600";
+        return "from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700";
       case "delete":
       default:
-        return "bg-red-500 hover:bg-red-600";
+        return "from-red-500 to-red-600 hover:from-red-600 hover:to-red-700";
     }
   };
 
@@ -31,6 +32,16 @@ const ConfirmDeleteModal = ({
       case "delete":
       default:
         return "border-red-400/30";
+    }
+  };
+
+  const getIconColor = () => {
+    switch (actionType) {
+      case "withdraw":
+        return "text-yellow-400";
+      case "delete":
+      default:
+        return "text-red-400";
     }
   };
 
@@ -45,66 +56,93 @@ const ConfirmDeleteModal = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50"
-      onClick={() => {
-        if (!processing) onClose();
-      }}
-    >
+    <AnimatePresence>
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className={`bg-gradient-to-b from-slate-900 to-slate-950 backdrop-blur-xl border ${getBorderColor()} rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-sm w-full`}
-        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
+        onClick={() => {
+          if (!processing) onClose();
+        }}
       >
-        <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">{title}</h3>
-        <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6 break-words">
-          {message || getDefaultMessage()}
-        </p>
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+          className={`bg-gradient-to-b from-slate-900 to-slate-950 backdrop-blur-xl border ${getBorderColor()} rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header with Icon */}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${actionType === 'withdraw' ? 'from-yellow-500/20 to-orange-500/20' : 'from-red-500/20 to-red-600/20'} flex items-center justify-center`}>
+                <AlertTriangle className={`w-6 h-6 ${getIconColor()}`} />
+              </div>
+              <div>
+                <h3 className="text-lg sm:text-xl font-bold text-white">{title}</h3>
+                <p className="text-xs text-gray-400">This action is permanent</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              disabled={processing}
+              className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-4">
-          <button
-            onClick={onClose}
-            disabled={processing}
-            aria-disabled={processing}
-            className={`px-3 sm:px-4 py-2 text-sm sm:text-base bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg transition-all duration-300 ${
-              processing ? "opacity-60 cursor-not-allowed" : "hover:bg-slate-800/70"
-            }`}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={async () => {
-              try {
-                setProcessing(true);
-                await onConfirm();
-                onClose();
-              } finally {
-                setProcessing(false);
-              }
-            }}
-            disabled={processing}
-            aria-busy={processing}
-            className={`px-3 sm:px-4 py-2 text-sm sm:text-base text-white rounded-lg transition-all duration-300 ${getActionColor()} ${
-              processing ? "opacity-80 cursor-wait" : ""
-            }`}
-          >
-            {processing ? (
-              <span className="flex items-center justify-center space-x-2">
-                <span className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                <span>{actionType === "withdraw" ? "Withdrawing..." : "Deleting..."}</span>
-              </span>
-            ) : (
-              actionText
-            )}
-          </button>
-        </div>
+          {/* Message */}
+          <div className={`p-4 rounded-lg border ${getBorderColor()} bg-gradient-to-r ${actionType === 'withdraw' ? 'from-yellow-500/10 to-orange-500/10' : 'from-red-500/10 to-red-600/10'} mb-6`}>
+            <p className="text-sm sm:text-base text-gray-300 leading-relaxed break-words">
+              {message || getDefaultMessage()}
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+            <button
+              onClick={onClose}
+              disabled={processing}
+              className={`px-4 py-2.5 text-sm sm:text-base bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg transition-all duration-300 font-medium ${
+                processing ? "opacity-60 cursor-not-allowed" : "hover:bg-slate-800/70 hover:border-gray-400/40"
+              }`}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  setProcessing(true);
+                  await onConfirm();
+                  onClose();
+                } finally {
+                  setProcessing(false);
+                }
+              }}
+              disabled={processing}
+              className={`px-4 py-2.5 text-sm sm:text-base text-white rounded-lg transition-all duration-300 font-semibold bg-gradient-to-r ${getActionColor()} shadow-lg ${
+                processing ? "opacity-80 cursor-wait" : "hover:shadow-xl"
+              }`}
+            >
+              {processing ? (
+                <span className="flex items-center justify-center space-x-2">
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <span>{actionType === "withdraw" ? "Withdrawing..." : "Deleting..."}</span>
+                </span>
+              ) : (
+                <span className="flex items-center space-x-2">
+                  <Trash2 className="w-4 h-4" />
+                  <span>{actionText}</span>
+                </span>
+              )}
+            </button>
+          </div>
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </AnimatePresence>
   );
 };
 

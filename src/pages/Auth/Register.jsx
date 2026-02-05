@@ -17,7 +17,8 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { authApi } from "../../services/api";
 import toast from "react-hot-toast";
-import { handleApiError, logError } from "../../utils/errorHandler";
+import { handleApiError } from "../../utils/errorHandler.jsx";
+import logger from "../../utils/logger";
 
 const Register = () => {
   const { user, loading, register } = useAuth();
@@ -74,13 +75,13 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      console.log("Registering user...");
-      console.log(formData);
+      logger.log("Registering user...");
+      logger.log(formData);
 
       // Prepare registration data
       const registrationData = {
         name: formData.name,
-        email: formData.email,
+        email: formData.email.toLowerCase().trim(),
         password: formData.password,
         role: formData.role,
         company: formData.company,
@@ -101,9 +102,14 @@ const Register = () => {
 
       // Registration successful → redirect to OTP verification
       toast.success("Registration successful! Please verify your email.");
+      // Update formData with normalized email for navigation state
+      setFormData((prev) => ({
+        ...prev,
+        email: prev.email.toLowerCase().trim(),
+      }));
       setIsRegistered(true);
     } catch (err) {
-      console.error("Registration error:", err);
+      logger.error("Registration error:", err);
 
       // Extract error message from response
       let errorMessage = "Registration failed";
@@ -273,7 +279,7 @@ const Register = () => {
                 >
                   <option value="bidder">Bidder</option>
                   <option value="issuer">Issuer</option>
-                  {/* <option value="admin">Admin</option> */}
+                  <option value="admin">Admin</option>
                 </select>
               </div>
             </div>

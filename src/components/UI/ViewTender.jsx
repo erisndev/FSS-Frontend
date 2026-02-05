@@ -3,7 +3,6 @@ import DashboardLayout from "../../components/Layout/DashboardLayout";
 import {
   FileText,
   Calendar,
-  DollarSign,
   AlertCircle,
   ArrowLeft,
   Building,
@@ -286,7 +285,6 @@ const ViewTender = () => {
               <div className="space-y-4">
                 <div className="bg-slate-800/30 rounded-xl p-4 border border-slate-600/20">
                   <div className="flex items-center space-x-3 mb-2">
-                    <DollarSign className="w-5 h-5 text-green-400" />
                     <span className="text-white font-medium">Budget Range</span>
                   </div>
                   <p className="text-green-300 text-lg font-semibold">

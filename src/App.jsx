@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { Toaster } from "react-hot-toast";
 
 // Landing Page
@@ -46,8 +47,9 @@ import Profile from "./pages/Profile/Profile";
 
 function App() {
   return (
-    <AuthProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <ErrorBoundary>
+      <AuthProvider>
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
@@ -268,8 +270,9 @@ function App() {
           />
         </Routes>
         <Toaster />
-      </div>
-    </AuthProvider>
+        </div>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

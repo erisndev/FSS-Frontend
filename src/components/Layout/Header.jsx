@@ -479,41 +479,68 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
       </motion.header>
 
-      {/* Logout Confirmation Modal - Outside header to avoid positioning issues */}
+      {/* Logout Confirmation Modal */}
       <AnimatePresence>
         {showLogoutModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
             onClick={() => setShowLogoutModal(false)}
           >
             <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
-              className="bg-slate-900 p-6 rounded-xl w-80 max-w-[90vw] text-center border border-cyan-400/20 shadow-2xl"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+              className="bg-gradient-to-b from-slate-900 to-slate-950 border border-red-400/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Confirm Logout
-              </h2>
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to logout?
-              </p>
-              <div className="flex justify-center space-x-4">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center">
+                    <LogOut className="w-6 h-6 text-red-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">
+                      Confirm Logout
+                    </h2>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      End your current session
+                    </p>
+                  </div>
+                </div>
                 <button
                   onClick={() => setShowLogoutModal(false)}
-                  className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition"
+                  className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Message */}
+              <div className="p-4 rounded-lg border border-red-400/20 bg-gradient-to-r from-red-500/10 to-orange-500/10 mb-6">
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Are you sure you want to logout? You'll need to sign in again to access your account.
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col-reverse sm:flex-row gap-3">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 px-4 py-2.5 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg hover:bg-slate-800/70 hover:border-gray-400/40 transition-all duration-300 font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmLogout}
-                  className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
                 >
-                  Logout
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
                 </button>
               </div>
             </motion.div>

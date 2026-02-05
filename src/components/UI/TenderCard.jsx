@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import {
   Calendar,
-  DollarSign,
   Clock,
   Eye,
   FileText,
@@ -93,7 +92,6 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
       <div className="space-y-3 mb-4">
         {/* Budget */}
         <div className="flex items-start gap-3">
-          <DollarSign className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-xs text-gray-400 mb-0.5">Budget</p>
             <p className="text-sm font-semibold text-cyan-400">

@@ -19,13 +19,14 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      console.log("Requesting password reset for:", email);
-      await forgotPassword(email);
+      const normalizedEmail = email.toLowerCase().trim();
+      console.log("Requesting password reset for:", normalizedEmail);
+      await forgotPassword(normalizedEmail);
       // Start OTP timer and move to OTP Verification step
-      console.log("Password reset OTP sent to:", email);
+      console.log("Password reset OTP sent to:", normalizedEmail);
       localStorage.setItem("otpTimestamp", Date.now().toString());
       toast.success("OTP sent to your email");
-      navigate("/verify-otp", { state: { email, isRegistration: false } });
+      navigate("/verify-otp", { state: { email: normalizedEmail, isRegistration: false } });
     } catch (err) {
       setError(err.message);
     } finally {

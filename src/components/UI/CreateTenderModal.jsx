@@ -4,7 +4,6 @@ import {
   X,
   FileText,
   Calendar,
-  DollarSign,
   Upload,
   AlertCircle,
   Plus,
@@ -49,7 +48,11 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     contactEmail: "",
     contactPhone: "",
     status: "active",
-    documents: [],
+    bidFileDocuments: null,
+    compiledDocuments: null,
+    financialDocuments: null,
+    technicalProposal: null,
+    proofOfExperience: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -85,7 +88,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     {
       number: 2,
       title: "Budget & Timeline",
-      icon: DollarSign,
+      icon: Calendar,
       description: "Financial and time constraints",
     },
     {
@@ -233,7 +236,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
       setCurrentStep(currentStep + 1);
       // Scroll to top of form
       if (contentRef.current) {
-        contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+        contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
       }
     } else {
       toast.error("Please fix the errors before proceeding", {
@@ -246,7 +249,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     setCurrentStep(currentStep - 1);
     // Scroll to top of form
     if (contentRef.current) {
-      contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -285,48 +288,53 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     }));
   };
 
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files || []);
-    addFiles(files);
-  };
+  const handleDocumentUpload = (e, documentType) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const files = Array.from(e.dataTransfer.files);
-    addFiles(files);
-  };
-
-  const addFiles = (files) => {
     const maxSize = 10 * 1024 * 1024; // 10MB
-    const validFiles = [];
-
-    files.forEach((file) => {
-      if (file.size > maxSize) {
-        toast.error(`${file.name} is too large. Maximum size is 10MB`);
-      } else {
-        validFiles.push({
-          id: Date.now() + Math.random(),
-          name: file.name,
-          size: file.size,
-          file,
-        });
-      }
-    });
-
-    if (validFiles.length > 0) {
-      setFormData((prev) => ({
-        ...prev,
-        documents: [...prev.documents, ...validFiles],
-      }));
-      toast.success(`${validFiles.length} file(s) added successfully`);
+    if (file.size > maxSize) {
+      toast.error(`${file.name} is too large. Maximum size is 10MB`);
+      return;
     }
-  };
 
-  const handleRemoveDocument = (id) => {
     setFormData((prev) => ({
       ...prev,
-      documents: prev.documents.filter((doc) => doc.id !== id),
+      [documentType]: file,
+    }));
+    toast.success(`${file.name} uploaded successfully`);
+  };
+
+  const handleDocumentDrop = (e, documentType) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      toast.error(`${file.name} is too large. Maximum size is 10MB`);
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [documentType]: file,
+    }));
+    toast.success(`${file.name} uploaded successfully`);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleRemoveDocument = (documentType) => {
+    setFormData((prev) => ({
+      ...prev,
+      [documentType]: null,
     }));
     toast.success("File removed");
   };
@@ -388,6 +396,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           .map((tag) => tag.trim())
           .filter(Boolean),
       };
+      console.log("SUbmitData", submitData);
 
       await tenderApi.createTender(submitData);
 
@@ -645,7 +654,10 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           {/* Content - Scrollable */}
-          <div ref={contentRef} className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+          <div
+            ref={contentRef}
+            className="flex-1 overflow-y-auto p-6 custom-scrollbar"
+          >
             <form onSubmit={handleSubmit}>
               <AnimatePresence mode="wait">
                 {/* Step 1: Basic Information */}
@@ -881,7 +893,6 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           <span className="text-red-400">*</span>
                         </label>
                         <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <input
                             type="number"
                             name="budgetMin"
@@ -915,7 +926,6 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           <span className="text-red-400">*</span>
                         </label>
                         <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <input
                             type="number"
                             name="budgetMax"
@@ -1109,30 +1119,14 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       </label>
                       <div className="relative">
                         <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <select
+                        <input
+                          type="text"
                           name="cidbGrading"
                           value={formData.cidbGrading}
                           onChange={handleInputChange}
-                          className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white focus:outline-none focus:border-cyan-400/50 transition-all duration-200 appearance-none"
-                        >
-                          <option value="">Select CIDB Grading</option>
-                          {[
-                            "1GB",
-                            "2GB",
-                            "3GB",
-                            "4GB",
-                            "5GB",
-                            "6GB",
-                            "7GB",
-                            "8GB",
-                            "9GB",
-                            "10GB",
-                          ].map((grade) => (
-                            <option key={grade} value={grade}>
-                              {grade}
-                            </option>
-                          ))}
-                        </select>
+                          placeholder="e.g., 5GB, 7CE"
+                          className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
+                        />
                       </div>
                     </div>
 
@@ -1257,93 +1251,290 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Supporting Documents
-                      </label>
-                      <div
-                        className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
-                          isDragging
-                            ? "border-cyan-400 bg-cyan-500/10 scale-105"
-                            : "border-cyan-400/20 hover:border-cyan-400/40 hover:bg-slate-800/30"
-                        }`}
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                          setIsDragging(true);
-                        }}
-                        onDragLeave={() => setIsDragging(false)}
-                        onDrop={handleDrop}
-                      >
-                        <input
-                          type="file"
-                          id="documents"
-                          multiple
-                          onChange={handleFileUpload}
-                          className="hidden"
-                          accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                        />
-                        <label
-                          htmlFor="documents"
-                          className="cursor-pointer flex flex-col items-center"
-                        >
-                          <motion.div
-                            animate={{ y: isDragging ? -10 : 0 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <Upload className="w-12 h-12 text-cyan-400 mb-3" />
-                          </motion.div>
-                          <span className="text-white font-medium text-lg">
-                            {isDragging
-                              ? "Drop files here"
-                              : "Upload Documents"}
-                          </span>
-                          <span className="text-gray-400 text-sm mt-2">
-                            Click to browse or drag and drop
-                          </span>
-                          <span className="text-gray-500 text-xs mt-1">
-                            PDF, DOC, XLS, Images (Max 10MB each)
-                          </span>
-                        </label>
-                      </div>
-
-                      {formData.documents.length > 0 && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-4 space-y-2"
-                        >
-                          <p className="text-sm text-gray-400">
-                            {formData.documents.length} file(s) uploaded
-                          </p>
-                          {formData.documents.map((doc, index) => (
-                            <motion.div
-                              key={doc.id}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg group hover:bg-slate-800/70 transition-all duration-200"
-                            >
+                      <h3 className="text-lg font-semibold text-white mb-4">
+                        Documents
+                      </h3>
+                      <div className="space-y-4">
+                        {/* Bid File Documents */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Bid File Documents
+                          </label>
+                          {formData.bidFileDocuments ? (
+                            <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
                               <div className="flex items-center space-x-3">
                                 <FileText className="w-5 h-5 text-cyan-400" />
                                 <div>
                                   <p className="text-white text-sm font-medium">
-                                    {doc.name}
+                                    {formData.bidFileDocuments.name}
                                   </p>
                                   <p className="text-gray-500 text-xs">
-                                    {formatFileSize(doc.size)}
+                                    {formatFileSize(
+                                      formData.bidFileDocuments.size
+                                    )}
                                   </p>
                                 </div>
                               </div>
                               <button
                                 type="button"
-                                onClick={() => handleRemoveDocument(doc.id)}
-                                className="p-2 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 rounded-lg transition-all duration-200"
+                                onClick={() =>
+                                  handleRemoveDocument("bidFileDocuments")
+                                }
+                                className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
                               >
-                                <Trash2 className="w-4 h-4 text-red-400" />
+                                <X className="w-4 h-4 text-red-400" />
                               </button>
-                            </motion.div>
-                          ))}
-                        </motion.div>
-                      )}
+                            </div>
+                          ) : (
+                            <div className="relative">
+                              <input
+                                type="file"
+                                id="bidFileDocuments"
+                                onChange={(e) =>
+                                  handleDocumentUpload(e, "bidFileDocuments")
+                                }
+                                className="hidden"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                              />
+                              <label
+                                htmlFor="bidFileDocuments"
+                                onDrop={(e) => handleDocumentDrop(e, 'bidFileDocuments')}
+                                onDragOver={handleDragOver}
+                                className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
+                              >
+                                <Upload className="w-5 h-5 mr-2" />
+                                <span className="text-sm">
+                                  Choose File or Drop Here
+                                </span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Compiled Documents */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Compiled Documents
+                          </label>
+                          {formData.compiledDocuments ? (
+                            <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
+                              <div className="flex items-center space-x-3">
+                                <FileText className="w-5 h-5 text-cyan-400" />
+                                <div>
+                                  <p className="text-white text-sm font-medium">
+                                    {formData.compiledDocuments.name}
+                                  </p>
+                                  <p className="text-gray-500 text-xs">
+                                    {formatFileSize(
+                                      formData.compiledDocuments.size
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleRemoveDocument("compiledDocuments")
+                                }
+                                className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
+                              >
+                                <X className="w-4 h-4 text-red-400" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="relative">
+                              <input
+                                type="file"
+                                id="compiledDocuments"
+                                onChange={(e) =>
+                                  handleDocumentUpload(e, "compiledDocuments")
+                                }
+                                className="hidden"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                              />
+                              <label
+                                htmlFor="compiledDocuments"
+                                onDrop={(e) => handleDocumentDrop(e, 'compiledDocuments')}
+                                onDragOver={handleDragOver}
+                                className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
+                              >
+                                <Upload className="w-5 h-5 mr-2" />
+                                <span className="text-sm">
+                                  Choose File or Drop Here
+                                </span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Financial Documents */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Financial Documents
+                          </label>
+                          {formData.financialDocuments ? (
+                            <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
+                              <div className="flex items-center space-x-3">
+                                <FileText className="w-5 h-5 text-cyan-400" />
+                                <div>
+                                  <p className="text-white text-sm font-medium">
+                                    {formData.financialDocuments.name}
+                                  </p>
+                                  <p className="text-gray-500 text-xs">
+                                    {formatFileSize(
+                                      formData.financialDocuments.size
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleRemoveDocument("financialDocuments")
+                                }
+                                className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
+                              >
+                                <X className="w-4 h-4 text-red-400" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="relative">
+                              <input
+                                type="file"
+                                id="financialDocuments"
+                                onChange={(e) =>
+                                  handleDocumentUpload(e, "financialDocuments")
+                                }
+                                className="hidden"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                              />
+                              <label
+                                htmlFor="financialDocuments"
+                                onDrop={(e) => handleDocumentDrop(e, 'financialDocuments')}
+                                onDragOver={handleDragOver}
+                                className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
+                              >
+                                <Upload className="w-5 h-5 mr-2" />
+                                <span className="text-sm">
+                                  Choose File or Drop Here
+                                </span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Technical Proposal */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Technical Proposal
+                          </label>
+                          {formData.technicalProposal ? (
+                            <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
+                              <div className="flex items-center space-x-3">
+                                <FileText className="w-5 h-5 text-cyan-400" />
+                                <div>
+                                  <p className="text-white text-sm font-medium">
+                                    {formData.technicalProposal.name}
+                                  </p>
+                                  <p className="text-gray-500 text-xs">
+                                    {formatFileSize(
+                                      formData.technicalProposal.size
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleRemoveDocument("technicalProposal")
+                                }
+                                className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
+                              >
+                                <X className="w-4 h-4 text-red-400" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="relative">
+                              <input
+                                type="file"
+                                id="technicalProposal"
+                                onChange={(e) =>
+                                  handleDocumentUpload(e, "technicalProposal")
+                                }
+                                className="hidden"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                              />
+                              <label
+                                htmlFor="technicalProposal"
+                                onDrop={(e) => handleDocumentDrop(e, 'technicalProposal')}
+                                onDragOver={handleDragOver}
+                                className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
+                              >
+                                <Upload className="w-5 h-5 mr-2" />
+                                <span className="text-sm">
+                                  Choose File or Drop Here
+                                </span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Proof of Experience */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Proof of Experience (Reference Letter)
+                          </label>
+                          {formData.proofOfExperience ? (
+                            <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
+                              <div className="flex items-center space-x-3">
+                                <FileText className="w-5 h-5 text-cyan-400" />
+                                <div>
+                                  <p className="text-white text-sm font-medium">
+                                    {formData.proofOfExperience.name}
+                                  </p>
+                                  <p className="text-gray-500 text-xs">
+                                    {formatFileSize(
+                                      formData.proofOfExperience.size
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleRemoveDocument("proofOfExperience")
+                                }
+                                className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
+                              >
+                                <X className="w-4 h-4 text-red-400" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="relative">
+                              <input
+                                type="file"
+                                id="proofOfExperience"
+                                onChange={(e) =>
+                                  handleDocumentUpload(e, "proofOfExperience")
+                                }
+                                className="hidden"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                              />
+                              <label
+                                htmlFor="proofOfExperience"
+                                onDrop={(e) => handleDocumentDrop(e, 'proofOfExperience')}
+                                onDragOver={handleDragOver}
+                                className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
+                              >
+                                <Upload className="w-5 h-5 mr-2" />
+                                <span className="text-sm">
+                                  Choose File or Drop Here
+                                </span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Final Summary */}

@@ -6,7 +6,6 @@ import {
   Trash2,
   Eye,
   Users,
-  DollarSign,
   Calendar,
   AlertCircle,
   Plus,
@@ -267,7 +266,6 @@ const ManageTenders = () => {
                 {/* Details */}
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center space-x-2 text-sm">
-                    <DollarSign className="w-4 h-4 text-cyan-400" />
                     <span className="text-cyan-400 font-medium">
                       {tender.budgetMin || tender.budgetMax
                         ? `R${Number(
@@ -306,7 +304,22 @@ const ManageTenders = () => {
                   <div className="flex items-center space-x-2 text-sm">
                     <FileText className="w-4 h-4 text-yellow-400" />
                     <span className="text-yellow-400">
-                      {tender.documents?.length || 0} documents
+                      {(() => {
+                        // Count documents based on structure
+                        if (Array.isArray(tender.documents)) {
+                          return tender.documents.length;
+                        } else if (tender.documents && typeof tender.documents === 'object') {
+                          // Count individual document fields
+                          let count = 0;
+                          if (tender.documents.bidFileDocuments) count++;
+                          if (tender.documents.compiledDocuments) count++;
+                          if (tender.documents.financialDocuments) count++;
+                          if (tender.documents.technicalProposal) count++;
+                          if (tender.documents.proofOfExperience) count++;
+                          return count;
+                        }
+                        return 0;
+                      })()} documents
                     </span>
                   </div>
                 </div>

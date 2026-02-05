@@ -1,7 +1,6 @@
- import React from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import {
-  DollarSign,
   Clock,
   FileText,
   MessageCircle,
@@ -64,7 +63,6 @@ const ApplicationCard = ({ application, index, onView, onWithdraw }) => {
       {/* Application Details */}
       <div className="space-y-3 mb-4">
         <div className="flex items-center space-x-2 text-sm">
-          <DollarSign className="w-4 h-4 text-cyan-400" />
           <span className="text-cyan-400 font-medium">
             R{application.bidAmount?.toLocaleString()}
           </span>

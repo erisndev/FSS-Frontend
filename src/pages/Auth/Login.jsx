@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
-import { handleApiError, logError } from "../../utils/errorHandler";
+import { handleApiError } from "../../utils/errorHandler.jsx";
+import logger from "../../utils/logger";
 
 const Login = () => {
   const { user, login, loading, resendRegisterOTP } = useAuth();
@@ -42,7 +43,8 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const result = await login(formData.email, formData.password);
+      const normalizedEmail = formData.email.toLowerCase().trim();
+      const result = await login(normalizedEmail, formData.password);
 
       // Check if this is a redirect response (team member trying to use regular login)
       if (result?.redirectToTeamLogin) {
@@ -65,7 +67,7 @@ const Login = () => {
       // Normal login success
       toast.success("Login successful");
     } catch (err) {
-      logError("Login", err);
+      logger.error("Login error:", err);
 
       const errorMessage =
         err.response?.data?.message || err.message || "Login failed";
@@ -75,18 +77,19 @@ const Login = () => {
         errorMessage.toLowerCase().includes("email not verified") ||
         errorMessage.toLowerCase().includes("not verified")
       ) {
+        const normalizedEmail = formData.email.toLowerCase().trim();
         try {
           // Send OTP before redirect
-          await resendRegisterOTP(formData.email);
+          await resendRegisterOTP(normalizedEmail);
           toast.success("OTP resent to your email");
         } catch (otpError) {
-          console.error("Failed to send OTP:", otpError.message);
+          logger.error("Failed to send OTP:", otpError);
         }
 
         // Then redirect to OTP verification page
         navigate("/verify-otp", {
           state: {
-            email: formData.email,
+            email: normalizedEmail,
             isRegistration: true,
           },
         });

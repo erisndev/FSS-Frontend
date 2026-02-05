@@ -70,7 +70,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const res = await authApi.login(email, password);
+      const normalizedEmail = email.toLowerCase().trim();
+      const res = await authApi.login(normalizedEmail, password);
       
       // Check if this is a redirect response (not an error, but a redirect instruction)
       if (res.redirectToTeamLogin) {
@@ -106,7 +107,8 @@ export const AuthProvider = ({ children }) => {
 
   const teamLogin = async (email, memberId, password) => {
     try {
-      const res = await teamAuthApi.teamLogin(email, memberId, password);
+      const normalizedEmail = email.toLowerCase().trim();
+      const res = await teamAuthApi.teamLogin(normalizedEmail, memberId, password);
       if (!res.token || !res.user) throw new Error("Invalid login response");
 
       // Set token expiry to 24 hours from now
@@ -129,7 +131,8 @@ export const AuthProvider = ({ children }) => {
 
   const getTeamMembers = async (email) => {
     try {
-      const res = await teamAuthApi.getTeamMembersForLogin(email);
+      const normalizedEmail = email.toLowerCase().trim();
+      const res = await teamAuthApi.getTeamMembersForLogin(normalizedEmail);
       return res;
     } catch (error) {
       throw error;
@@ -170,7 +173,8 @@ export const AuthProvider = ({ children }) => {
 
   const forgotPassword = async (email) => {
     try {
-      await authApi.forgotPassword(email);
+      const normalizedEmail = email.toLowerCase().trim();
+      await authApi.forgotPassword(normalizedEmail);
     } catch (error) {
       throw new Error(
         error?.response?.data?.message || "Failed to send reset email"
@@ -181,8 +185,9 @@ export const AuthProvider = ({ children }) => {
   // ---------------- NEW OTP METHODS ----------------
   const verifyRegisterOTP = async (email, otp) => {
     try {
+      const normalizedEmail = email.toLowerCase().trim();
       const { user: userData, token } = await authApi.verifyRegisterOTP(
-        email,
+        normalizedEmail,
         otp
       );
       
@@ -204,8 +209,9 @@ export const AuthProvider = ({ children }) => {
 
   const verifyResetOTP = async (email, otp) => {
     try {
-      console.log("Verifying reset OTP for:", email, otp);
-      const data = await authApi.verifyResetOTP(email, otp);
+      const normalizedEmail = email.toLowerCase().trim();
+      console.log("Verifying reset OTP for:", normalizedEmail, otp);
+      const data = await authApi.verifyResetOTP(normalizedEmail, otp);
       console.log("Reset OTP verified:", data);
       return data;
     } catch (error) {
@@ -215,8 +221,9 @@ export const AuthProvider = ({ children }) => {
 
   const resetPassword = async (email, otp, password) => {
     try {
-      console.log("Resetting password for:", email);
-      await authApi.resetPassword(email, otp, password);
+      const normalizedEmail = email.toLowerCase().trim();
+      console.log("Resetting password for:", normalizedEmail);
+      await authApi.resetPassword(normalizedEmail, otp, password);
       console.log("Password reset successful");
     } catch (error) {
       throw new Error(
@@ -227,7 +234,8 @@ export const AuthProvider = ({ children }) => {
 
   const resendRegisterOTP = async (email) => {
     try {
-      return await authApi.resendRegisterOTP(email);
+      const normalizedEmail = email.toLowerCase().trim();
+      return await authApi.resendRegisterOTP(normalizedEmail);
     } catch (error) {
       throw new Error(error?.response?.data?.message || "Failed to resend OTP");
     }
@@ -235,7 +243,8 @@ export const AuthProvider = ({ children }) => {
 
   const resendResetOTP = async (email) => {
     try {
-      return await authApi.resendResetOTP(email);
+      const normalizedEmail = email.toLowerCase().trim();
+      return await authApi.resendResetOTP(normalizedEmail);
     } catch (error) {
       throw new Error(
         error?.response?.data?.message || "Failed to resend reset OTP"

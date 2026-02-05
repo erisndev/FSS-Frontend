@@ -40,7 +40,12 @@ const BrowseTenders = () => {
     bidAmount: "", // required, was proposedAmount
     timeframe: "", // optional
     message: "", // required, was coverLetter
-    files: [], // [{id, name, size, file}]
+    bidFileDocuments: null,
+    compiledDocuments: null,
+    financialDocuments: null,
+    technicalProposal: null,
+    proofOfExperience: null,
+    supportingDocuments: null,
   });
 
   const [applyLoading, setApplyLoading] = useState(false);
@@ -185,7 +190,15 @@ const BrowseTenders = () => {
     }
 
     if (restored) {
-      setApplyForm({ ...restored, files: [] });
+      setApplyForm({ 
+        ...restored, 
+        bidFileDocuments: null,
+        compiledDocuments: null,
+        financialDocuments: null,
+        technicalProposal: null,
+        proofOfExperience: null,
+        supportingDocuments: null,
+      });
       toast.success("Draft restored from your last session.");
     } else {
       setApplyForm({
@@ -199,7 +212,12 @@ const BrowseTenders = () => {
         bidAmount: "",
         timeframe: "",
         message: "",
-        files: [],
+        bidFileDocuments: null,
+        compiledDocuments: null,
+        financialDocuments: null,
+        technicalProposal: null,
+        proofOfExperience: null,
+        supportingDocuments: null,
       });
     }
 
@@ -212,25 +230,29 @@ const BrowseTenders = () => {
     setApplyForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleApplyFileUpload = (e) => {
-    const files = Array.from(e.target.files || []);
-    const newFiles = files.map((file) => ({
-      id: Date.now() + Math.random(),
-      name: file.name,
-      size: file.size,
-      file,
-    }));
+  const handleApplyFileUpload = (e, documentType) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      toast.error(`${file.name} is too large. Maximum size is 10MB`);
+      return;
+    }
+
     setApplyForm((prev) => ({
       ...prev,
-      files: [...prev.files, ...newFiles],
+      [documentType]: file,
     }));
+    toast.success(`${file.name} uploaded successfully`);
   };
 
-  const handleRemoveApplyDocument = (id) => {
+  const handleRemoveApplyDocument = (documentType) => {
     setApplyForm((prev) => ({
       ...prev,
-      files: prev.files.filter((doc) => doc.id !== id),
+      [documentType]: null,
     }));
+    toast.success("File removed");
   };
 
   const handleSubmitApplication = async (e) => {
@@ -254,7 +276,12 @@ const BrowseTenders = () => {
         bidAmount: Number(applyForm.bidAmount) || 0,
         timeframe: applyForm.timeframe || undefined,
         message: applyForm.message,
-        files: applyForm.files.map((d) => d.file), // uploaded files
+        bidFileDocuments: applyForm.bidFileDocuments,
+        compiledDocuments: applyForm.compiledDocuments,
+        financialDocuments: applyForm.financialDocuments,
+        technicalProposal: applyForm.technicalProposal,
+        proofOfExperience: applyForm.proofOfExperience,
+        supportingDocuments: applyForm.supportingDocuments,
       };
 
       const tenderId = selectedTender._id || selectedTender.id;
@@ -293,7 +320,12 @@ const BrowseTenders = () => {
         bidAmount: "",
         timeframe: "",
         message: "",
-        files: [],
+        bidFileDocuments: null,
+        compiledDocuments: null,
+        financialDocuments: null,
+        technicalProposal: null,
+        proofOfExperience: null,
+        supportingDocuments: null,
       });
     } catch (err) {
       console.error("Error applying to tender:", err);

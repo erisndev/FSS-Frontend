@@ -8,7 +8,6 @@ import {
   Clock,
   Plus,
   Eye,
-  DollarSign,
   Calendar,
 } from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
@@ -384,8 +383,7 @@ const IssuerDashboard = () => {
                       </p>
                       <div className="flex items-center space-x-4 mt-2">
                         <span className="text-cyan-400 text-sm">
-                          <DollarSign className="w-4 h-4 inline mr-1" />R
-                          {application.bidAmount?.toLocaleString()}
+                          R{application.bidAmount?.toLocaleString()}
                         </span>
                         <span className="text-gray-400 text-sm">
                           {formatDate(

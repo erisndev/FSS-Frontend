@@ -5,7 +5,6 @@ import {
   TrendingUp,
   Users,
   FileText,
-  DollarSign,
   Award,
   CheckCircle,
 } from "lucide-react";
@@ -292,7 +291,7 @@ const Analytics = () => {
     {
       title: "Total Budget",
       value: `R${Number(analytics.totalBudget || 0).toLocaleString()}`,
-      icon: DollarSign,
+      icon: Award,
       color: "from-red-500 to-pink-500",
       change: changes.budget,
     },
@@ -332,9 +331,6 @@ const Analytics = () => {
                   <p className="text-gray-400 text-sm">{stat.title}</p>
                   <p className="text-2xl font-bold text-white mt-1">
                     {stat.value}
-                  </p>
-                  <p className="text-green-400 text-sm mt-1">
-                    {stat.change} from last month
                   </p>
                 </div>
                 <div
@@ -425,54 +421,6 @@ const Analytics = () => {
             </div>
           </motion.div>
         </div>
-
-        {/* Performance Metrics */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
-        >
-          <h3 className="text-xl font-semibold text-white mb-6">
-            Performance Metrics
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-10 h-10 text-white" />
-              </div>
-              <h4 className="text-white font-semibold mb-2">Success Rate</h4>
-              <p className="text-3xl font-bold text-cyan-400 mb-1">
-                {analytics.completionRate}%
-              </p>
-              <p className="text-gray-400 text-sm">Applications accepted</p>
-            </div>
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-10 h-10 text-white" />
-              </div>
-              <h4 className="text-white font-semibold mb-2">Engagement</h4>
-              <p className="text-3xl font-bold text-purple-400 mb-1">
-                {analytics.averageApplicationsPerTender}
-              </p>
-              <p className="text-gray-400 text-sm">
-                Avg applications per tender
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-10 h-10 text-white" />
-              </div>
-              <h4 className="text-white font-semibold mb-2">Growth</h4>
-              <p className="text-3xl font-bold text-emerald-400 mb-1">
-                {changes.applications}
-              </p>
-              <p className="text-gray-400 text-sm">
-                Applications vs last month
-              </p>
-            </div>
-          </div>
-        </motion.div>
 
         {/* Recent Activity */}
         <motion.div

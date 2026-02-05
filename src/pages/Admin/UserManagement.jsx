@@ -30,6 +30,8 @@ const UserManagement = () => {
     name: "",
     email: "",
     role: "bidder",
+    company: "",
+    contactPhone: "",
     isActive: true,
   });
 
@@ -52,12 +54,24 @@ const UserManagement = () => {
   const handleCreateUser = async (e) => {
     e.preventDefault();
     try {
-      await userApi.createUser(formData);
+      // Normalize email before sending
+      const userData = {
+        ...formData,
+        email: formData.email.toLowerCase().trim(),
+      };
+      
+      // Only include company and contactPhone for issuer role
+      if (formData.role !== "issuer") {
+        delete userData.company;
+        delete userData.contactPhone;
+      }
+      
+      await userApi.createUser(userData);
 
       fetchUsers();
       toast.success("User created successfully");
       setShowCreateModal(false);
-      setFormData({ name: "", email: "", role: "bidder", isActive: true });
+      setFormData({ name: "", email: "", role: "bidder", company: "", contactPhone: "", isActive: true });
     } catch (error) {
       toast.error("Failed to create user");
       console.error("Error creating user:", error);
@@ -67,12 +81,24 @@ const UserManagement = () => {
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
-      await userApi.updateUser(selectedUser.id, formData);
+      // Normalize email before sending
+      const userData = {
+        ...formData,
+        email: formData.email.toLowerCase().trim(),
+      };
+      
+      // Only include company and contactPhone for issuer role
+      if (formData.role !== "issuer") {
+        delete userData.company;
+        delete userData.contactPhone;
+      }
+      
+      await userApi.updateUser(selectedUser.id || selectedUser._id, userData);
       fetchUsers();
       toast.success("User updated successfully");
       setShowEditModal(false);
       setSelectedUser(null);
-      setFormData({ name: "", email: "", role: "bidder", isActive: true });
+      setFormData({ name: "", email: "", role: "bidder", company: "", contactPhone: "", isActive: true });
     } catch (error) {
       toast.error("Failed to update user");
       console.error("Error updating user:", error);
@@ -96,6 +122,8 @@ const UserManagement = () => {
       name: user.name,
       email: user.email,
       role: user.role,
+      company: user.company || "",
+      contactPhone: user.contactPhone || "",
       isActive: user.isActive,
     });
     setShowEditModal(true);
@@ -202,6 +230,43 @@ const UserManagement = () => {
               <option value="admin">Admin</option>
             </select>
           </div>
+
+          {/* Issuer-specific fields */}
+          {formData.role === "issuer" && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Company Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.company}
+                  onChange={(e) =>
+                    setFormData({ ...formData, company: e.target.value })
+                  }
+                  required
+                  className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
+                  placeholder="Enter company name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Contact Phone
+                </label>
+                <input
+                  type="tel"
+                  value={formData.contactPhone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, contactPhone: e.target.value })
+                  }
+                  required
+                  className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
+                  placeholder="Enter contact phone"
+                />
+              </div>
+            </>
+          )}
 
           <div>
             <label className="flex items-center space-x-3 cursor-pointer">
@@ -361,6 +426,9 @@ const UserManagement = () => {
                         <div>
                           <p className="text-white font-medium">{user.name}</p>
                           <p className="text-gray-400 text-sm">{user.email}</p>
+                          {user.company && (
+                            <p className="text-gray-500 text-xs">{user.company}</p>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -446,6 +514,8 @@ const UserManagement = () => {
                 name: "",
                 email: "",
                 role: "bidder",
+                company: "",
+                contactPhone: "",
                 isActive: true,
               });
             }}
@@ -462,6 +532,8 @@ const UserManagement = () => {
                 name: "",
                 email: "",
                 role: "bidder",
+                company: "",
+                contactPhone: "",
                 isActive: true,
               });
             }}

@@ -7,7 +7,6 @@ import {
   Check,
   X,
   MessageCircle,
-  DollarSign,
   Calendar,
   FileText,
   Download,
@@ -145,10 +144,20 @@ const ReviewApplications = () => {
   const userPermissions = user?.permissions;
 
   // Check if user can view applications
-  const canViewApp = canPerformApplicationAction(user, userPermissions, selectedTender, 'view');
+  const canViewApp = canPerformApplicationAction(
+    user,
+    userPermissions,
+    selectedTender,
+    "view"
+  );
 
   // Check if user can accept/reject applications
-  const canAcceptRejectApp = canPerformApplicationAction(user, userPermissions, selectedTender, 'accept');
+  const canAcceptRejectApp = canPerformApplicationAction(
+    user,
+    userPermissions,
+    selectedTender,
+    "accept"
+  );
 
   const canChangeStatus = (application) => {
     return canAcceptRejectApp;
@@ -202,10 +211,13 @@ const ReviewApplications = () => {
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4 sm:p-6"
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-4">
-            <h3 className="text-base sm:text-lg font-semibold text-white">Select Tender</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-white">
+              Select Tender
+            </h3>
             {selectedTender && (
               <span className="text-cyan-400 text-xs sm:text-sm">
-                {applications.length} application{applications.length !== 1 ? 's' : ''}
+                {applications.length} application
+                {applications.length !== 1 ? "s" : ""}
               </span>
             )}
           </div>
@@ -254,10 +266,12 @@ const ReviewApplications = () => {
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
               <h3 className="text-base sm:text-lg font-semibold text-white break-words pr-2">
-                Applications for "<span className="text-cyan-400">{selectedTender.title}</span>"
+                Applications for "
+                <span className="text-cyan-400">{selectedTender.title}</span>"
               </h3>
               <span className="text-cyan-400 text-xs sm:text-sm whitespace-nowrap">
-                {applications.length} application{applications.length !== 1 ? 's' : ''}
+                {applications.length} application
+                {applications.length !== 1 ? "s" : ""}
               </span>
             </div>
 
@@ -299,10 +313,11 @@ const ReviewApplications = () => {
                         <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-400">
                           <span className="flex items-center space-x-1 break-all">
                             <Mail className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                            <span className="truncate">{application.email}</span>
+                            <span className="truncate">
+                              {application.email}
+                            </span>
                           </span>
                           <span className="flex items-center space-x-1">
-                            <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400 flex-shrink-0" />
                             <span className="text-cyan-400 font-medium">
                               R{application.bidAmount?.toLocaleString()}
                             </span>
@@ -320,7 +335,8 @@ const ReviewApplications = () => {
                               <span className="flex items-center space-x-1">
                                 <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400 flex-shrink-0" />
                                 <span className="text-emerald-400">
-                                  {application.files.length} doc{application.files.length !== 1 ? 's' : ''}
+                                  {application.files.length} doc
+                                  {application.files.length !== 1 ? "s" : ""}
                                 </span>
                               </span>
                             )}
@@ -370,45 +386,48 @@ const ReviewApplications = () => {
             )}
           </motion.div>
         )}
-
-        </div>
+      </div>
 
       {/* Modals - Rendered via Portal */}
-      {showModal && selectedApplication && createPortal(
-        <ApplicationModal
-          key={selectedApplication._id || selectedApplication.id}
-          isOpen={showModal}
-          application={selectedApplication}
-          tender={selectedTender}
-          user={user}
-          onStatusUpdate={handleStatusUpdate}
-          onClose={() => {
-            setShowModal(false);
-            setSelectedApplication(null);
-          }}
-        />,
-        document.body
-      )}
+      {showModal &&
+        selectedApplication &&
+        createPortal(
+          <ApplicationModal
+            key={selectedApplication._id || selectedApplication.id}
+            isOpen={showModal}
+            application={selectedApplication}
+            tender={selectedTender}
+            user={user}
+            onStatusUpdate={handleStatusUpdate}
+            onClose={() => {
+              setShowModal(false);
+              setSelectedApplication(null);
+            }}
+          />,
+          document.body
+        )}
 
-      {showStatusModal && selectedApplication && createPortal(
-        <StatusChangeModal
-          application={selectedApplication}
-          action={statusAction}
-          onClose={() => {
-            setShowStatusModal(false);
-            setSelectedApplication(null);
-            setStatusAction("");
-          }}
-          onSubmit={(comment) =>
-            handleStatusUpdate(
-              selectedApplication._id || selectedApplication.id,
-              statusAction,
-              comment
-            )
-          }
-        />,
-        document.body
-      )}
+      {showStatusModal &&
+        selectedApplication &&
+        createPortal(
+          <StatusChangeModal
+            application={selectedApplication}
+            action={statusAction}
+            onClose={() => {
+              setShowStatusModal(false);
+              setSelectedApplication(null);
+              setStatusAction("");
+            }}
+            onSubmit={(comment) =>
+              handleStatusUpdate(
+                selectedApplication._id || selectedApplication.id,
+                statusAction,
+                comment
+              )
+            }
+          />,
+          document.body
+        )}
     </DashboardLayout>
   );
 };

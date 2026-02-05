@@ -17,7 +17,11 @@ const InviteMemberModal = ({ organizationId, presets, onClose, onSuccess }) => {
     setLoading(true);
 
     try {
-      await teamMemberApi.sendInvitation(organizationId, formData);
+      const invitationData = {
+        ...formData,
+        email: formData.email.toLowerCase().trim()
+      };
+      await teamMemberApi.sendInvitation(organizationId, invitationData);
       toast.success("Invitation sent successfully! The member will receive an email.");
       onSuccess();
     } catch (error) {

@@ -2,7 +2,6 @@ import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   X,
-  DollarSign,
   Calendar,
   FileText,
   Download,
@@ -15,6 +14,8 @@ import {
   MessageSquare,
   Check,
   XIcon,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import StatusChangeModal from "./StatusChangeModal";
@@ -35,10 +36,20 @@ const ApplicationModal = ({
   const userPermissions = user?.permissions;
 
   // Check if user can view applications
-  const canView = canPerformApplicationAction(user, userPermissions, tender, 'view');
+  const canView = canPerformApplicationAction(
+    user,
+    userPermissions,
+    tender,
+    "view"
+  );
 
   // Check if user can accept/reject applications
-  const canAcceptReject = canPerformApplicationAction(user, userPermissions, tender, 'accept');
+  const canAcceptReject = canPerformApplicationAction(
+    user,
+    userPermissions,
+    tender,
+    "accept"
+  );
 
   const canChangeStatus = () => {
     return canAcceptReject;
@@ -139,9 +150,10 @@ const ApplicationModal = ({
           </h5>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div className="flex items-center space-x-2 sm:space-x-3">
-              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 flex-shrink-0" />
               <div className="min-w-0">
-                <p className="text-gray-400 text-xs sm:text-sm">Proposed Amount</p>
+                <p className="text-gray-400 text-xs sm:text-sm">
+                  Proposed Amount
+                </p>
                 <p className="text-cyan-400 font-semibold text-sm sm:text-base md:text-lg break-words">
                   R{application.bidAmount?.toLocaleString()}
                 </p>
@@ -198,7 +210,9 @@ const ApplicationModal = ({
                 <Building className="w-5 h-5 text-emerald-400" />
                 <div>
                   <p className="text-gray-400 text-sm">Company Name</p>
-                  <p className="text-white font-medium">{application.companyName}</p>
+                  <p className="text-white font-medium">
+                    {application.companyName}
+                  </p>
                 </div>
               </div>
 
@@ -207,7 +221,9 @@ const ApplicationModal = ({
                   <FileText className="w-5 h-5 text-blue-400" />
                   <div>
                     <p className="text-gray-400 text-sm">Registration Number</p>
-                    <p className="text-white font-medium">{application.registrationNumber}</p>
+                    <p className="text-white font-medium">
+                      {application.registrationNumber}
+                    </p>
                   </div>
                 </div>
               )}
@@ -219,7 +235,9 @@ const ApplicationModal = ({
                   <Award className="w-5 h-5 text-yellow-400" />
                   <div>
                     <p className="text-gray-400 text-sm">B-BBEE Level</p>
-                    <p className="text-white font-medium">Level {application.bbeeLevel}</p>
+                    <p className="text-white font-medium">
+                      Level {application.bbeeLevel}
+                    </p>
                   </div>
                 </div>
               )}
@@ -229,7 +247,9 @@ const ApplicationModal = ({
                   <Award className="w-5 h-5 text-purple-400" />
                   <div>
                     <p className="text-gray-400 text-sm">CIDB Grading</p>
-                    <p className="text-white font-medium">{application.cidbGrading}</p>
+                    <p className="text-white font-medium">
+                      {application.cidbGrading}
+                    </p>
                   </div>
                 </div>
               )}
@@ -252,7 +272,9 @@ const ApplicationModal = ({
               <User className="w-5 h-5 text-emerald-400" />
               <div>
                 <p className="text-gray-400 text-sm">Contact Person</p>
-                <p className="text-white font-medium">{application.contactPerson}</p>
+                <p className="text-white font-medium">
+                  {application.contactPerson}
+                </p>
               </div>
             </div>
 
@@ -294,52 +316,258 @@ const ApplicationModal = ({
           </motion.div>
         )}
 
-        {/* Supporting Documents */}
-        {application.files && application.files.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8"
-          >
-            <h5 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
-              Supporting Documents ({application.files.length})
-            </h5>
-            <div className="space-y-3">
-              {application.files.map((doc, idx) => (
-                <div
-                  key={doc._id || idx}
-                  className="flex items-center justify-between p-4 bg-slate-800/50 border border-cyan-400/10 rounded-lg hover:bg-slate-800/70 transition-all duration-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-cyan-400" />
-                    </div>
-                    <div>
-                      <p className="text-white font-medium text-sm">
-                        {doc.originalName || doc.name || `Document ${idx + 1}`}
-                      </p>
-                      {doc.size && (
-                        <p className="text-gray-400 text-xs">{formatFileSize(doc.size)}</p>
-                      )}
-                    </div>
-                  </div>
-                  {doc.url && (
-                    <a
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-2 px-4 py-2 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 hover:border-cyan-400/50 transition-all duration-200 text-sm font-medium"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>Download</span>
-                    </a>
-                  )}
-                </div>
-              ))}
+        {/* Documents */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8"
+        >
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
+              <FileText className="w-5 h-5 text-cyan-400" />
             </div>
-          </motion.div>
-        )}
+            <div>
+              <h5 className="text-base sm:text-lg font-semibold text-white">
+                Submitted Documents
+              </h5>
+              <p className="text-xs text-gray-400">
+                Application attachments and files
+              </p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            {/* Check if documents is an array with labels */}
+            {Array.isArray(application.files) && application.files.length > 0 && application.files[0]?.label ? (
+              // New format: Array with label property
+              <>
+                {/* Always show these 5 required document labels */}
+                {['Bid File Documents', 'Compiled Documents', 'Financial Documents', 'Technical Proposal', 'Proof of Experience (Reference Letter)'].map((requiredLabel, index) => {
+                  const doc = application.files.find(f => f.label === requiredLabel);
+                  const getFileExtension = (filename) => {
+                    if (!filename) return 'file';
+                    const ext = filename.split('.').pop().toLowerCase();
+                    return ext;
+                  };
+                  const getFileTypeColor = (filename) => {
+                    const ext = getFileExtension(filename);
+                    if (['pdf'].includes(ext)) return 'from-red-500/20 to-red-600/20 border-red-400/30';
+                    if (['doc', 'docx'].includes(ext)) return 'from-blue-500/20 to-blue-600/20 border-blue-400/30';
+                    if (['xls', 'xlsx'].includes(ext)) return 'from-green-500/20 to-green-600/20 border-green-400/30';
+                    if (['jpg', 'jpeg', 'png'].includes(ext)) return 'from-purple-500/20 to-purple-600/20 border-purple-400/30';
+                    return 'from-cyan-500/20 to-cyan-600/20 border-cyan-400/30';
+                  };
+                  const getFileTypeIcon = (filename) => {
+                    const ext = getFileExtension(filename);
+                    if (['pdf'].includes(ext)) return '📄';
+                    if (['doc', 'docx'].includes(ext)) return '📝';
+                    if (['xls', 'xlsx'].includes(ext)) return '📊';
+                    if (['jpg', 'jpeg', 'png'].includes(ext)) return '🖼️';
+                    return '📎';
+                  };
+                  
+                  return (
+                    <motion.div 
+                      key={requiredLabel}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                      className="group"
+                    >
+                      <div className="flex items-center space-x-2 mb-2">
+                        <div className="w-1 h-4 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></div>
+                        <label className="text-xs sm:text-sm font-semibold text-gray-200">
+                          {requiredLabel}
+                        </label>
+                        {doc ? (
+                          <CheckCircle className="w-4 h-4 text-green-400" />
+                        ) : (
+                          <XCircle className="w-4 h-4 text-red-400" />
+                        )}
+                      </div>
+                      {doc ? (
+                        <div className={`relative flex items-center justify-between gap-3 p-4 bg-gradient-to-r ${getFileTypeColor(doc.name || doc.originalName)} border rounded-xl hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 group-hover:scale-[1.02]`}>
+                          <div className="flex items-center space-x-3 min-w-0 flex-1">
+                            <div className="relative">
+                              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border border-cyan-400/20 shadow-lg">
+                                <span className="text-2xl">{getFileTypeIcon(doc.name || doc.originalName)}</span>
+                              </div>
+                              <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-slate-900">
+                                <CheckCircle className="w-3 h-3 text-white" />
+                              </div>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-white truncate mb-0.5">
+                                {doc.name || doc.originalName || 'Document'}
+                              </p>
+                              <div className="flex items-center space-x-2">
+                                {doc.size && (
+                                  <span className="text-xs text-gray-400 font-medium">
+                                    {formatFileSize(doc.size)}
+                                  </span>
+                                )}
+                                <span className="text-xs text-gray-500">•</span>
+                                <span className="text-xs text-cyan-400 uppercase font-bold">
+                                  {getFileExtension(doc.name || doc.originalName)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          {doc.url && (
+                            <a
+                              href={doc.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-400/40 text-cyan-300 rounded-lg hover:from-cyan-500/40 hover:to-purple-500/40 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 text-sm font-semibold flex-shrink-0 group/btn"
+                            >
+                              <Download className="w-4 h-4 group-hover/btn:animate-bounce" />
+                              <span className="hidden sm:inline">Download</span>
+                            </a>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between p-4 bg-slate-800/30 border border-red-400/20 rounded-xl">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center border border-red-400/30">
+                              <XCircle className="w-6 h-6 text-red-400" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-red-400">Not Uploaded</p>
+                              <p className="text-xs text-gray-500">This document was not provided</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+                
+                {/* Supporting Documents - only show if exists */}
+                {application.files.find(f => f.label === 'Supporting Documents' || f.label === 'Extra or Supporting Documents') && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="group"
+                  >
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-1 h-4 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></div>
+                      <label className="text-xs sm:text-sm font-semibold text-gray-200">
+                        Supporting Documents
+                      </label>
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                    </div>
+                    {(() => {
+                      const doc = application.files.find(f => f.label === 'Supporting Documents' || f.label === 'Extra or Supporting Documents');
+                      const getFileExtension = (filename) => {
+                        if (!filename) return 'file';
+                        const ext = filename.split('.').pop().toLowerCase();
+                        return ext;
+                      };
+                      const getFileTypeColor = (filename) => {
+                        const ext = getFileExtension(filename);
+                        if (['pdf'].includes(ext)) return 'from-red-500/20 to-red-600/20 border-red-400/30';
+                        if (['doc', 'docx'].includes(ext)) return 'from-blue-500/20 to-blue-600/20 border-blue-400/30';
+                        if (['xls', 'xlsx'].includes(ext)) return 'from-green-500/20 to-green-600/20 border-green-400/30';
+                        if (['jpg', 'jpeg', 'png'].includes(ext)) return 'from-purple-500/20 to-purple-600/20 border-purple-400/30';
+                        return 'from-cyan-500/20 to-cyan-600/20 border-cyan-400/30';
+                      };
+                      const getFileTypeIcon = (filename) => {
+                        const ext = getFileExtension(filename);
+                        if (['pdf'].includes(ext)) return '📄';
+                        if (['doc', 'docx'].includes(ext)) return '📝';
+                        if (['xls', 'xlsx'].includes(ext)) return '📊';
+                        if (['jpg', 'jpeg', 'png'].includes(ext)) return '🖼️';
+                        return '📎';
+                      };
+                      
+                      return (
+                        <div className={`relative flex items-center justify-between gap-3 p-4 bg-gradient-to-r ${getFileTypeColor(doc.name || doc.originalName)} border rounded-xl hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 group-hover:scale-[1.02]`}>
+                          <div className="flex items-center space-x-3 min-w-0 flex-1">
+                            <div className="relative">
+                              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border border-cyan-400/20 shadow-lg">
+                                <span className="text-2xl">{getFileTypeIcon(doc.name || doc.originalName)}</span>
+                              </div>
+                              <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-slate-900">
+                                <CheckCircle className="w-3 h-3 text-white" />
+                              </div>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-white truncate mb-0.5">
+                                {doc.name || doc.originalName || 'Document'}
+                              </p>
+                              <div className="flex items-center space-x-2">
+                                {doc.size && (
+                                  <span className="text-xs text-gray-400 font-medium">
+                                    {formatFileSize(doc.size)}
+                                  </span>
+                                )}
+                                <span className="text-xs text-gray-500">•</span>
+                                <span className="text-xs text-cyan-400 uppercase font-bold">
+                                  {getFileExtension(doc.name || doc.originalName)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          {doc.url && (
+                            <a
+                              href={doc.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-400/40 text-cyan-300 rounded-lg hover:from-cyan-500/40 hover:to-purple-500/40 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 text-sm font-semibold flex-shrink-0 group/btn"
+                            >
+                              <Download className="w-4 h-4 group-hover/btn:animate-bounce" />
+                              <span className="hidden sm:inline">Download</span>
+                            </a>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </motion.div>
+                )}
+              </>
+            ) : (
+              /* Fallback for old array format without labels */
+              application.files && application.files.length > 0 ? (
+                application.files.map((doc, idx) => (
+                  <div
+                    key={doc._id || idx}
+                    className="flex items-center justify-between p-4 bg-slate-800/50 border border-cyan-400/10 rounded-lg hover:bg-slate-800/70 transition-all duration-200"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-cyan-400" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm">
+                          {doc.originalName || doc.name || `Document ${idx + 1}`}
+                        </p>
+                        {doc.size && (
+                          <p className="text-gray-400 text-xs">
+                            {formatFileSize(doc.size)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {doc.url && (
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2 px-4 py-2 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 hover:border-cyan-400/50 transition-all duration-200 text-sm font-medium"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Download</span>
+                      </a>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-400 text-sm">No documents uploaded</p>
+              )
+            )}
+          </div>
+        </motion.div>
 
         {/* Tender Information */}
         {application.tender && (
@@ -355,18 +583,24 @@ const ApplicationModal = ({
             <div className="space-y-3">
               <div>
                 <p className="text-gray-400 text-sm">Title</p>
-                <p className="text-white font-medium">{application.tender.title}</p>
+                <p className="text-white font-medium">
+                  {application.tender.title}
+                </p>
               </div>
               {application.tender.description && (
                 <div>
                   <p className="text-gray-400 text-sm">Description</p>
-                  <p className="text-gray-300">{application.tender.description}</p>
+                  <p className="text-gray-300">
+                    {application.tender.description}
+                  </p>
                 </div>
               )}
               {application.tender.category && (
                 <div>
                   <p className="text-gray-400 text-sm">Category</p>
-                  <p className="text-white font-medium">{application.tender.category}</p>
+                  <p className="text-white font-medium">
+                    {application.tender.category}
+                  </p>
                 </div>
               )}
             </div>
@@ -374,34 +608,35 @@ const ApplicationModal = ({
         )}
 
         {/* Actions */}
-        {application.status?.toLowerCase() === "pending" && canChangeStatus() && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-2 sm:mb-4"
-          >
-            <h5 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
-              Application Actions
-            </h5>
-            <div className="flex items-center justify-end space-x-4">
-              <button
-                onClick={() => openStatusModal("Reject")}
-                className="flex items-center space-x-2 px-6 py-3 bg-red-500/20 border border-red-400/30 text-red-400 rounded-lg hover:bg-red-500/30 hover:border-red-400/50 transition-all duration-300"
-              >
-                <XIcon className="w-5 h-5" />
-                <span>Reject Application</span>
-              </button>
-              <button
-                onClick={() => openStatusModal("Accept")}
-                className="flex items-center space-x-2 px-6 py-3 bg-green-500/20 border border-green-400/30 text-green-400 rounded-lg hover:bg-green-500/30 hover:border-green-400/50 transition-all duration-300"
-              >
-                <Check className="w-5 h-5" />
-                <span>Accept Application</span>
-              </button>
-            </div>
-          </motion.div>
-        )}
+        {application.status?.toLowerCase() === "pending" &&
+          canChangeStatus() && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-2 sm:mb-4"
+            >
+              <h5 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
+                Application Actions
+              </h5>
+              <div className="flex items-center justify-end space-x-4">
+                <button
+                  onClick={() => openStatusModal("Reject")}
+                  className="flex items-center space-x-2 px-6 py-3 bg-red-500/20 border border-red-400/30 text-red-400 rounded-lg hover:bg-red-500/30 hover:border-red-400/50 transition-all duration-300"
+                >
+                  <XIcon className="w-5 h-5" />
+                  <span>Reject Application</span>
+                </button>
+                <button
+                  onClick={() => openStatusModal("Accept")}
+                  className="flex items-center space-x-2 px-6 py-3 bg-green-500/20 border border-green-400/30 text-green-400 rounded-lg hover:bg-green-500/30 hover:border-green-400/50 transition-all duration-300"
+                >
+                  <Check className="w-5 h-5" />
+                  <span>Accept Application</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
 
         {/* Reusable Status Change Modal */}
         {showStatusModal && (

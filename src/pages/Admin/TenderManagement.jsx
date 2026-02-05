@@ -6,7 +6,6 @@ import {
   Trash2,
   Eye,
   Users,
-  DollarSign,
   Calendar,
   AlertCircle,
   Search,

@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
-import { handleApiError, logError } from "../../utils/errorHandler";
+import { handleApiError } from "../../utils/errorHandler.jsx";
+import logger from "../../utils/logger";
 
 const TeamLogin = () => {
   const { user, teamLogin, getTeamMembers, loading } = useAuth();
@@ -45,7 +46,9 @@ const TeamLogin = () => {
     setIsLoading(true);
 
     try {
-      const data = await getTeamMembers(email);
+      const normalizedEmail = email.toLowerCase().trim();
+      setEmail(normalizedEmail);
+      const data = await getTeamMembers(normalizedEmail);
       setOrganizationData(data);
       setStep(2);
       toast.success(`Welcome to ${data.organizationName}`);
@@ -75,10 +78,11 @@ const TeamLogin = () => {
     setIsLoading(true);
 
     try {
-      await teamLogin(email, selectedMember.id, password);
+      const normalizedEmail = email.toLowerCase().trim();
+      await teamLogin(normalizedEmail, selectedMember.id, password);
       toast.success("Login successful");
     } catch (err) {
-      logError("Team Login", err);
+      logger.error("Team Login error:", err);
       const friendlyError = handleApiError(err, toast, "Login failed");
       setError(friendlyError);
     } finally {

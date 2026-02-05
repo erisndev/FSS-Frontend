@@ -274,13 +274,30 @@ export const tenderApi = {
   },
   createTender: async (formData) => {
     const data = new FormData();
+    
+    // Document field names
+    const documentFields = [
+      'bidFileDocuments',
+      'compiledDocuments',
+      'financialDocuments',
+      'technicalProposal',
+      'proofOfExperience'
+    ];
+    
+    // Append all non-document fields
     Object.entries(formData).forEach(([key, value]) => {
-      if (key !== "documents") data.append(key, value);
+      if (!documentFields.includes(key)) {
+        data.append(key, value);
+      }
     });
-    const documents = formData.documents || [];
-    documents.forEach((doc) => {
-      if (doc?.file) data.append("documents", doc.file);
+    
+    // Append individual document files
+    documentFields.forEach((fieldName) => {
+      if (formData[fieldName] && formData[fieldName] instanceof File) {
+        data.append(fieldName, formData[fieldName]);
+      }
     });
+    
     const res = await api.post("/tenders", data, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -307,17 +324,35 @@ export const tenderApi = {
 export const applicationApi = {
   applyToTender: async (tenderId, formData) => {
     const data = new FormData();
+    
+    // Document field names for applications
+    const documentFields = [
+      'bidFileDocuments',
+      'compiledDocuments',
+      'financialDocuments',
+      'technicalProposal',
+      'proofOfExperience',
+      'supportingDocuments'
+    ];
+    
+    // Append all non-document fields
     for (const [key, value] of Object.entries(formData)) {
-      if (key === "files") {
-        value.forEach((file) => {
-          if (file instanceof File) data.append("files", file);
-        });
-      } else if (Array.isArray(value)) {
-        data.append(key, JSON.stringify(value));
-      } else {
-        data.append(key, value);
+      if (!documentFields.includes(key)) {
+        if (Array.isArray(value)) {
+          data.append(key, JSON.stringify(value));
+        } else {
+          data.append(key, value);
+        }
       }
     }
+    
+    // Append individual document files
+    documentFields.forEach((fieldName) => {
+      if (formData[fieldName] && formData[fieldName] instanceof File) {
+        data.append(fieldName, formData[fieldName]);
+      }
+    });
+    
     const res = await api.post(`/applications/${tenderId}`, data, {
       headers: { "Content-Type": "multipart/form-data" },
     });

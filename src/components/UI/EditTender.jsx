@@ -5,7 +5,6 @@ import {
   Upload,
   X,
   Calendar,
-  DollarSign,
   AlertCircle,
   Save,
   ArrowLeft,
@@ -42,7 +41,11 @@ const EditTender = () => {
     contactEmail: "",
     contactPhone: "",
     status: "active",
-    documents: [],
+    bidFileDocuments: null,
+    compiledDocuments: null,
+    financialDocuments: null,
+    technicalProposal: null,
+    proofOfExperience: null,
   });
 
   const categories = [
@@ -65,16 +68,62 @@ const EditTender = () => {
       try {
         const res = await tenderApi.getTender(id);
         console.log("Fetched tender data:", res);
-        const existingDocs = (res.documents || []).map((doc, index) => ({
-          id: `existing-${index}`,
-          name: doc.name || doc.split("/").pop(),
-          url: doc.url || doc, // support URL
-        }));
+
+        // Process existing documents
+        let existingDocs = {
+          bidFileDocuments: null,
+          compiledDocuments: null,
+          financialDocuments: null,
+          technicalProposal: null,
+          proofOfExperience: null,
+        };
+
+        // Check if documents exist and have the label property (new format)
+        if (Array.isArray(res.documents) && res.documents.length > 0) {
+          res.documents.forEach(doc => {
+            if (doc.label === 'Bid File Documents') {
+              existingDocs.bidFileDocuments = { 
+                name: doc.name || doc.originalName, 
+                url: doc.url, 
+                size: doc.size,
+                isExisting: true 
+              };
+            } else if (doc.label === 'Compiled Documents') {
+              existingDocs.compiledDocuments = { 
+                name: doc.name || doc.originalName, 
+                url: doc.url, 
+                size: doc.size,
+                isExisting: true 
+              };
+            } else if (doc.label === 'Financial Documents') {
+              existingDocs.financialDocuments = { 
+                name: doc.name || doc.originalName, 
+                url: doc.url, 
+                size: doc.size,
+                isExisting: true 
+              };
+            } else if (doc.label === 'Technical Proposal') {
+              existingDocs.technicalProposal = { 
+                name: doc.name || doc.originalName, 
+                url: doc.url, 
+                size: doc.size,
+                isExisting: true 
+              };
+            } else if (doc.label === 'Proof of Experience (Reference Letter)') {
+              existingDocs.proofOfExperience = { 
+                name: doc.name || doc.originalName, 
+                url: doc.url, 
+                size: doc.size,
+                isExisting: true 
+              };
+            }
+          });
+        }
 
         setFormData({
           ...res,
           deadline: res.deadline ? res.deadline.slice(0, 16) : "",
-          documents: existingDocs,
+          ...existingDocs,
         });
       } catch (err) {
         console.error(err);
@@ -93,38 +142,56 @@ const EditTender = () => {
     }));
   };
 
-  // Handle file uploads
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    addFiles(files);
+  // Handle file uploads for individual document types
+  const handleFileUpload = (e, documentType) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      toast.error(`${file.name} is too large. Maximum size is 10MB`);
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [documentType]: file,
+    }));
+    toast.success(`${file.name} uploaded successfully`);
   };
 
-  // Handle drag-and-drop
-  const handleDrop = (e) => {
+  // Handle drag and drop for individual document types
+  const handleDocumentDrop = (e, documentType) => {
     e.preventDefault();
-    setIsDragging(false);
-    const files = Array.from(e.dataTransfer.files);
-    addFiles(files);
-  };
+    e.stopPropagation();
+    
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
 
-  const addFiles = (files) => {
-    const newFiles = files.map((file) => ({
-      id: Date.now() + Math.random(),
-      name: file.name,
-      size: file.size,
-      file,
-    }));
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      toast.error(`${file.name} is too large. Maximum size is 10MB`);
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
-      documents: [...prev.documents, ...newFiles],
+      [documentType]: file,
     }));
+    toast.success(`${file.name} uploaded successfully`);
   };
 
-  const handleRemoveDocument = (id) => {
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleRemoveDocument = (documentType) => {
     setFormData((prev) => ({
       ...prev,
-      documents: prev.documents.filter((doc) => doc.id !== id),
+      [documentType]: null,
     }));
+    toast.success("File removed");
   };
 
   const formatFileSize = (bytes) => {
@@ -144,24 +211,37 @@ const EditTender = () => {
     try {
       const payload = new FormData();
 
-      // Append all fields except documents
+      // Append all text fields
+      const documentFields = ['bidFileDocuments', 'compiledDocuments', 'financialDocuments', 'technicalProposal', 'proofOfExperience'];
+      
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === "documents") return;
-        payload.append(key, value);
+        if (documentFields.includes(key)) return; // Skip document fields for now
+        if (value !== null && value !== undefined) {
+          payload.append(key, value);
+        }
       });
 
-      // Separate documents into new files and existing URLs
-      const existingDocUrls = formData.documents
-        .filter((doc) => !doc.file && doc.url)
-        .map((doc) => doc.url);
+      // Track existing documents that should be kept
+      const existingDocuments = {};
 
-      const newFiles = formData.documents.filter((doc) => doc.file);
+      // Handle each document field
+      documentFields.forEach(field => {
+        const doc = formData[field];
+        if (doc) {
+          if (doc.isExisting) {
+            // This is an existing document, keep its URL
+            existingDocuments[field] = doc.url;
+          } else {
+            // This is a new file upload
+            payload.append(field, doc);
+          }
+        }
+      });
 
-      // Append new files
-      newFiles.forEach((doc) => payload.append("documents", doc.file));
-
-      // Append existing document URLs
-      payload.append("existingDocuments", JSON.stringify(existingDocUrls));
+      // Send existing document URLs as JSON
+      if (Object.keys(existingDocuments).length > 0) {
+        payload.append('existingDocuments', JSON.stringify(existingDocuments));
+      }
 
       await tenderApi.updateTender(id, payload);
 
@@ -182,8 +262,6 @@ const EditTender = () => {
       setLoading(false);
     }
   };
-
-  const { documents } = formData;
 
   return (
     <DashboardLayout title="Edit Tender" subtitle="Update tender details">
@@ -458,26 +536,14 @@ const EditTender = () => {
                   {" "}
                   CIDB Grading{" "}
                 </label>{" "}
-                <select
+                <input
+                  type="text"
                   name="cidbGrading"
                   value={formData.cidbGrading}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-                  placeholder="Select CIDB Grading"
-                >
-                  {" "}
-                  <option value="">Select CIDB Grading</option>{" "}
-                  <option value="1GB">1GB</option>{" "}
-                  <option value="2GB">2GB</option>{" "}
-                  <option value="3GB">3GB</option>{" "}
-                  <option value="4GB">4GB</option>{" "}
-                  <option value="5GB">5GB</option>{" "}
-                  <option value="6GB">6GB</option>{" "}
-                  <option value="7GB">7GB</option>{" "}
-                  <option value="8GB">8GB</option>{" "}
-                  <option value="9GB">9GB</option>{" "}
-                  <option value="10GB">10GB</option>{" "}
-                </select>{" "}
+                  placeholder="e.g., 5GB, 7CE"
+                />{" "}
               </div>{" "}
             </div>{" "}
             {/* Contact Info */}{" "}
@@ -551,79 +617,240 @@ const EditTender = () => {
             </div>
             {/* Documents Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-4">
                 Documents
               </label>
-              <div
-                className={`border-2 border-dashed rounded-lg p-6 transition-all duration-300 ${
-                  isDragging
-                    ? "border-cyan-400 bg-cyan-500/10"
-                    : "border-cyan-400/20 hover:border-cyan-400/40"
-                }`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setIsDragging(true);
-                }}
-                onDragLeave={() => setIsDragging(false)}
-                onDrop={handleDrop}
-              >
-                <div className="text-center">
-                  <Upload className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
-                  <p className="text-gray-300 mb-2">
-                    Drop files here or click to upload
-                  </p>
-                  <p className="text-gray-500 text-sm">
-                    PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB each)
-                  </p>
-                  <input
-                    type="file"
-                    multiple
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="file-upload"
-                  />
-                  <label
-                    htmlFor="file-upload"
-                    className="inline-block mt-4 px-6 py-2 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 cursor-pointer transition-all duration-300"
-                  >
-                    Choose Files
+              <div className="space-y-4">
+                {/* Bid File Documents */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Bid File Documents
                   </label>
-                </div>
-              </div>
-
-              {documents.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  <h4 className="text-white font-medium">
-                    Uploaded Documents:
-                  </h4>
-                  {documents.map((doc) => (
-                    <div
-                      key={doc.id}
-                      className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg"
-                    >
+                  {formData.bidFileDocuments ? (
+                    <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg">
                       <div className="flex items-center space-x-3">
                         <FileText className="w-5 h-5 text-cyan-400" />
                         <div>
-                          <p className="text-white text-sm">{doc.name}</p>
-                          {doc.size && (
-                            <p className="text-gray-400 text-xs">
-                              {formatFileSize(doc.size)}
-                            </p>
-                          )}
+                          <p className="text-white text-sm">{formData.bidFileDocuments.name}</p>
+                          <p className="text-gray-400 text-xs">
+                            {formatFileSize(formData.bidFileDocuments.size)}
+                          </p>
                         </div>
                       </div>
                       <button
                         type="button"
-                        onClick={() => handleRemoveDocument(doc.id)}
+                        onClick={() => handleRemoveDocument('bidFileDocuments')}
                         className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
-                  ))}
+                  ) : (
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        onChange={(e) => handleFileUpload(e, 'bidFileDocuments')}
+                        className="hidden"
+                        id="bidFileDocuments"
+                      />
+                      <label
+                        htmlFor="bidFileDocuments"
+                        onDrop={(e) => handleDocumentDrop(e, 'bidFileDocuments')}
+                        onDragOver={handleDragOver}
+                        className="flex items-center justify-center w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:bg-slate-800/70 hover:border-cyan-400/40 cursor-pointer transition-all duration-300"
+                      >
+                        <Upload className="w-5 h-5 mr-2" />
+                        Choose File or Drop Here
+                      </label>
+                    </div>
+                  )}
                 </div>
-              )}
+
+                {/* Compiled Documents */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Compiled Documents
+                  </label>
+                  {formData.compiledDocuments ? (
+                    <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <FileText className="w-5 h-5 text-cyan-400" />
+                        <div>
+                          <p className="text-white text-sm">{formData.compiledDocuments.name}</p>
+                          <p className="text-gray-400 text-xs">
+                            {formatFileSize(formData.compiledDocuments.size)}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDocument('compiledDocuments')}
+                        className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        onChange={(e) => handleFileUpload(e, 'compiledDocuments')}
+                        className="hidden"
+                        id="compiledDocuments"
+                      />
+                      <label
+                        htmlFor="compiledDocuments"
+                        onDrop={(e) => handleDocumentDrop(e, 'compiledDocuments')}
+                        onDragOver={handleDragOver}
+                        className="flex items-center justify-center w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:bg-slate-800/70 hover:border-cyan-400/40 cursor-pointer transition-all duration-300"
+                      >
+                        <Upload className="w-5 h-5 mr-2" />
+                        Choose File or Drop Here
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* Financial Documents */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Financial Documents
+                  </label>
+                  {formData.financialDocuments ? (
+                    <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <FileText className="w-5 h-5 text-cyan-400" />
+                        <div>
+                          <p className="text-white text-sm">{formData.financialDocuments.name}</p>
+                          <p className="text-gray-400 text-xs">
+                            {formatFileSize(formData.financialDocuments.size)}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDocument('financialDocuments')}
+                        className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        onChange={(e) => handleFileUpload(e, 'financialDocuments')}
+                        className="hidden"
+                        id="financialDocuments"
+                      />
+                      <label
+                        htmlFor="financialDocuments"
+                        onDrop={(e) => handleDocumentDrop(e, 'financialDocuments')}
+                        onDragOver={handleDragOver}
+                        className="flex items-center justify-center w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:bg-slate-800/70 hover:border-cyan-400/40 cursor-pointer transition-all duration-300"
+                      >
+                        <Upload className="w-5 h-5 mr-2" />
+                        Choose File or Drop Here
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* Technical Proposal */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Technical Proposal
+                  </label>
+                  {formData.technicalProposal ? (
+                    <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <FileText className="w-5 h-5 text-cyan-400" />
+                        <div>
+                          <p className="text-white text-sm">{formData.technicalProposal.name}</p>
+                          <p className="text-gray-400 text-xs">
+                            {formatFileSize(formData.technicalProposal.size)}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDocument('technicalProposal')}
+                        className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        onChange={(e) => handleFileUpload(e, 'technicalProposal')}
+                        className="hidden"
+                        id="technicalProposal"
+                      />
+                      <label
+                        htmlFor="technicalProposal"
+                        onDrop={(e) => handleDocumentDrop(e, 'technicalProposal')}
+                        onDragOver={handleDragOver}
+                        className="flex items-center justify-center w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:bg-slate-800/70 hover:border-cyan-400/40 cursor-pointer transition-all duration-300"
+                      >
+                        <Upload className="w-5 h-5 mr-2" />
+                        Choose File or Drop Here
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* Proof of Experience */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Proof of Experience (Reference Letter)
+                  </label>
+                  {formData.proofOfExperience ? (
+                    <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <FileText className="w-5 h-5 text-cyan-400" />
+                        <div>
+                          <p className="text-white text-sm">{formData.proofOfExperience.name}</p>
+                          <p className="text-gray-400 text-xs">
+                            {formatFileSize(formData.proofOfExperience.size)}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDocument('proofOfExperience')}
+                        className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        onChange={(e) => handleFileUpload(e, 'proofOfExperience')}
+                        className="hidden"
+                        id="proofOfExperience"
+                      />
+                      <label
+                        htmlFor="proofOfExperience"
+                        onDrop={(e) => handleDocumentDrop(e, 'proofOfExperience')}
+                        onDragOver={handleDragOver}
+                        className="flex items-center justify-center w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:bg-slate-800/70 hover:border-cyan-400/40 cursor-pointer transition-all duration-300"
+                      >
+                        <Upload className="w-5 h-5 mr-2" />
+                        Choose File or Drop Here
+                      </label>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
             {/* Submit */}
             <div className="flex items-center justify-end space-x-4 pt-6 border-t border-cyan-400/10">

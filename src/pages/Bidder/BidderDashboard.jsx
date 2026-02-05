@@ -10,7 +10,6 @@ import {
   Eye,
   Search,
   Filter,
-  DollarSign,
 } from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import ViewTenderModal from "../../components/UI/ViewTenderModal";
@@ -262,7 +261,6 @@ const BidderDashboard = () => {
                       </p>
                       <div className="flex items-center space-x-4 mt-2">
                         <span className="text-cyan-400 text-sm">
-                          <DollarSign className="w-4 h-4 inline mr-1" />
                           R{tender.budgetMin?.toLocaleString()}
                         </span>
                         <span className="text-gray-400 text-sm">
@@ -331,7 +329,6 @@ const BidderDashboard = () => {
                       </p>
                       <div className="flex items-center space-x-4 mt-2">
                         <span className="text-cyan-400 text-sm">
-                          <DollarSign className="w-4 h-4 inline mr-1" />
                           R{application.bidAmount?.toLocaleString()}
                         </span>
                       </div>
