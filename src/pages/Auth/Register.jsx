@@ -53,13 +53,14 @@ const Register = () => {
     return (
       <Navigate
         to="/verify-otp"
-        state={{ email: formData.email, isRegistration: true }}
+        state={{ email: formData.email.toLowerCase().trim(), isRegistration: true }}
         replace
       />
     );
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLoading) return;
     setError("");
 
     if (formData.password !== formData.confirmPassword) {

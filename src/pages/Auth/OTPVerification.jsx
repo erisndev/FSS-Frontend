@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Shield, ArrowLeft } from "lucide-react";
@@ -19,49 +19,57 @@ const OTPVerification = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState("");
-  const [resendTimer, setResendTimer] = useState(60);
-  const [canResend, setCanResend] = useState(false);
+
+  // Cooldown implementation: store a timestamp (ms) until resend is allowed
+  const [cooldownUntil, setCooldownUntil] = useState(null);
 
   const { email, isRegistration } = location.state || {};
 
-  useEffect(() => {
-    if (!email) navigate("/login", { replace: true });
-  }, [email, navigate]);
+  const normalizedEmail = useMemo(
+    () => (email ? email.toLowerCase().trim() : ""),
+    [email]
+  );
+
+  const resendTimer = useMemo(() => {
+    if (!cooldownUntil) return 0;
+    return Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000));
+  }, [cooldownUntil]);
+
+  const canResend = resendTimer === 0;
 
   useEffect(() => {
-    const otpTimestamp = localStorage.getItem("otpTimestamp");
-    if (otpTimestamp) {
-      const elapsed = Math.floor((Date.now() - parseInt(otpTimestamp)) / 1000);
-      const remaining = 60 - elapsed;
-      if (remaining > 0) {
-        setResendTimer(remaining);
-        setCanResend(false);
-      } else {
-        setResendTimer(0);
-        setCanResend(true);
+    if (!normalizedEmail) {
+      navigate("/login", { replace: true });
+      return;
+    }
+  }, [normalizedEmail, isRegistration, navigate]);
+
+  // Load cooldown timestamp (ms) on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("registerOtpCooldownUntil");
+    if (stored) {
+      const parsed = Number(stored);
+      if (!Number.isNaN(parsed) && parsed > Date.now()) {
+        setCooldownUntil(parsed);
       }
-    } else {
-      setResendTimer(60);
-      setCanResend(false);
     }
   }, []);
 
+  // Tick every second while cooling down
   useEffect(() => {
-    if (canResend) return;
+    if (!cooldownUntil) return;
 
-    const interval = setInterval(() => {
-      setResendTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setCanResend(true);
-          return 0;
-        }
-        return prev - 1;
-      });
+    const id = setInterval(() => {
+      if (Date.now() >= cooldownUntil) {
+        setCooldownUntil(null);
+      } else {
+        // trigger rerender for timer display
+        setCooldownUntil((prev) => prev);
+      }
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [canResend]);
+    return () => clearInterval(id);
+  }, [cooldownUntil]);
 
   const formatTimer = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -90,8 +98,14 @@ const OTPVerification = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLoading) return;
+
     const otpString = otp.join("");
-    console.log("Submitting OTP:", otpString);
+    
+    if (!normalizedEmail) {
+      setError("Missing email. Please register again.");
+      return;
+    }
 
     if (otpString.length !== 6) {
       setError("Please enter all 6 digits");
@@ -103,10 +117,10 @@ const OTPVerification = () => {
 
     try {
       if (isRegistration) {
-        // Verify registration OTP and get user
-        const user = await verifyRegisterOTP(email, otpString);
+        const user = await verifyRegisterOTP(normalizedEmail, otpString);
         toast.success("Registration successful");
 
+        
         if (user && user.role) {
           const dashboardPath =
             user.role === "admin"
@@ -123,41 +137,91 @@ const OTPVerification = () => {
           navigate("/login", { replace: true });
         }
       } else {
-        // Verify reset OTP
-        console.log("Verifying reset OTP for:", email, otpString);
-        await verifyResetOTP(email, otpString);
-        console.log("Reset OTP verified, navigating to reset password");
-        navigate("/reset-password", { state: { email, otp: otpString } });
+        await verifyResetOTP(normalizedEmail, otpString);
+        navigate("/reset-password", {
+          state: { email: normalizedEmail, otp: otpString },
+        });
       }
     } catch (err) {
-      setError(err.message || "Verification failed");
+      const message =
+        err?.response?.data?.message || err?.message || "Verification failed";
+
+      
+      // Match spec messaging for register flow
+      if (
+        isRegistration &&
+        err?.response?.status === 400 &&
+        message === "Invalid or expired registration OTP"
+      ) {
+        setError(
+          "Incorrect code. Please check the latest email or resend a new code."
+        );
+      } else if (isRegistration && err?.response?.status === 404) {
+        setError("User not found. Please register again.");
+      } else {
+        setError(message);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleResendOTP = async () => {
-    if (!canResend) return;
+    if (!normalizedEmail) {
+      setError("Missing email. Please register again.");
+      return;
+    }
+
+    if (!canResend || isResending) return;
 
     setIsResending(true);
     setError("");
 
+    
     try {
+      let res;
       if (isRegistration) {
-        await resendRegisterOTP(email);
+        res = await resendRegisterOTP(normalizedEmail);
       } else {
-        await resendResetOTP(email);
+        res = await resendResetOTP(normalizedEmail);
       }
 
-      localStorage.setItem("otpTimestamp", Date.now().toString());
-      setResendTimer(60);
-      setCanResend(false);
-      setOtp(["", "", "", "", "", ""]);
+      
+      // Spec: backend may return resendAvailableInSeconds when reusing cooldown
+      const seconds =
+        Number(res?.resendAvailableInSeconds) > 0
+          ? Number(res.resendAvailableInSeconds)
+          : 60;
 
+      const until = Date.now() + seconds * 1000;
+      localStorage.setItem("registerOtpCooldownUntil", until.toString());
+      setCooldownUntil(until);
+
+      // UX: make it clear they must use the latest OTP
+      toast.success("Code sent. Use the latest code you receive.");
+
+      setOtp(["", "", "", "", "", ""]);
       const firstInput = document.getElementById("otp-0");
       if (firstInput) firstInput.focus();
+
+      // If backend indicates already verified
+      if (res?.message === "Email already verified") {
+        navigate("/login", { replace: true });
+      }
     } catch (err) {
-      setError(err.message || "Failed to resend OTP");
+      const message =
+        err?.response?.data?.message || err?.message || "Failed to resend OTP";
+
+      
+      // Spec: already verified should redirect to login
+      if (isRegistration && err?.response?.status === 400) {
+        if (message === "Email already verified") {
+          navigate("/login", { replace: true });
+          return;
+        }
+      }
+
+      setError(message);
     } finally {
       setIsResending(false);
     }
@@ -274,7 +338,7 @@ const OTPVerification = () => {
                     <span>Resending...</span>
                   </div>
                 ) : (
-                  "Resend OTP"
+                  "Resend code"
                 )}
               </button>
             )}
