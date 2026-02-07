@@ -97,6 +97,7 @@ const EditTender = () => {
               url: doc.url,
               size: doc.size,
               isExisting: true,
+              label: doc.label,
             };
 
             if (doc.label === "Bid File Documents") {
@@ -138,12 +139,31 @@ const EditTender = () => {
     fetchTender();
   }, [id]);
 
+  const docTypeConfig = [
+    { key: "bidFileDocuments", label: "Bid File Documents" },
+    { key: "compiledDocuments", label: "Compiled Documents" },
+    { key: "financialDocuments", label: "Financial Documents" },
+    { key: "technicalProposal", label: "Technical Proposal" },
+    {
+      key: "proofOfExperience",
+      label: "Proof of Experience (Reference Letter)",
+    },
+  ];
+
+  const getDocLabel = (key) =>
+    docTypeConfig.find((d) => d.key === key)?.label || key;
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  const handleReplaceClick = (documentType) => {
+    const input = document.getElementById(`replace-${documentType}`);
+    input?.click();
   };
 
   // Handle file uploads for individual document types
@@ -661,13 +681,23 @@ const EditTender = () => {
                           </p>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveDocument('bidFileDocuments')}
-                        className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => handleReplaceClick("bidFileDocuments")}
+                          className="px-3 py-1 text-xs bg-cyan-500/10 text-cyan-300 border border-cyan-400/20 rounded-md hover:bg-cyan-500/20 hover:text-cyan-200 transition-all duration-200"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDocument('bidFileDocuments')}
+                          className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
+                          title="Remove"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="relative">
@@ -677,6 +707,13 @@ const EditTender = () => {
                         onChange={(e) => handleFileUpload(e, 'bidFileDocuments')}
                         className="hidden"
                         id="bidFileDocuments"
+                      />
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        onChange={(e) => handleFileUpload(e, 'bidFileDocuments')}
+                        className="hidden"
+                        id="replace-bidFileDocuments"
                       />
                       <label
                         htmlFor="bidFileDocuments"
@@ -719,13 +756,23 @@ const EditTender = () => {
                           </p>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveDocument('compiledDocuments')}
-                        className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => handleReplaceClick("compiledDocuments")}
+                          className="px-3 py-1 text-xs bg-cyan-500/10 text-cyan-300 border border-cyan-400/20 rounded-md hover:bg-cyan-500/20 hover:text-cyan-200 transition-all duration-200"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDocument('compiledDocuments')}
+                          className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
+                          title="Remove"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="relative">
@@ -735,6 +782,13 @@ const EditTender = () => {
                         onChange={(e) => handleFileUpload(e, 'compiledDocuments')}
                         className="hidden"
                         id="compiledDocuments"
+                      />
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        onChange={(e) => handleFileUpload(e, 'compiledDocuments')}
+                        className="hidden"
+                        id="replace-compiledDocuments"
                       />
                       <label
                         htmlFor="compiledDocuments"
@@ -777,13 +831,23 @@ const EditTender = () => {
                           </p>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveDocument('financialDocuments')}
-                        className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => handleReplaceClick("financialDocuments")}
+                          className="px-3 py-1 text-xs bg-cyan-500/10 text-cyan-300 border border-cyan-400/20 rounded-md hover:bg-cyan-500/20 hover:text-cyan-200 transition-all duration-200"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDocument('financialDocuments')}
+                          className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
+                          title="Remove"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="relative">
@@ -793,6 +857,13 @@ const EditTender = () => {
                         onChange={(e) => handleFileUpload(e, 'financialDocuments')}
                         className="hidden"
                         id="financialDocuments"
+                      />
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        onChange={(e) => handleFileUpload(e, 'financialDocuments')}
+                        className="hidden"
+                        id="replace-financialDocuments"
                       />
                       <label
                         htmlFor="financialDocuments"
@@ -835,13 +906,23 @@ const EditTender = () => {
                           </p>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveDocument('technicalProposal')}
-                        className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => handleReplaceClick("technicalProposal")}
+                          className="px-3 py-1 text-xs bg-cyan-500/10 text-cyan-300 border border-cyan-400/20 rounded-md hover:bg-cyan-500/20 hover:text-cyan-200 transition-all duration-200"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDocument('technicalProposal')}
+                          className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
+                          title="Remove"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="relative">
@@ -851,6 +932,13 @@ const EditTender = () => {
                         onChange={(e) => handleFileUpload(e, 'technicalProposal')}
                         className="hidden"
                         id="technicalProposal"
+                      />
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        onChange={(e) => handleFileUpload(e, 'technicalProposal')}
+                        className="hidden"
+                        id="replace-technicalProposal"
                       />
                       <label
                         htmlFor="technicalProposal"
@@ -893,13 +981,23 @@ const EditTender = () => {
                           </p>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveDocument('proofOfExperience')}
-                        className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => handleReplaceClick("proofOfExperience")}
+                          className="px-3 py-1 text-xs bg-cyan-500/10 text-cyan-300 border border-cyan-400/20 rounded-md hover:bg-cyan-500/20 hover:text-cyan-200 transition-all duration-200"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDocument('proofOfExperience')}
+                          className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
+                          title="Remove"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="relative">
@@ -909,6 +1007,13 @@ const EditTender = () => {
                         onChange={(e) => handleFileUpload(e, 'proofOfExperience')}
                         className="hidden"
                         id="proofOfExperience"
+                      />
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        onChange={(e) => handleFileUpload(e, 'proofOfExperience')}
+                        className="hidden"
+                        id="replace-proofOfExperience"
                       />
                       <label
                         htmlFor="proofOfExperience"
