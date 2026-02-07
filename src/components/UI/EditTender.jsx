@@ -499,15 +499,12 @@ const EditTender = () => {
                 placeholder="List tender requirements"
               />{" "}
             </div>{" "}
-            {/* Company Info */}{" "}
+            {/* Company Info */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {" "}
               <div>
-                {" "}
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  {" "}
-                  Company Name *{" "}
-                </label>{" "}
+                  Company Name *
+                </label>
                 <input
                   type="text"
                   name="companyName"
@@ -516,117 +513,126 @@ const EditTender = () => {
                   required
                   className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
                   placeholder="Enter company name"
-                />{" "}
-              </div>{" "}
+                />
+              </div>
+
               <div>
-                {" "}
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  {" "}
-                  Registration Number{" "}
-                </label>{" "}
+                  Company Address
+                </label>
                 <input
                   type="text"
-                  name="registrationNumber"
-                  value={formData.registrationNumber}
+                  name="companyAddress"
+                  value={formData.companyAddress}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-                  placeholder="Enter registration number"
-                />{" "}
-              </div>{" "}
-            </div>{" "}
-            {/* B-BBEE & CIDB */}{" "}
+                  placeholder="Street, suburb, city, province"
+                />
+              </div>
+            </div>
+
+            {/* Contacts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {" "}
-              <div>
-                {" "}
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  {" "}
-                  B-BBEE Level{" "}
-                </label>{" "}
-                <select
-                  name="bbeeLevel"
-                  value={formData.bbeeLevel}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-                  placeholder="Select B-BBEE Level"
-                >
-                  {" "}
-                  <option value="">Select B-BBEE Level</option>{" "}
-                  <option value="1">Level 1</option>{" "}
-                  <option value="2">Level 2</option>{" "}
-                  <option value="3">Level 3</option>{" "}
-                  <option value="4">Level 4</option>{" "}
-                  <option value="5">Level 5</option>{" "}
-                  <option value="6">Level 6</option>{" "}
-                  <option value="7">Level 7</option>{" "}
-                  <option value="8">Level 8</option>{" "}
-                </select>{" "}
-              </div>{" "}
-              <div>
-                {" "}
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  {" "}
-                  CIDB Grading{" "}
-                </label>{" "}
-                <input
-                  type="text"
-                  name="cidbGrading"
-                  value={formData.cidbGrading}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-                  placeholder="e.g., 5GB, 7CE"
-                />{" "}
-              </div>{" "}
-            </div>{" "}
-            {/* Contact Info */}{" "}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {" "}
-              <div>
-                {" "}
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  {" "}
-                  Contact Person{" "}
-                </label>{" "}
-                <input
-                  type="text"
-                  name="contactPerson"
-                  value={formData.contactPerson}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-                  placeholder="Enter contact person"
-                />{" "}
-              </div>{" "}
-              <div>
-                {" "}
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  {" "}
-                  Contact Email{" "}
-                </label>{" "}
-                <input
-                  type="email"
-                  name="contactEmail"
-                  value={formData.contactEmail}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-                  placeholder="Enter contact email"
-                />{" "}
-              </div>{" "}
-              <div>
-                {" "}
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  {" "}
-                  Contact Phone{" "}
-                </label>{" "}
-                <input
-                  type="text"
-                  name="contactPhone"
-                  value={formData.contactPhone}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-                  placeholder="Enter contact phone"
-                />{" "}
-              </div>{" "}
-            </div>{" "}
+              <div className="bg-slate-800/20 border border-cyan-400/10 rounded-lg p-4">
+                <p className="text-sm font-semibold text-cyan-300 mb-3">
+                  Technical Contact
+                </p>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                      Person
+                    </label>
+                    <input
+                      type="text"
+                      name="technicalContactPerson"
+                      value={formData.technicalContactPerson}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300"
+                      placeholder="Full name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      name="technicalContactEmail"
+                      value={formData.technicalContactEmail}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300"
+                      placeholder="technical@example.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                      Phone
+                    </label>
+                    <input
+                      type="tel"
+                      name="technicalContactPhone"
+                      value={formData.technicalContactPhone}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300"
+                      placeholder="+27 ..."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-800/20 border border-cyan-400/10 rounded-lg p-4">
+                <p className="text-sm font-semibold text-cyan-300 mb-3">
+                  General / Bid Queries Contact
+                </p>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                      Person
+                    </label>
+                    <input
+                      type="text"
+                      name="generalContactPerson"
+                      value={formData.generalContactPerson}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300"
+                      placeholder="Full name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      name="generalContactEmail"
+                      value={formData.generalContactEmail}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300"
+                      placeholder="bids@example.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                      Phone
+                    </label>
+                    <input
+                      type="tel"
+                      name="generalContactPhone"
+                      value={formData.generalContactPhone}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300"
+                      placeholder="+27 ..."
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
             {/* Status */}{" "}
             <div>
               {" "}
@@ -652,6 +658,44 @@ const EditTender = () => {
               <label className="block text-sm font-medium text-gray-300 mb-4">
                 Documents
               </label>
+
+              {/* DB documents list (same source as ViewTender) */}
+              {Array.isArray(formData.documents) && formData.documents.length > 0 && (
+                <div className="mb-6 space-y-3">
+                  {formData.documents.map((doc, index) => (
+                    <div
+                      key={doc.public_id || doc.url || index}
+                      className="flex items-center justify-between p-3 bg-slate-800/40 border border-slate-600/30 rounded-lg"
+                    >
+                      <div className="flex items-center space-x-3 min-w-0">
+                        <FileText className="w-5 h-5 text-cyan-400 flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-white text-sm font-medium truncate">
+                            {doc.originalName || doc.name || "Document"}
+                          </p>
+                          <p className="text-gray-400 text-xs">
+                            {doc.label || doc.type || ""}
+                            {doc.size ? ` • ${formatFileSize(doc.size)}` : ""}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2 flex-shrink-0">
+                        {doc.url && (
+                          <a
+                            href={doc.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3 py-1 text-xs bg-slate-700/40 text-gray-200 border border-slate-500/30 rounded-md hover:bg-slate-700/60 transition-all duration-200"
+                          >
+                            View
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="space-y-4">
                 {/* Bid File Documents */}
                 <div>
