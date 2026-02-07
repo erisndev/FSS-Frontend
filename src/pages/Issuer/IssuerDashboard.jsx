@@ -80,7 +80,7 @@ const IssuerDashboard = () => {
       for (const tender of tenders) {
         try {
           const applications = await applicationApi.getTenderApplications(
-            tender._id
+            tender._id,
           );
 
           console.log("Fetched applications ", applications);
@@ -89,7 +89,7 @@ const IssuerDashboard = () => {
         } catch (error) {
           console.error(
             `Error fetching applications for tender ${tender.id}:`,
-            error
+            error,
           );
         }
       }
@@ -99,7 +99,7 @@ const IssuerDashboard = () => {
       const applicationStats = {
         totalApplications: allApplications.length,
         pendingApplications: allApplications.filter(
-          (app) => app.status === "pending"
+          (app) => app.status === "pending",
         ).length,
       };
 
@@ -149,7 +149,7 @@ const IssuerDashboard = () => {
       (t) =>
         t._id === application.tenderId ||
         t.id === application.tenderId ||
-        application.tenderTitle === t.title
+        application.tenderTitle === t.title,
     );
     console.log("Selected tender for application:", tender);
     setSelectedTender(tender || null);
@@ -172,7 +172,7 @@ const IssuerDashboard = () => {
       await applicationApi.updateApplicationStatus(
         applicationId,
         normalizedStatus,
-        comment
+        comment,
       );
       toast.success(`Application ${normalizedStatus} successfully`);
 
@@ -309,7 +309,11 @@ const IssuerDashboard = () => {
                       </p>
                       <div className="flex items-center space-x-4 mt-2">
                         <span className="text-cyan-400 text-sm">
-                          R{tender.budgetMin?.toLocaleString()}
+                          {tender.budgetMin || tender.budgetMax
+                            ? `R${Number(tender.budgetMin || 0).toLocaleString()} - R${Number(
+                                tender.budgetMax || 0,
+                              ).toLocaleString()}`
+                            : `R${Number(tender.budget || 0).toLocaleString()}`}
                         </span>
                         <span className="text-gray-400 text-sm">
                           Due: {formatDate(tender.deadline)}
@@ -325,7 +329,7 @@ const IssuerDashboard = () => {
                   <div className="flex items-center justify-between mt-4">
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                        tender.status
+                        tender.status,
                       )}`}
                     >
                       {tender.status}
@@ -387,7 +391,7 @@ const IssuerDashboard = () => {
                         </span>
                         <span className="text-gray-400 text-sm">
                           {formatDate(
-                            application.appliedAt || application.createdAt
+                            application.appliedAt || application.createdAt,
                           )}
                         </span>
                       </div>
@@ -396,7 +400,7 @@ const IssuerDashboard = () => {
                   <div className="flex items-center justify-between mt-4">
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                        application.status
+                        application.status,
                       )}`}
                     >
                       {application.status}
