@@ -209,52 +209,48 @@ const EditTender = () => {
     setLoading(true);
 
     try {
-      const payload = new FormData();
+      // Match CreateTender payload shape for non-file fields
+      const submitData = {
+        ...formData,
+        budgetMin: Number(formData.budgetMin),
+        budgetMax: Number(formData.budgetMax),
+        tags:
+          typeof formData.tags === "string"
+            ? formData.tags
+                .split(",")
+                .map((t) => t.trim())
+                .filter(Boolean)
+            : Array.isArray(formData.tags)
+              ? formData.tags
+              : [],
+      };
 
-      // Append all text fields
-      const documentFields = ['bidFileDocuments', 'compiledDocuments', 'financialDocuments', 'technicalProposal', 'proofOfExperience'];
-      
-      Object.entries(formData).forEach(([key, value]) => {
-        if (documentFields.includes(key)) return; // Skip document fields for now
-        if (value !== null && value !== undefined) {
-          payload.append(key, value);
+      // Existing docs should NOT be re-sent as file uploads.
+      const documentFields = [
+        "bidFileDocuments",
+        "compiledDocuments",
+        "financialDocuments",
+        "technicalProposal",
+        "proofOfExperience",
+      ];
+
+      documentFields.forEach((field) => {
+        const doc = submitData[field];
+        if (doc?.isExisting) {
+          submitData[field] = null;
         }
       });
 
-      // Track existing documents that should be kept
-      const existingDocuments = {};
-
-      // Handle each document field
-      documentFields.forEach(field => {
-        const doc = formData[field];
-        if (doc) {
-          if (doc.isExisting) {
-            // This is an existing document, keep its URL
-            existingDocuments[field] = doc.url;
-          } else {
-            // This is a new file upload
-            payload.append(field, doc);
-          }
-        }
-      });
-
-      // Send existing document URLs as JSON
-      if (Object.keys(existingDocuments).length > 0) {
-        payload.append('existingDocuments', JSON.stringify(existingDocuments));
-      }
-
-      await tenderApi.updateTender(id, payload);
+      await tenderApi.updateTender(id, submitData);
 
       toast.success("Tender updated successfully!");
       setSuccess("Tender updated successfully!");
-      // Redirect after 2 seconds
       setTimeout(() => navigate("/issuer/tenders"), 2000);
       successRef.current?.scrollIntoView({ behavior: "smooth" });
     } catch (err) {
       console.error(err);
       const msg = err.response?.data?.message || "Failed to update tender";
       setError(msg);
-      // Don't show toast if it's a permission error (403) - API interceptor handles it
       if (err.response?.status !== 403) {
         toast.error(msg);
       }
