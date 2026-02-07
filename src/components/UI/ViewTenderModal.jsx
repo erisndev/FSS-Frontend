@@ -204,26 +204,10 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
               </div>
               <div className="flex justify-between items-center gap-2">
                 <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
-                  Registration No.:
+                  Company Address:
                 </span>
-                <span className="text-xs sm:text-sm text-white font-medium text-right break-words">
-                  {tender.registrationNumber || "—"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
-                  B-BBEE Level:
-                </span>
-                <span className="text-xs sm:text-sm text-white font-medium text-right">
-                  {tender.bbeeLevel || "—"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
-                  CIDB Grading:
-                </span>
-                <span className="text-xs sm:text-sm text-white font-medium text-right">
-                  {tender.cidbGrading || "—"}
+                <span className="text-xs sm:text-sm text-white font-medium text-right break-words whitespace-pre-line">
+                  {tender.companyAddress || "—"}
                 </span>
               </div>
               <div className="flex justify-between items-center gap-2">
@@ -250,38 +234,70 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
             <h4 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
               Contact Information
             </h4>
-            <div className="space-y-2 sm:space-y-3">
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
-                  Contact Person:
-                </span>
-                <span className="text-xs sm:text-sm text-white font-medium text-right break-words">
-                  {tender.contactPerson || "—"}
-                </span>
+
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs sm:text-sm font-semibold text-white mb-2">
+                  Technical Contact
+                </p>
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
+                      Contact Person:
+                    </span>
+                    <span className="text-xs sm:text-sm text-white font-medium text-right break-words">
+                      {tender.technicalContactPerson || "—"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
+                      Email:
+                    </span>
+                    <span className="text-xs sm:text-sm text-cyan-400 text-right break-all">
+                      {tender.technicalContactEmail || "—"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
+                      Phone:
+                    </span>
+                    <span className="text-xs sm:text-sm text-white font-medium text-right break-words">
+                      {tender.technicalContactPhone || "—"}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
-                  Email:
-                </span>
-                <span className="text-xs sm:text-sm text-cyan-400 text-right break-all">
-                  {tender.contactEmail || "—"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
-                  Phone:
-                </span>
-                <span className="text-xs sm:text-sm text-white font-medium text-right break-words">
-                  {tender.contactPhone || "—"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
-                  Issuer:
-                </span>
-                <span className="text-xs sm:text-sm text-white font-medium text-right break-words">
-                  {tender.companyName || "—"}
-                </span>
+
+              <div className="pt-3 border-t border-cyan-400/10">
+                <p className="text-xs sm:text-sm font-semibold text-white mb-2">
+                  General / Bid Queries Contact
+                </p>
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
+                      Contact Person:
+                    </span>
+                    <span className="text-xs sm:text-sm text-white font-medium text-right break-words">
+                      {tender.generalContactPerson || "—"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
+                      Email:
+                    </span>
+                    <span className="text-xs sm:text-sm text-cyan-400 text-right break-all">
+                      {tender.generalContactEmail || "—"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
+                      Phone:
+                    </span>
+                    <span className="text-xs sm:text-sm text-white font-medium text-right break-words">
+                      {tender.generalContactPhone || "—"}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

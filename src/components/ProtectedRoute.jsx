@@ -17,8 +17,8 @@ const ProtectedRoute = ({ children, roles = [] }) => {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  console.log("User is logged in:", user);
-  console.log("User role:", user.role);
+  // console.log("User is logged in:", user);
+  // console.log("User role:", user.role);
 
   // If user role is not allowed
   if (roles.length > 0 && !roles.includes(user.role)) {

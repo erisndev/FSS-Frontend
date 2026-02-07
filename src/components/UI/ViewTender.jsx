@@ -30,7 +30,6 @@ const ViewTender = () => {
       try {
         setLoading(true);
         const tenderData = await tenderApi.getTender(id); // expects signed URLs for private files
-        console.log("Fetched Tender:", tenderData);
         setTender(tenderData);
       } catch (err) {
         console.error(err);
@@ -312,25 +311,15 @@ const ViewTender = () => {
               <div className="space-y-3">
                 <div>
                   <p className="text-gray-400 text-sm">Company Name</p>
-                  <p className="text-white font-medium">{tender.companyName}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Registration Number</p>
-                  <p className="text-cyan-300 font-mono">
-                    {tender.registrationNumber}
+                  <p className="text-white font-medium">
+                    {tender.companyName || "—"}
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-gray-400 text-sm">B-BBEE Level</p>
-                    <p className="text-white font-medium">{tender.bbeeLevel}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-400 text-sm">CIDB Grading</p>
-                    <p className="text-white font-medium">
-                      {tender.cidbGrading}
-                    </p>
-                  </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Company Address</p>
+                  <p className="text-white font-medium whitespace-pre-line">
+                    {tender.companyAddress || "—"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -341,38 +330,104 @@ const ViewTender = () => {
                 <User className="w-5 h-5 text-cyan-400 mr-2" />
                 Contact Information
               </h3>
+
+              {/* Technical */}
               <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <div>
-                    <p className="text-gray-400 text-sm">Contact Person</p>
-                    <p className="text-white font-medium">
-                      {tender.contactPerson}
-                    </p>
+                <div>
+                  <p className="text-sm font-semibold text-cyan-300 mb-2">
+                    Technical Contact
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div>
+                        <p className="text-gray-400 text-sm">Contact Person</p>
+                        <p className="text-white font-medium">
+                          {tender.technicalContactPerson || "—"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div>
+                        <p className="text-gray-400 text-sm">Email</p>
+                        {tender.technicalContactEmail ? (
+                          <a
+                            href={`mailto:${tender.technicalContactEmail}`}
+                            className="text-cyan-300 hover:text-cyan-200 font-medium hover:underline transition-colors duration-300"
+                          >
+                            {tender.technicalContactEmail}
+                          </a>
+                        ) : (
+                          <span className="text-white font-medium">—</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div>
+                        <p className="text-gray-400 text-sm">Phone</p>
+                        {tender.technicalContactPhone ? (
+                          <a
+                            href={`tel:${tender.technicalContactPhone}`}
+                            className="text-cyan-300 hover:text-cyan-200 font-medium hover:underline transition-colors duration-300"
+                          >
+                            {tender.technicalContactPhone}
+                          </a>
+                        ) : (
+                          <span className="text-white font-medium">—</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <div>
-                    <p className="text-gray-400 text-sm">Email</p>
-                    <a
-                      href={`mailto:${tender.contactEmail}`}
-                      className="text-cyan-300 hover:text-cyan-200 font-medium hover:underline transition-colors duration-300"
-                    >
-                      {tender.contactEmail}
-                    </a>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <div>
-                    <p className="text-gray-400 text-sm">Phone</p>
-                    <a
-                      href={`tel:${tender.contactPhone}`}
-                      className="text-cyan-300 hover:text-cyan-200 font-medium hover:underline transition-colors duration-300"
-                    >
-                      {tender.contactPhone}
-                    </a>
+
+                <div className="border-t border-cyan-400/10 pt-4">
+                  <p className="text-sm font-semibold text-cyan-300 mb-2">
+                    General / Bid Queries Contact
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div>
+                        <p className="text-gray-400 text-sm">Contact Person</p>
+                        <p className="text-white font-medium">
+                          {tender.generalContactPerson || "—"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div>
+                        <p className="text-gray-400 text-sm">Email</p>
+                        {tender.generalContactEmail ? (
+                          <a
+                            href={`mailto:${tender.generalContactEmail}`}
+                            className="text-cyan-300 hover:text-cyan-200 font-medium hover:underline transition-colors duration-300"
+                          >
+                            {tender.generalContactEmail}
+                          </a>
+                        ) : (
+                          <span className="text-white font-medium">—</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div>
+                        <p className="text-gray-400 text-sm">Phone</p>
+                        {tender.generalContactPhone ? (
+                          <a
+                            href={`tel:${tender.generalContactPhone}`}
+                            className="text-cyan-300 hover:text-cyan-200 font-medium hover:underline transition-colors duration-300"
+                          >
+                            {tender.generalContactPhone}
+                          </a>
+                        ) : (
+                          <span className="text-white font-medium">—</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

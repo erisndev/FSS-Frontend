@@ -40,14 +40,23 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     requirements: "",
     isUrgent: false,
     tags: "",
+
+    // Company info
     companyName: "",
-    registrationNumber: "",
-    bbeeLevel: "",
-    cidbGrading: "",
-    contactPerson: "",
-    contactEmail: "",
-    contactPhone: "",
+    companyAddress: "",
+
+    // Contacts
+    technicalContactPerson: "",
+    technicalContactEmail: "",
+    technicalContactPhone: "",
+    generalContactPerson: "",
+    generalContactEmail: "",
+    generalContactPhone: "",
+
     status: "active",
+    // Keep a stable array for UI summary (length access) and future support for multi-file uploads
+    documents: [],
+    // Individual document fields
     bidFileDocuments: null,
     compiledDocuments: null,
     financialDocuments: null,
@@ -121,7 +130,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
       if (savedDraft) {
         try {
           const parsed = JSON.parse(savedDraft);
-          setFormData({ ...parsed, documents: [] });
+          setFormData((prev) => ({
+            ...prev,
+            ...parsed,
+            // Ensure documents is always an array to avoid `.length` crashes in Step 4 summary
+            documents: Array.isArray(parsed?.documents) ? parsed.documents : [],
+          }));
           toast.success("Draft restored from previous session", {
             icon: "📝",
             duration: 3000,
@@ -180,11 +194,13 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
             error = "Deadline must be at least 7 days from now";
         }
         break;
-      case "contactEmail":
+      case "technicalContactEmail":
+      case "generalContactEmail":
         if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
           error = "Invalid email format";
         break;
-      case "contactPhone":
+      case "technicalContactPhone":
+      case "generalContactPhone":
         if (value && !/^[\d\s\-\+\(\)]+$/.test(value))
           error = "Invalid phone number format";
         break;
@@ -211,7 +227,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
   const getStepFields = (step) => {
     switch (step) {
       case 1:
-        return ["title", "category", "description", "companyName"];
+        return ["title", "category", "description"];
       case 2:
         return ["budgetMin", "budgetMax", "deadline"];
       case 3:
@@ -396,7 +412,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           .map((tag) => tag.trim())
           .filter(Boolean),
       };
-      console.log("SUbmitData", submitData);
+      // console.log("SubmitData", submitData);
 
       await tenderApi.createTender(submitData);
 
@@ -419,15 +435,24 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
         requirements: "",
         isUrgent: false,
         tags: "",
+
         companyName: "",
-        registrationNumber: "",
-        bbeeLevel: "",
-        cidbGrading: "",
-        contactPerson: "",
-        contactEmail: "",
-        contactPhone: "",
+        companyAddress: "",
+
+        technicalContactPerson: "",
+        technicalContactEmail: "",
+        technicalContactPhone: "",
+        generalContactPerson: "",
+        generalContactEmail: "",
+        generalContactPhone: "",
+
         status: "active",
         documents: [],
+        bidFileDocuments: null,
+        compiledDocuments: null,
+        financialDocuments: null,
+        technicalProposal: null,
+        proofOfExperience: null,
       });
       setCurrentStep(1);
       setErrors({});
@@ -454,7 +479,8 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
       formData.title ||
       formData.description ||
       formData.category ||
-      formData.companyName;
+      formData.companyName ||
+      formData.companyAddress;
     if (hasData) {
       const confirmClose = window.confirm(
         "You have unsaved changes. Do you want to save them as a draft before closing?"
@@ -751,38 +777,6 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           </motion.p>
                         )}
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Company Name <span className="text-red-400">*</span>
-                        </label>
-                        <div className="relative">
-                          <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <input
-                            type="text"
-                            name="companyName"
-                            value={formData.companyName}
-                            onChange={handleInputChange}
-                            onBlur={handleBlur}
-                            placeholder="Your company name"
-                            className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
-                              touched.companyName && errors.companyName
-                                ? "border-red-400/50"
-                                : "border-cyan-400/20"
-                            } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
-                          />
-                        </div>
-                        {touched.companyName && errors.companyName && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="mt-1 text-sm text-red-400 flex items-center space-x-1"
-                          >
-                            <AlertCircle className="w-3 h-3" />
-                            <span>{errors.companyName}</span>
-                          </motion.p>
-                        )}
-                      </div>
                     </div>
 
                     <div>
@@ -1071,151 +1065,249 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Registration Number
-                        </label>
-                        <div className="relative">
-                          <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <input
-                            type="text"
-                            name="registrationNumber"
-                            value={formData.registrationNumber}
-                            onChange={handleInputChange}
-                            placeholder="Company registration number"
-                            className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
-                          />
-                        </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Company Name <span className="text-red-400">*</span>
+                      </label>
+                      <div className="relative">
+                        <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          type="text"
+                          name="companyName"
+                          value={formData.companyName}
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="Your company name"
+                          className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
+                            touched.companyName && errors.companyName
+                              ? "border-red-400/50"
+                              : "border-cyan-400/20"
+                          } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                        />
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          B-BBEE Level
-                        </label>
-                        <div className="relative">
-                          <Award className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <select
-                            name="bbeeLevel"
-                            value={formData.bbeeLevel}
-                            onChange={handleInputChange}
-                            className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white focus:outline-none focus:border-cyan-400/50 transition-all duration-200 appearance-none"
-                          >
-                            <option value="">Select B-BBEE Level</option>
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map((level) => (
-                              <option key={level} value={level}>
-                                Level {level}
-                              </option>
-                            ))}
-                            <option value="Non-compliant">Non-compliant</option>
-                          </select>
-                        </div>
-                      </div>
+                      {touched.companyName && errors.companyName && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-1 text-sm text-red-400 flex items-center space-x-1"
+                        >
+                          <AlertCircle className="w-3 h-3" />
+                          <span>{errors.companyName}</span>
+                        </motion.p>
+                      )}
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        CIDB Grading
+                        Company Address
                       </label>
                       <div className="relative">
-                        <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          name="cidbGrading"
-                          value={formData.cidbGrading}
+                        <Building className="absolute left-3 top-4 w-5 h-5 text-gray-400" />
+                        <textarea
+                          name="companyAddress"
+                          value={formData.companyAddress}
                           onChange={handleInputChange}
-                          placeholder="e.g., 5GB, 7CE"
-                          className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
+                          rows={3}
+                          placeholder="Street, suburb, city, province, postal code"
+                          className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200 resize-none"
                         />
                       </div>
+                      <p className="mt-1 text-xs text-gray-500">
+                        This will be shown to bidders as part of the tender details.
+                      </p>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <h4 className="text-sm font-medium text-purple-400 flex items-center space-x-2">
                         <User className="w-4 h-4" />
                         <span>Contact Information</span>
                       </h4>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Contact Person
-                        </label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <input
-                            type="text"
-                            name="contactPerson"
-                            value={formData.contactPerson}
-                            onChange={handleInputChange}
-                            placeholder="Full name of contact person"
-                            className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
-                          />
+                      {/* Technical contact */}
+                      <div className="p-4 bg-slate-800/30 border border-cyan-400/10 rounded-xl">
+                        <p className="text-sm font-semibold text-cyan-300 mb-3">
+                          Technical Contact
+                        </p>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Contact Person
+                          </label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                              type="text"
+                              name="technicalContactPerson"
+                              value={formData.technicalContactPerson}
+                              onChange={handleInputChange}
+                              placeholder="Full name"
+                              className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Email
+                            </label>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                              <input
+                                type="email"
+                                name="technicalContactEmail"
+                                value={formData.technicalContactEmail}
+                                onChange={handleInputChange}
+                                onBlur={handleBlur}
+                                placeholder="technical@example.com"
+                                className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
+                                  touched.technicalContactEmail &&
+                                  errors.technicalContactEmail
+                                    ? "border-red-400/50"
+                                    : "border-cyan-400/20"
+                                } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                              />
+                            </div>
+                            {touched.technicalContactEmail &&
+                              errors.technicalContactEmail && (
+                                <motion.p
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="mt-1 text-sm text-red-400 flex items-center space-x-1"
+                                >
+                                  <AlertCircle className="w-3 h-3" />
+                                  <span>{errors.technicalContactEmail}</span>
+                                </motion.p>
+                              )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Phone
+                            </label>
+                            <div className="relative">
+                              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                              <input
+                                type="tel"
+                                name="technicalContactPhone"
+                                value={formData.technicalContactPhone}
+                                onChange={handleInputChange}
+                                onBlur={handleBlur}
+                                placeholder="+27 ..."
+                                className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
+                                  touched.technicalContactPhone &&
+                                  errors.technicalContactPhone
+                                    ? "border-red-400/50"
+                                    : "border-cyan-400/20"
+                                } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                              />
+                            </div>
+                            {touched.technicalContactPhone &&
+                              errors.technicalContactPhone && (
+                                <motion.p
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="mt-1 text-sm text-red-400 flex items-center space-x-1"
+                                >
+                                  <AlertCircle className="w-3 h-3" />
+                                  <span>{errors.technicalContactPhone}</span>
+                                </motion.p>
+                              )}
+                          </div>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Contact Email
-                          </label>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                              type="email"
-                              name="contactEmail"
-                              value={formData.contactEmail}
-                              onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              placeholder="contact@example.com"
-                              className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
-                                touched.contactEmail && errors.contactEmail
-                                  ? "border-red-400/50"
-                                  : "border-cyan-400/20"
-                              } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
-                            />
-                          </div>
-                          {touched.contactEmail && errors.contactEmail && (
-                            <motion.p
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="mt-1 text-sm text-red-400 flex items-center space-x-1"
-                            >
-                              <AlertCircle className="w-3 h-3" />
-                              <span>{errors.contactEmail}</span>
-                            </motion.p>
-                          )}
-                        </div>
+                      {/* General/Bid queries contact */}
+                      <div className="p-4 bg-slate-800/30 border border-cyan-400/10 rounded-xl">
+                        <p className="text-sm font-semibold text-cyan-300 mb-3">
+                          General / Bid Queries Contact
+                        </p>
 
                         <div>
                           <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Contact Phone
+                            Contact Person
                           </label>
                           <div className="relative">
-                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
-                              type="tel"
-                              name="contactPhone"
-                              value={formData.contactPhone}
+                              type="text"
+                              name="generalContactPerson"
+                              value={formData.generalContactPerson}
                               onChange={handleInputChange}
-                              onBlur={handleBlur}
-                              placeholder="+27 12 345 6789"
-                              className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
-                                touched.contactPhone && errors.contactPhone
-                                  ? "border-red-400/50"
-                                  : "border-cyan-400/20"
-                              } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                              placeholder="Full name"
+                              className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
                             />
                           </div>
-                          {touched.contactPhone && errors.contactPhone && (
-                            <motion.p
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="mt-1 text-sm text-red-400 flex items-center space-x-1"
-                            >
-                              <AlertCircle className="w-3 h-3" />
-                              <span>{errors.contactPhone}</span>
-                            </motion.p>
-                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Email
+                            </label>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                              <input
+                                type="email"
+                                name="generalContactEmail"
+                                value={formData.generalContactEmail}
+                                onChange={handleInputChange}
+                                onBlur={handleBlur}
+                                placeholder="bids@example.com"
+                                className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
+                                  touched.generalContactEmail &&
+                                  errors.generalContactEmail
+                                    ? "border-red-400/50"
+                                    : "border-cyan-400/20"
+                                } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                              />
+                            </div>
+                            {touched.generalContactEmail &&
+                              errors.generalContactEmail && (
+                                <motion.p
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="mt-1 text-sm text-red-400 flex items-center space-x-1"
+                                >
+                                  <AlertCircle className="w-3 h-3" />
+                                  <span>{errors.generalContactEmail}</span>
+                                </motion.p>
+                              )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Phone
+                            </label>
+                            <div className="relative">
+                              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                              <input
+                                type="tel"
+                                name="generalContactPhone"
+                                value={formData.generalContactPhone}
+                                onChange={handleInputChange}
+                                onBlur={handleBlur}
+                                placeholder="+27 ..."
+                                className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border ${
+                                  touched.generalContactPhone &&
+                                  errors.generalContactPhone
+                                    ? "border-red-400/50"
+                                    : "border-cyan-400/20"
+                                } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                              />
+                            </div>
+                            {touched.generalContactPhone &&
+                              errors.generalContactPhone && (
+                                <motion.p
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="mt-1 text-sm text-red-400 flex items-center space-x-1"
+                                >
+                                  <AlertCircle className="w-3 h-3" />
+                                  <span>{errors.generalContactPhone}</span>
+                                </motion.p>
+                              )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1560,6 +1652,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             <span className="text-gray-500">Company:</span>{" "}
                             <span className="text-white font-medium">
                               {formData.companyName || "Not set"}
+                            </span>
+                          </p>
+                          <p className="text-gray-300">
+                            <span className="text-gray-500">Address:</span>{" "}
+                            <span className="text-white font-medium">
+                              {formData.companyAddress || "Not set"}
                             </span>
                           </p>
                           <p className="text-gray-300">
