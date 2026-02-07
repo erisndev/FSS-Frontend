@@ -20,6 +20,7 @@ const EditTender = () => {
   const successRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -30,17 +31,27 @@ const EditTender = () => {
     budgetMin: "",
     budgetMax: "",
     deadline: "",
+    requirements: "",
     isUrgent: false,
     tags: "",
-    requirements: "",
+
+    // Company info
     companyName: "",
-    registrationNumber: "",
-    bbeeLevel: "",
-    cidbGrading: "",
-    contactPerson: "",
-    contactEmail: "",
-    contactPhone: "",
+    companyAddress: "",
+
+    // Contacts
+    technicalContactPerson: "",
+    technicalContactEmail: "",
+    technicalContactPhone: "",
+    generalContactPerson: "",
+    generalContactEmail: "",
+    generalContactPhone: "",
+
     status: "active",
+    // Keep a stable array for UI summary / compatibility with CreateTender
+    documents: [],
+
+    // Individual document fields
     bidFileDocuments: null,
     compiledDocuments: null,
     financialDocuments: null,
@@ -65,12 +76,12 @@ const EditTender = () => {
 
   useEffect(() => {
     const fetchTender = async () => {
+      setIsFetching(true);
       try {
         const res = await tenderApi.getTender(id);
-        console.log("Fetched tender data:", res);
 
         // Process existing documents
-        let existingDocs = {
+        const existingDocs = {
           bidFileDocuments: null,
           compiledDocuments: null,
           financialDocuments: null,
@@ -80,54 +91,47 @@ const EditTender = () => {
 
         // Check if documents exist and have the label property (new format)
         if (Array.isArray(res.documents) && res.documents.length > 0) {
-          res.documents.forEach(doc => {
-            if (doc.label === 'Bid File Documents') {
-              existingDocs.bidFileDocuments = { 
-                name: doc.name || doc.originalName, 
-                url: doc.url, 
-                size: doc.size,
-                isExisting: true 
-              };
-            } else if (doc.label === 'Compiled Documents') {
-              existingDocs.compiledDocuments = { 
-                name: doc.name || doc.originalName, 
-                url: doc.url, 
-                size: doc.size,
-                isExisting: true 
-              };
-            } else if (doc.label === 'Financial Documents') {
-              existingDocs.financialDocuments = { 
-                name: doc.name || doc.originalName, 
-                url: doc.url, 
-                size: doc.size,
-                isExisting: true 
-              };
-            } else if (doc.label === 'Technical Proposal') {
-              existingDocs.technicalProposal = { 
-                name: doc.name || doc.originalName, 
-                url: doc.url, 
-                size: doc.size,
-                isExisting: true 
-              };
-            } else if (doc.label === 'Proof of Experience (Reference Letter)') {
-              existingDocs.proofOfExperience = { 
-                name: doc.name || doc.originalName, 
-                url: doc.url, 
-                size: doc.size,
-                isExisting: true 
-              };
+          res.documents.forEach((doc) => {
+            const mapped = {
+              name: doc.name || doc.originalName,
+              url: doc.url,
+              size: doc.size,
+              isExisting: true,
+            };
+
+            if (doc.label === "Bid File Documents") {
+              existingDocs.bidFileDocuments = mapped;
+            } else if (doc.label === "Compiled Documents") {
+              existingDocs.compiledDocuments = mapped;
+            } else if (doc.label === "Financial Documents") {
+              existingDocs.financialDocuments = mapped;
+            } else if (doc.label === "Technical Proposal") {
+              existingDocs.technicalProposal = mapped;
+            } else if (doc.label === "Proof of Experience (Reference Letter)") {
+              existingDocs.proofOfExperience = mapped;
             }
           });
         }
 
-        setFormData({
+        // Normalize tags back into comma-separated string for the input UI
+        const tagsString = Array.isArray(res.tags)
+          ? res.tags.join(", ")
+          : res.tags || "";
+
+        setFormData((prev) => ({
+          ...prev,
           ...res,
+          tags: tagsString,
           deadline: res.deadline ? res.deadline.slice(0, 16) : "",
+          // Ensure we always have an array for UI compatibility
+          documents: Array.isArray(res.documents) ? res.documents : [],
           ...existingDocs,
-        });
+        }));
       } catch (err) {
         console.error(err);
         toast.error("Failed to fetch tender data");
+      } finally {
+        setIsFetching(false);
       }
     };
 
@@ -262,11 +266,23 @@ const EditTender = () => {
   return (
     <DashboardLayout title="Edit Tender" subtitle="Update tender details">
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8"
-        >
+        {isFetching ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8"
+          >
+            <div className="flex items-center space-x-3 text-gray-300">
+              <div className="w-5 h-5 border-2 border-cyan-400/60 border-t-transparent rounded-full animate-spin" />
+              <span>Loading tender details...</span>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8"
+          >
           {/* Back to Tenders Button */}
           <div className="mb-6">
             <button
@@ -627,7 +643,19 @@ const EditTender = () => {
                       <div className="flex items-center space-x-3">
                         <FileText className="w-5 h-5 text-cyan-400" />
                         <div>
-                          <p className="text-white text-sm">{formData.bidFileDocuments.name}</p>
+                          <div className="flex items-center space-x-2">
+                            <p className="text-white text-sm">{formData.bidFileDocuments.name}</p>
+                            {formData.bidFileDocuments.isExisting && formData.bidFileDocuments.url && (
+                              <a
+                                href={formData.bidFileDocuments.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs text-cyan-300 hover:text-cyan-200 underline"
+                              >
+                                View
+                              </a>
+                            )}
+                          </div>
                           <p className="text-gray-400 text-xs">
                             {formatFileSize(formData.bidFileDocuments.size)}
                           </p>
@@ -673,7 +701,19 @@ const EditTender = () => {
                       <div className="flex items-center space-x-3">
                         <FileText className="w-5 h-5 text-cyan-400" />
                         <div>
-                          <p className="text-white text-sm">{formData.compiledDocuments.name}</p>
+                          <div className="flex items-center space-x-2">
+                            <p className="text-white text-sm">{formData.compiledDocuments.name}</p>
+                            {formData.compiledDocuments.isExisting && formData.compiledDocuments.url && (
+                              <a
+                                href={formData.compiledDocuments.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs text-cyan-300 hover:text-cyan-200 underline"
+                              >
+                                View
+                              </a>
+                            )}
+                          </div>
                           <p className="text-gray-400 text-xs">
                             {formatFileSize(formData.compiledDocuments.size)}
                           </p>
@@ -719,7 +759,19 @@ const EditTender = () => {
                       <div className="flex items-center space-x-3">
                         <FileText className="w-5 h-5 text-cyan-400" />
                         <div>
-                          <p className="text-white text-sm">{formData.financialDocuments.name}</p>
+                          <div className="flex items-center space-x-2">
+                            <p className="text-white text-sm">{formData.financialDocuments.name}</p>
+                            {formData.financialDocuments.isExisting && formData.financialDocuments.url && (
+                              <a
+                                href={formData.financialDocuments.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs text-cyan-300 hover:text-cyan-200 underline"
+                              >
+                                View
+                              </a>
+                            )}
+                          </div>
                           <p className="text-gray-400 text-xs">
                             {formatFileSize(formData.financialDocuments.size)}
                           </p>
@@ -765,7 +817,19 @@ const EditTender = () => {
                       <div className="flex items-center space-x-3">
                         <FileText className="w-5 h-5 text-cyan-400" />
                         <div>
-                          <p className="text-white text-sm">{formData.technicalProposal.name}</p>
+                          <div className="flex items-center space-x-2">
+                            <p className="text-white text-sm">{formData.technicalProposal.name}</p>
+                            {formData.technicalProposal.isExisting && formData.technicalProposal.url && (
+                              <a
+                                href={formData.technicalProposal.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs text-cyan-300 hover:text-cyan-200 underline"
+                              >
+                                View
+                              </a>
+                            )}
+                          </div>
                           <p className="text-gray-400 text-xs">
                             {formatFileSize(formData.technicalProposal.size)}
                           </p>
@@ -811,7 +875,19 @@ const EditTender = () => {
                       <div className="flex items-center space-x-3">
                         <FileText className="w-5 h-5 text-cyan-400" />
                         <div>
-                          <p className="text-white text-sm">{formData.proofOfExperience.name}</p>
+                          <div className="flex items-center space-x-2">
+                            <p className="text-white text-sm">{formData.proofOfExperience.name}</p>
+                            {formData.proofOfExperience.isExisting && formData.proofOfExperience.url && (
+                              <a
+                                href={formData.proofOfExperience.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs text-cyan-300 hover:text-cyan-200 underline"
+                              >
+                                View
+                              </a>
+                            )}
+                          </div>
                           <p className="text-gray-400 text-xs">
                             {formatFileSize(formData.proofOfExperience.size)}
                           </p>
@@ -870,6 +946,7 @@ const EditTender = () => {
             </div>
           </form>
         </motion.div>
+        )}
       </div>
     </DashboardLayout>
   );
