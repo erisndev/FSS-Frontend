@@ -119,13 +119,42 @@ const EditTender = () => {
           ? res.tags.join(", ")
           : res.tags || "";
 
+        // Some endpoints return documents as an object with keys (bidFileDocuments, ...)
+        // but our edit UI expects an array (like ViewTenderModal's "new format").
+        const normalizedDocumentsArray = Array.isArray(res.documents)
+          ? res.documents
+          : res.documents && typeof res.documents === "object"
+            ? [
+                {
+                  ...(res.documents.bidFileDocuments || {}),
+                  label: "Bid File Documents",
+                },
+                {
+                  ...(res.documents.compiledDocuments || {}),
+                  label: "Compiled Documents",
+                },
+                {
+                  ...(res.documents.financialDocuments || {}),
+                  label: "Financial Documents",
+                },
+                {
+                  ...(res.documents.technicalProposal || {}),
+                  label: "Technical Proposal",
+                },
+                {
+                  ...(res.documents.proofOfExperience || {}),
+                  label: "Proof of Experience (Reference Letter)",
+                },
+              ].filter((d) => d && d.url)
+            : [];
+
         setFormData((prev) => ({
           ...prev,
           ...res,
           tags: tagsString,
           deadline: res.deadline ? res.deadline.slice(0, 16) : "",
           // Ensure we always have an array for UI compatibility
-          documents: Array.isArray(res.documents) ? res.documents : [],
+          documents: normalizedDocumentsArray,
           ...existingDocs,
         }));
       } catch (err) {
@@ -659,42 +688,152 @@ const EditTender = () => {
                 Documents
               </label>
 
-              {/* DB documents list (same source as ViewTender) */}
-              {Array.isArray(formData.documents) && formData.documents.length > 0 && (
-                <div className="mb-6 space-y-3">
-                  {formData.documents.map((doc, index) => (
-                    <div
-                      key={doc.public_id || doc.url || index}
-                      className="flex items-center justify-between p-3 bg-slate-800/40 border border-slate-600/30 rounded-lg"
-                    >
-                      <div className="flex items-center space-x-3 min-w-0">
-                        <FileText className="w-5 h-5 text-cyan-400 flex-shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-white text-sm font-medium truncate">
-                            {doc.originalName || doc.name || "Document"}
-                          </p>
-                          <p className="text-gray-400 text-xs">
-                            {doc.label || doc.type || ""}
-                            {doc.size ? ` • ${formatFileSize(doc.size)}` : ""}
-                          </p>
+              {/* Required Documents (match ViewTenderModal behavior) */}
+              <div className="space-y-4 mb-6">
+                {[
+                  { label: "Bid File Documents", key: "bidFileDocuments" },
+                  { label: "Compiled Documents", key: "compiledDocuments" },
+                  { label: "Financial Documents", key: "financialDocuments" },
+                  { label: "Technical Proposal", key: "technicalProposal" },
+                  {
+                    label: "Proof of Experience (Reference Letter)",
+                    key: "proofOfExperience",
+                  },
+                ].map((required, index) => {
+                  const findDocInArray = () => {
+                    if (!Array.isArray(formData.documents)) return null;
+                    return (
+                      formData.documents.find((d) => d?.label === required.label) ||
+                      // fallback matching if backend used slightly different label casing
+                      formData.documents.find(
+                        (d) =>
+                          (d?.label || "").toLowerCase() ===
+                          required.label.toLowerCase()
+                      )
+                    );
+                  };
+
+                  const doc = findDocInArray();
+
+                  // Prefer per-field state (because it can be newly replaced locally), otherwise use DB doc
+                  const current = formData[required.key] ||
+                    (doc
+                      ? {
+                          name: doc.name || doc.originalName,
+                          url: doc.url,
+                          size: doc.size,
+                          isExisting: true,
+                          label: doc.label,
+                        }
+                      : null);
+
+                  return (
+                    <div key={required.key} className="group">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-1 h-4 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full" />
+                          <span className="text-xs sm:text-sm font-semibold text-gray-200">
+                            {required.label}
+                          </span>
                         </div>
-                      </div>
-                      <div className="flex items-center space-x-2 flex-shrink-0">
-                        {doc.url && (
-                          <a
-                            href={doc.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="px-3 py-1 text-xs bg-slate-700/40 text-gray-200 border border-slate-500/30 rounded-md hover:bg-slate-700/60 transition-all duration-200"
-                          >
-                            View
-                          </a>
+                        {current ? (
+                          <span className="text-xs text-green-400 font-semibold">Uploaded</span>
+                        ) : (
+                          <span className="text-xs text-red-400 font-semibold">Not Uploaded</span>
                         )}
                       </div>
+
+                      {current ? (
+                        <div className="flex items-center justify-between gap-3 p-3 bg-slate-800/40 border border-cyan-400/10 rounded-xl">
+                          <div className="flex items-center space-x-3 min-w-0 flex-1">
+                            <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-400/20 flex items-center justify-center flex-shrink-0">
+                              <FileText className="w-5 h-5 text-cyan-400" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-white truncate">
+                                {current.name || "Document"}
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                {current.size ? formatFileSize(current.size) : ""}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-2 flex-shrink-0">
+                            {current.url && (
+                              <a
+                                href={current.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-3 py-1 text-xs bg-slate-700/40 text-gray-200 border border-slate-500/30 rounded-md hover:bg-slate-700/60 transition-all duration-200"
+                              >
+                                View
+                              </a>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleReplaceClick(required.key)}
+                              className="px-3 py-1 text-xs bg-cyan-500/10 text-cyan-300 border border-cyan-400/20 rounded-md hover:bg-cyan-500/20 hover:text-cyan-200 transition-all duration-200"
+                            >
+                              Replace
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDocument(required.key)}
+                              className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-400/10 transition-all duration-200"
+                              title="Remove"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          {/* Hidden replace input */}
+                          <input
+                            type="file"
+                            accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                            onChange={(e) => handleFileUpload(e, required.key)}
+                            className="hidden"
+                            id={`replace-${required.key}`}
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between gap-3 p-3 bg-slate-800/30 border border-red-400/20 rounded-xl">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-400/30 flex items-center justify-center flex-shrink-0">
+                              <X className="w-5 h-5 text-red-400" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-red-400">
+                                Not Uploaded
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                This document is required
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-2 flex-shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleReplaceClick(required.key)}
+                              className="px-3 py-1 text-xs bg-cyan-500/10 text-cyan-300 border border-cyan-400/20 rounded-md hover:bg-cyan-500/20 hover:text-cyan-200 transition-all duration-200"
+                            >
+                              Upload
+                            </button>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                              onChange={(e) => handleFileUpload(e, required.key)}
+                              className="hidden"
+                              id={`replace-${required.key}`}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
-              )}
+                  );
+                })}
+              </div>
 
               <div className="space-y-4">
                 {/* Bid File Documents */}
