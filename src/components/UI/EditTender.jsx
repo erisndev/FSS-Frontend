@@ -314,7 +314,7 @@ const EditTender = () => {
 
   return (
     <DashboardLayout title="Edit Tender" subtitle="Update tender details">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4">
         {isFetching ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -330,21 +330,21 @@ const EditTender = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8"
+            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4 sm:p-6 lg:p-8"
           >
           {/* Back to Tenders Button */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <button
               type="button"
               onClick={() => navigate("/issuer/tenders")}
-              className="flex items-center px-4 py-2 bg-slate-700/50 text-gray-300 rounded-lg hover:bg-slate-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300"
+              className="flex items-center px-3 py-2 sm:px-4 bg-slate-700/50 text-gray-300 rounded-lg hover:bg-slate-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Tenders
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {error && (
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -367,7 +367,7 @@ const EditTender = () => {
               </motion.div>
             )}
             {/* Title & Category */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Tender Title *
@@ -420,7 +420,7 @@ const EditTender = () => {
               />{" "}
             </div>{" "}
             {/* Budget Min/Max & Deadline */}{" "}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {" "}
               <div>
                 {" "}
@@ -529,7 +529,7 @@ const EditTender = () => {
               />{" "}
             </div>{" "}
             {/* Company Info */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Company Name *
@@ -561,8 +561,8 @@ const EditTender = () => {
             </div>
 
             {/* Contacts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-slate-800/20 border border-cyan-400/10 rounded-lg p-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="bg-slate-800/20 border border-cyan-400/10 rounded-lg p-3 sm:p-4">
                 <p className="text-sm font-semibold text-cyan-300 mb-3">
                   Technical Contact
                 </p>
@@ -612,7 +612,7 @@ const EditTender = () => {
                 </div>
               </div>
 
-              <div className="bg-slate-800/20 border border-cyan-400/10 rounded-lg p-4">
+              <div className="bg-slate-800/20 border border-cyan-400/10 rounded-lg p-3 sm:p-4">
                 <p className="text-sm font-semibold text-cyan-300 mb-3">
                   General / Bid Queries Contact
                 </p>
@@ -684,12 +684,12 @@ const EditTender = () => {
             </div>
             {/* Documents Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-4">
+              <label className="block text-sm font-medium text-gray-300 mb-3 sm:mb-4">
                 Documents
               </label>
 
               {/* Required Documents (match ViewTenderModal behavior) */}
-              <div className="space-y-4 mb-6">
+              <div className="space-y-4 mb-4 sm:mb-6">
                 {[
                   { label: "Bid File Documents", key: "bidFileDocuments" },
                   { label: "Compiled Documents", key: "compiledDocuments" },
@@ -744,7 +744,7 @@ const EditTender = () => {
                       </div>
 
                       {current ? (
-                        <div className="flex items-center justify-between gap-3 p-3 bg-slate-800/40 border border-cyan-400/10 rounded-xl">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 bg-slate-800/40 border border-cyan-400/10 rounded-xl">
                           <div className="flex items-center space-x-3 min-w-0 flex-1">
                             <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-400/20 flex items-center justify-center flex-shrink-0">
                               <FileText className="w-5 h-5 text-cyan-400" />
@@ -759,7 +759,7 @@ const EditTender = () => {
                             </div>
                           </div>
 
-                          <div className="flex items-center space-x-2 flex-shrink-0">
+                          <div className="flex items-center space-x-2 flex-shrink-0 justify-end">
                             {current.url && (
                               <a
                                 href={current.url}
@@ -797,7 +797,7 @@ const EditTender = () => {
                           />
                         </div>
                       ) : (
-                        <div className="flex items-center justify-between gap-3 p-3 bg-slate-800/30 border border-red-400/20 rounded-xl">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 bg-slate-800/30 border border-red-400/20 rounded-xl">
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-400/30 flex items-center justify-center flex-shrink-0">
                               <X className="w-5 h-5 text-red-400" />
@@ -812,7 +812,7 @@ const EditTender = () => {
                             </div>
                           </div>
 
-                          <div className="flex items-center space-x-2 flex-shrink-0">
+                          <div className="flex items-center space-x-2 flex-shrink-0 justify-end">
                             <button
                               type="button"
                               onClick={() => handleReplaceClick(required.key)}
@@ -838,11 +838,11 @@ const EditTender = () => {
               {/* Legacy per-document upload blocks removed (duplicates of Required Documents UI above) */}
             </div>
             {/* Submit */}
-            <div className="flex items-center justify-end space-x-4 pt-6 border-t border-cyan-400/10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 sm:space-x-4 pt-6 border-t border-cyan-400/10">
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
                 {loading ? (
                   <div className="flex items-center space-x-2">
