@@ -549,12 +549,12 @@ const EditTender = () => {
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Company Address
                 </label>
-                <input
-                  type="text"
+                <textarea
                   name="companyAddress"
                   value={formData.companyAddress}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
+                  rows={3}
+                  className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300 resize-none"
                   placeholder="Street, suburb, city, province"
                 />
               </div>
