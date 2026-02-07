@@ -314,7 +314,7 @@ const EditTender = () => {
 
   return (
     <DashboardLayout title="Edit Tender" subtitle="Update tender details">
-      <div className="max-w-4xl mx-auto px-0 sm:px-4">
+      <div className="max-w-4xl mx-auto -mx-3 sm:mx-auto sm:px-4">
         {isFetching ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -330,7 +330,7 @@ const EditTender = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-xl p-0 sm:p-6 lg:p-8"
+            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-xl p-4 sm:p-6 lg:p-8"
           >
           {/* Back to Tenders Button */}
           <div className="mb-4 sm:mb-6">
