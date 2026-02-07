@@ -32,7 +32,12 @@ export const handleApiError = (
 
   // Handle specific HTTP status codes
   if (error.response?.status === 401) {
-    message = ERROR_MESSAGES.UNAUTHORIZED;
+    // For login/credential failures, backend typically returns 401.
+    // Prefer a clear "Invalid credentials" message over a generic unauthorized message.
+    message =
+      message === ERROR_MESSAGES.UNAUTHORIZED
+        ? "Invalid credentials"
+        : message || "Invalid credentials";
   } else if (error.response?.status === 403) {
     message = ERROR_MESSAGES.UNAUTHORIZED;
   } else if (error.response?.status === 404) {
@@ -47,6 +52,7 @@ export const handleApiError = (
   if (showToast) {
     toast.error(message, {
       duration: TIMING.TOAST_DURATION_LONG,
+      dismissible: true,
     });
   }
 
@@ -74,6 +80,7 @@ export const handleValidationErrors = (errors, showToast = true) => {
   if (errorMessages.length > 0 && showToast) {
     toast.error(errorMessages[0], {
       duration: TIMING.TOAST_DURATION,
+      dismissible: true,
     });
   }
 
@@ -97,6 +104,7 @@ export const handleFileUploadError = (error, fileName = "file") => {
 
   toast.error(message, {
     duration: TIMING.TOAST_DURATION,
+    dismissible: true,
   });
 
   logger.error("File Upload Error:", error);
@@ -112,6 +120,7 @@ export const handleNetworkError = (error) => {
 
   toast.error(message, {
     duration: TIMING.TOAST_DURATION_LONG,
+    dismissible: true,
   });
 
   logger.error("Network Error:", error);
@@ -135,6 +144,7 @@ export const handleAuthError = (error) => {
 
   toast.error(message, {
     duration: TIMING.TOAST_DURATION,
+    dismissible: true,
   });
 
   logger.error("Auth Error:", error);

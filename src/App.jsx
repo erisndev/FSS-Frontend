@@ -269,7 +269,14 @@ function App() {
             }
           />
         </Routes>
-        <Toaster />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            // Adds a close button on all toasts (clicking it dismisses the toast)
+            style: { pointerEvents: "auto" },
+          }}
+        />
         </div>
       </AuthProvider>
     </ErrorBoundary>
