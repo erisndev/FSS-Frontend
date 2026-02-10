@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import { useNavigate } from "react-router-dom";
 import {
   FileText,
@@ -10,6 +11,11 @@ import {
   Eye,
   Search,
   Filter,
+  ArrowRight,
+  DollarSign,
+  Calendar,
+  Building,
+  ExternalLink,
 } from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import ViewTenderModal from "../../components/UI/ViewTenderModal";
@@ -31,6 +37,7 @@ const BidderDashboard = () => {
   const [recentTenders, setRecentTenders] = useState([]);
   const [recentApplications, setRecentApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
 
   // Modal states
   const [selectedTender, setSelectedTender] = useState(null);
@@ -179,14 +186,14 @@ const BidderDashboard = () => {
     },
   ];
 
-  if (loading) {
+  if (showLoading) {
     return (
       <DashboardLayout
         title="Dashboard"
         subtitle="Welcome back! Here's an overview of your tender activities."
       >
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <LoadingSpinner variant="section" />
         </div>
       </DashboardLayout>
     );
@@ -201,42 +208,35 @@ const BidderDashboard = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statCards.map((stat, index) => (
-            <motion.div
+            <div
               key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`${stat.bgColor} backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:shadow-lg hover:shadow-cyan-400/10 transition-all duration-300 group`}
+              className="group relative bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5 hover:bg-white/[0.07] hover:border-cyan-400/20 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 overflow-hidden"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <p className="text-gray-400 text-sm font-medium mb-2">{stat.title}</p>
-                  <p className="text-3xl font-bold text-white">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.02] to-purple-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+              <div className="relative flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3">{stat.title}</p>
+                  <p className="text-3xl font-bold text-white tracking-tight">
                     {stat.value.toLocaleString()}
                   </p>
                 </div>
                 <div
-                  className={`w-14 h-14 rounded-xl ${stat.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300`}
                 >
-                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
-                    <stat.icon className="w-5 h-5 text-white" />
-                  </div>
+                  <stat.icon className="w-5 h-5 text-white" />
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Tenders */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
+          <div
+            className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-white">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-lg font-semibold text-white">
                 Recent Tenders
               </h3>
               <button 
@@ -247,62 +247,95 @@ const BidderDashboard = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
-              {recentTenders.map((tender) => (
-                <div
-                  key={tender._id}
-                  className="p-4 bg-slate-800/50 rounded-lg hover:bg-slate-800/70 transition-all duration-300"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="text-white font-medium">{tender.title}</h4>
-                      <p className="text-gray-400 text-sm mt-1">
-                        {tender.category}
-                      </p>
-                      <div className="flex items-center space-x-4 mt-2">
-                        <span className="text-cyan-400 text-sm">
-                          R{tender.budgetMin?.toLocaleString()}
+            <div className="space-y-3">
+              {recentTenders.length === 0 ? (
+                <div className="text-center py-8">
+                  <FileText className="w-10 h-10 text-gray-600 mx-auto mb-2" />
+                  <p className="text-gray-500 text-sm">No tenders available</p>
+                </div>
+              ) : (
+                recentTenders.map((tender) => (
+                  <div
+                    key={tender._id}
+                    className="group bg-slate-800/50 border border-cyan-400/10 rounded-xl overflow-hidden hover:bg-slate-800/70 hover:border-cyan-400/20 transition-all duration-300"
+                  >
+                    {/* Status accent bar */}
+                    <div
+                      className={`h-0.5 ${
+                        tender.status?.toLowerCase() === "active"
+                          ? "bg-gradient-to-r from-green-400 to-emerald-500"
+                          : tender.status?.toLowerCase() === "closed"
+                          ? "bg-gradient-to-r from-red-400 to-pink-500"
+                          : "bg-gradient-to-r from-gray-400 to-gray-500"
+                      }`}
+                    />
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-white font-medium text-sm truncate">
+                            {tender.title}
+                          </h4>
+                          <p className="text-gray-500 text-xs mt-0.5">
+                            {tender.category}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {tender.isUrgent && (
+                            <span className="px-1.5 py-0.5 bg-red-500/20 text-red-400 text-[10px] rounded-full font-medium">
+                              Urgent
+                            </span>
+                          )}
+                          <span
+                            className={`px-1.5 py-0.5 text-[10px] rounded-full border font-medium ${getTenderStatusColor(
+                              tender.status
+                            )}`}
+                          >
+                            {tender.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3 mb-3">
+                        <span className="text-cyan-400 text-sm font-semibold">
+                          R{(tender.budgetMin || 0).toLocaleString()}
+                          {tender.budgetMax ? ` – R${tender.budgetMax.toLocaleString()}` : ""}
                         </span>
-                        <span className="text-gray-400 text-sm">
-                          Due: {formatDate(tender.deadline)}
+                        <span className="text-gray-500 text-xs flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {formatDate(tender.deadline)}
                         </span>
                       </div>
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2 pt-2 border-t border-cyan-400/5">
+                        <button
+                          onClick={() => handleViewTender(tender)}
+                          className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 bg-slate-700/50 border border-cyan-400/15 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/30 transition-all duration-200 text-xs font-medium"
+                        >
+                          <Eye className="w-3 h-3" />
+                          <span>View</span>
+                        </button>
+                        <button
+                          onClick={() => navigate("/bidder/tenders")}
+                          className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/20 text-white rounded-lg hover:from-cyan-500/30 hover:to-purple-500/30 transition-all duration-200 text-xs font-medium"
+                        >
+                          <ArrowRight className="w-3 h-3" />
+                          <span>Go to Tender</span>
+                        </button>
+                      </div>
                     </div>
-                    {tender.isUrgent && (
-                      <span className="px-2 py-1 bg-red-500/20 text-red-400 text-xs rounded-full">
-                        Urgent
-                      </span>
-                    )}
                   </div>
-                  <div className="flex items-center justify-between mt-4">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${getTenderStatusColor(
-                        tender.status
-                      )}`}
-                    >
-                      {tender.status}
-                    </span>
-                    <button 
-                      onClick={() => handleViewTender(tender)}
-                      className="text-cyan-400 hover:text-cyan-300 p-1 rounded-lg hover:bg-cyan-400/10 transition-all duration-200"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
-          </motion.div>
+          </div>
 
           {/* Recent Applications */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
+          <div
+            className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-white">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-lg font-semibold text-white">
                 My Applications
               </h3>
               <button 
@@ -313,63 +346,84 @@ const BidderDashboard = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
-              {recentApplications.map((application) => (
-                <div
-                  key={application._id}
-                  className="p-4 bg-slate-800/50 rounded-lg hover:bg-slate-800/70 transition-all duration-300"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="text-white font-medium">
-                        {application.tender?.title || "Untitled Tender"}
-                      </h4>
-                      <p className="text-gray-400 text-sm mt-1">
-                        Applied on {formatDate(application.createdAt)}
-                      </p>
-                      <div className="flex items-center space-x-4 mt-2">
-                        <span className="text-cyan-400 text-sm">
-                          R{application.bidAmount?.toLocaleString()}
+            <div className="space-y-3">
+              {recentApplications.length === 0 ? (
+                <div className="text-center py-8">
+                  <FileText className="w-10 h-10 text-gray-600 mx-auto mb-2" />
+                  <p className="text-gray-500 text-sm">No applications yet</p>
+                </div>
+              ) : (
+                recentApplications.map((application) => (
+                  <div
+                    key={application._id}
+                    className="group bg-slate-800/50 border border-cyan-400/10 rounded-xl overflow-hidden hover:bg-slate-800/70 hover:border-cyan-400/20 transition-all duration-300"
+                  >
+                    {/* Status accent bar */}
+                    <div
+                      className={`h-0.5 ${
+                        (application.status || "").toLowerCase() === "pending"
+                          ? "bg-gradient-to-r from-yellow-400 to-amber-500"
+                          : (application.status || "").toLowerCase() === "accepted"
+                          ? "bg-gradient-to-r from-green-400 to-emerald-500"
+                          : (application.status || "").toLowerCase() === "rejected"
+                          ? "bg-gradient-to-r from-red-400 to-pink-500"
+                          : "bg-gradient-to-r from-gray-400 to-gray-500"
+                      }`}
+                    />
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-white font-medium text-sm truncate">
+                            {application.tender?.title || "Untitled Tender"}
+                          </h4>
+                          <p className="text-gray-500 text-xs mt-0.5">
+                            Applied {formatDate(application.createdAt)}
+                          </p>
+                        </div>
+                        <span
+                          className={`px-1.5 py-0.5 text-[10px] rounded-full font-semibold flex-shrink-0 ${getStatusColor(
+                            application.status
+                          )}`}
+                        >
+                          {application.status}
                         </span>
+                      </div>
+
+                      <div className="flex items-center space-x-3 mb-3">
+                        <span className="text-cyan-400 text-sm font-semibold">
+                          R{(application.bidAmount || 0).toLocaleString()}
+                        </span>
+                        {application.companyName && (
+                          <span className="text-gray-500 text-xs flex items-center gap-1">
+                            <Building className="w-3 h-3" />
+                            {application.companyName}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2 pt-2 border-t border-cyan-400/5">
+                        <button
+                          onClick={() => handleViewApplication(application)}
+                          className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 bg-slate-700/50 border border-cyan-400/15 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/30 transition-all duration-200 text-xs font-medium"
+                        >
+                          <Eye className="w-3 h-3" />
+                          <span>View Application</span>
+                        </button>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between mt-4">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                        application.status
-                      )}`}
-                    >
-                      {application.status}
-                    </span>
-                    <div className="flex items-center space-x-2">
-                      {application.comment && (
-                        <span className="text-xs text-gray-400">
-                          {application.comment}
-                        </span>
-                      )}
-                      <button 
-                        onClick={() => handleViewApplication(application)}
-                        className="text-cyan-400 hover:text-cyan-300 p-1 rounded-lg hover:bg-cyan-400/10 transition-all duration-200"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
+        <div
+          className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5"
         >
-          <h3 className="text-xl font-semibold text-white mb-6">
+          <h3 className="text-lg font-semibold text-white mb-5">
             Quick Actions
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -395,7 +449,7 @@ const BidderDashboard = () => {
               <span className="text-white font-medium">View Analytics</span>
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Modals */}

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import { teamMemberApi } from "../../services/api";
 import toast from "react-hot-toast";
 
@@ -42,9 +41,7 @@ const EditPermissionsModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
+      <div
         className="bg-slate-900 border border-cyan-400/20 rounded-xl p-6 max-w-md w-full"
       >
         <h2 className="text-2xl font-bold text-white mb-4">Edit Permissions</h2>
@@ -76,27 +73,23 @@ const EditPermissionsModal = ({
           </div>
 
           <div className="flex space-x-3 pt-4">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               type="button"
               onClick={onClose}
               className="flex-1 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
             >
               Cancel
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            </button>
+            <button
               type="submit"
               disabled={loading}
               className="flex-1 px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 disabled:opacity-50 transition-all duration-200"
             >
               {loading ? "Saving..." : "Save Changes"}
-            </motion.button>
+            </button>
           </div>
         </form>
-      </motion.div>
+      </div>
     </div>
   );
 };

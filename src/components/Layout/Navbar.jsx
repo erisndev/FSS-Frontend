@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Shield, Menu, X, LogIn, UserPlus } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const navItems = [
     { name: "Home", href: "/" },
@@ -14,58 +20,55 @@ const Navbar = () => {
   ];
 
   return (
-    <motion.nav
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-xl border-b border-cyan-400/20"
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-slate-900/90 backdrop-blur-xl border-b border-cyan-400/10 shadow-lg shadow-black/20"
+          : "bg-transparent border-b border-transparent"
+      }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center space-x-3"
-          >
-            <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="w-9 h-9 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center group-hover:shadow-lg group-hover:shadow-cyan-500/20 transition-shadow duration-300">
+              <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">TenderFlow</h1>
-              <p className="text-xs text-cyan-400/70 hidden sm:block">
+              <h1 className="text-lg font-bold text-white leading-tight">
+                TenderFlow
+              </h1>
+              <p className="text-[10px] text-cyan-400/60 hidden sm:block leading-tight">
                 Management System
               </p>
             </div>
-          </motion.div>
+          </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item, index) => (
-              <motion.a
+              <a
                 key={item.name}
                 href={item.href}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="text-gray-300 hover:text-cyan-400 transition-colors duration-300 font-medium"
+                className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200 font-medium"
               >
                 {item.name}
-              </motion.a>
+              </a>
             ))}
           </div>
 
           {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
             <Link
               to="/login"
-              className="flex items-center space-x-2 px-4 py-2 text-cyan-400 hover:text-cyan-300 transition-colors duration-300"
+              className="flex items-center space-x-1.5 px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors duration-200 font-medium"
             >
               <LogIn className="w-4 h-4" />
               <span>Login</span>
             </Link>
             <Link
               to="/register"
-              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300"
+              className="flex items-center space-x-1.5 px-5 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white text-sm font-semibold rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 shadow-md shadow-purple-500/20 hover:shadow-lg hover:shadow-purple-500/30"
             >
               <UserPlus className="w-4 h-4" />
               <span>Sign Up</span>
@@ -76,59 +79,58 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-300 hover:text-white p-2"
+              className="text-gray-300 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors"
             >
               {isMenuOpen ? (
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Menu className="w-5 h-5" />
               )}
             </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-cyan-400/20 py-4"
-          >
-            <div className="flex flex-col space-y-4">
-              {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="text-gray-300 hover:text-cyan-400 transition-colors duration-300 font-medium px-2 py-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </a>
-              ))}
-              <div className="flex flex-col space-y-2 pt-4 border-t border-cyan-400/20">
-                <Link
-                  to="/login"
-                  className="flex items-center space-x-2 px-2 py-2 text-cyan-400 hover:text-cyan-300 transition-colors duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <LogIn className="w-4 h-4" />
-                  <span>Login</span>
-                </Link>
-                <Link
-                  to="/register"
-                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <UserPlus className="w-4 h-4" />
-                  <span>Sign Up</span>
-                </Link>
+        
+          {isMenuOpen && (
+            <div
+              className="md:hidden border-t border-white/5 py-4 overflow-hidden"
+            >
+              <div className="flex flex-col space-y-1">
+                {navItems.map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-200 font-medium px-3 py-2.5 rounded-lg text-sm"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.name}
+                  </a>
+                ))}
+                <div className="flex flex-col space-y-2 pt-3 mt-2 border-t border-white/5">
+                  <Link
+                    to="/login"
+                    className="flex items-center space-x-2 px-3 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200 text-sm font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>Login</span>
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="flex items-center justify-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 text-sm font-semibold"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>Sign Up</span>
+                  </Link>
+                </div>
               </div>
             </div>
-          </motion.div>
-        )}
+          )}
+        
       </div>
-    </motion.nav>
+    </nav>
   );
 };
 

@@ -1,27 +1,20 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import LoadingSpinner from "./LoadingSpinner";
 import { X, AlertTriangle, CheckCircle, ThumbsUp, ThumbsDown } from "lucide-react";
 
 const ConfirmActionModal = ({ isOpen, onClose, onConfirm, title, message, actionType = "approve", isLoading = false }) => {
   const isApprove = actionType === "approve";
   
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]"
           onClick={onClose}
         >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+          <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            className="bg-gradient-to-b from-slate-900 to-slate-950 border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/40 w-full max-w-md overflow-hidden"
           >
               {/* Header */}
             <div className="flex items-start justify-between p-6 border-b border-cyan-400/10">
@@ -80,7 +73,7 @@ const ConfirmActionModal = ({ isOpen, onClose, onConfirm, title, message, action
               >
                 {isLoading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <LoadingSpinner variant="inline" size="sm" color="white" />
                     <span>Processing...</span>
                   </>
                 ) : (
@@ -91,10 +84,10 @@ const ConfirmActionModal = ({ isOpen, onClose, onConfirm, title, message, action
                 )}
               </button>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 };
 

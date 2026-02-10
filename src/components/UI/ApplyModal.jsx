@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { X, FileText, Sparkles } from "lucide-react";
 import ApplyForm from "./ApplyForm";
 import toast from "react-hot-toast";
@@ -46,19 +45,12 @@ const ApplyModal = ({
   if (!isOpen || !tender) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+    
+      <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]"
         onClick={onClose}
       >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+        <div
           className="bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
@@ -67,13 +59,11 @@ const ApplyModal = ({
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 animate-pulse" />
             <div className="relative flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <motion.div
-                  animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                <div
                   className="w-9 h-9 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center shadow-lg"
                 >
                   <Sparkles className="w-5 h-5 text-white" />
-                </motion.div>
+                </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-bold text-white">
                     Apply to Tender
@@ -123,9 +113,9 @@ const ApplyModal = ({
               background: linear-gradient(to bottom, #0891b2, #9333ea);
             }
           `}</style>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </div>
+      </div>
+    
   );
 };
 

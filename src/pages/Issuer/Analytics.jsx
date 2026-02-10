@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import {
   BarChart3,
   TrendingUp,
@@ -62,6 +63,7 @@ const Analytics = () => {
   });
   const [activity, setActivity] = useState([]); // recent activity list
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
 
   useEffect(() => {
     fetchAnalytics();
@@ -297,14 +299,14 @@ const Analytics = () => {
     },
   ];
 
-  if (loading) {
+  if (showLoading) {
     return (
       <DashboardLayout
         title="Analytics"
         subtitle="Insights and performance metrics"
       >
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <LoadingSpinner variant="section" />
         </div>
       </DashboardLayout>
     );
@@ -319,11 +321,8 @@ const Analytics = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {statCards.map((stat, index) => (
-            <motion.div
+            <div
               key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
               className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:bg-white/10 transition-all duration-300"
             >
               <div className="flex items-center justify-between">
@@ -339,17 +338,14 @@ const Analytics = () => {
                   <stat.icon className="w-6 h-6 text-white" />
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Tender Performance Chart */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
+          <div
             className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
           >
             <h3 className="text-xl font-semibold text-white mb-6">
@@ -364,12 +360,10 @@ const Analytics = () => {
                   <span className="text-gray-300 w-12">{data.month}</span>
                   <div className="flex-1 mx-4">
                     <div className="bg-slate-800/50 rounded-full h-3 overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
+                      <div
                         animate={{
                           width: `${((data.tenders || 0) / maxTenders) * 100}%`,
                         }}
-                        transition={{ delay: 0.5 + index * 0.1, duration: 0.8 }}
                         className="h-full bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full"
                       />
                     </div>
@@ -380,13 +374,10 @@ const Analytics = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Application Trends */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
+          <div
             className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
           >
             <h3 className="text-xl font-semibold text-white mb-6">
@@ -401,14 +392,12 @@ const Analytics = () => {
                   <span className="text-gray-300 w-12">{data.month}</span>
                   <div className="flex-1 mx-4">
                     <div className="bg-slate-800/50 rounded-full h-3 overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
+                      <div
                         animate={{
                           width: `${
                             ((data.applications || 0) / maxApplications) * 100
                           }%`,
                         }}
-                        transition={{ delay: 0.6 + index * 0.1, duration: 0.8 }}
                         className="h-full bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full"
                       />
                     </div>
@@ -419,14 +408,11 @@ const Analytics = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
         >
           <h3 className="text-xl font-semibold text-white mb-6">
@@ -457,7 +443,7 @@ const Analytics = () => {
               ))
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
     </DashboardLayout>
   );

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield,
   Clock,
@@ -20,6 +19,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import EmptyState from "../../components/UI/EmptyState";
 import ViewTenderModal from "../../components/UI/ViewTenderModal";
 import { verificationCodeApi, tenderApi } from "../../services/api";
@@ -29,6 +29,7 @@ import toast from "react-hot-toast";
 const MyVerificationRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
   const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -58,7 +59,7 @@ const MyVerificationRequests = () => {
 
       // Sort by date, newest first
       const sortedData = (Array.isArray(data) ? data : []).sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
       );
 
       setRequests(sortedData);
@@ -68,7 +69,7 @@ const MyVerificationRequests = () => {
         const newlyApproved = sortedData.filter(
           (req) =>
             req.status === "approved" &&
-            !requests.find((r) => r._id === req._id && r.status === "approved")
+            !requests.find((r) => r._id === req._id && r.status === "approved"),
         );
 
         if (newlyApproved.length > 0) {
@@ -77,7 +78,7 @@ const MyVerificationRequests = () => {
             {
               duration: 5000,
               icon: "🎉",
-            }
+            },
           );
         }
       }
@@ -120,15 +121,11 @@ const MyVerificationRequests = () => {
     switch (statusLower) {
       case "pending":
         return (
-          <motion.span
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-yellow-500/20 text-yellow-400 text-xs sm:text-sm rounded-full border border-yellow-400/30"
-          >
+          <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-yellow-500/20 text-yellow-400 text-xs sm:text-sm rounded-full border border-yellow-400/30">
             <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
             <span className="hidden xs:inline">Pending</span>
             <span className="xs:hidden">...</span>
-          </motion.span>
+          </span>
         );
       case "approved":
         return (
@@ -209,13 +206,13 @@ const MyVerificationRequests = () => {
   const stats = {
     total: requests.length,
     pending: requests.filter(
-      (r) => (r.status || "pending").toLowerCase() === "pending"
+      (r) => (r.status || "pending").toLowerCase() === "pending",
     ).length,
     approved: requests.filter(
-      (r) => (r.status || "").toLowerCase() === "approved"
+      (r) => (r.status || "").toLowerCase() === "approved",
     ).length,
     rejected: requests.filter(
-      (r) => (r.status || "").toLowerCase() === "rejected"
+      (r) => (r.status || "").toLowerCase() === "rejected",
     ).length,
   };
 
@@ -247,11 +244,7 @@ const MyVerificationRequests = () => {
     >
       {/* Stats Cards - Responsive Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-xs sm:text-sm">Total</p>
@@ -263,14 +256,9 @@ const MyVerificationRequests = () => {
               <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-xs sm:text-sm">Pending</p>
@@ -287,14 +275,9 @@ const MyVerificationRequests = () => {
               Auto-refresh...
             </p>
           )}
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-xs sm:text-sm">Approved</p>
@@ -306,14 +289,9 @@ const MyVerificationRequests = () => {
               <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-xs sm:text-sm">Rejected</p>
@@ -325,7 +303,7 @@ const MyVerificationRequests = () => {
               <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Mobile Filter Toggle */}
@@ -405,278 +383,257 @@ const MyVerificationRequests = () => {
         />
       ) : (
         <div className="space-y-3 sm:space-y-4">
-          <AnimatePresence>
-            {filteredRequests.map((request, index) => (
-              <motion.div
-                key={request._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl overflow-hidden hover:bg-white/10 transition-all duration-300"
-              >
-                {/* Main Content - Responsive */}
-                <div className="p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-start space-x-3 sm:space-x-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+          {filteredRequests.map((request, index) => (
+            <div
+              key={request._id}
+              className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl overflow-hidden hover:bg-white/10 transition-all duration-300"
+            >
+              {/* Main Content - Responsive */}
+              <div className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-start space-x-3 sm:space-x-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm sm:text-lg font-semibold text-white mb-1 line-clamp-2">
+                          {request.tender?.title || "Unknown Tender"}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">
+                          <span className="truncate max-w-[120px] sm:max-w-none">
+                            {request.tender?.category || "No category"}
+                          </span>
+                          <span className="hidden sm:inline">•</span>
+                          <span className="flex items-center space-x-1">
+                            <Calendar className="w-3 h-3" />
+                            <span className="hidden sm:inline">
+                              {formatDate(request.createdAt)}
+                            </span>
+                            <span className="sm:hidden">
+                              {formatDateMobile(request.createdAt)}
+                            </span>
+                          </span>
+                          <span className="hidden xs:inline">•</span>
+                          <span className="text-cyan-400 text-xs hidden xs:inline">
+                            {getTimeAgo(request.createdAt)}
+                          </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm sm:text-lg font-semibold text-white mb-1 line-clamp-2">
-                            {request.tender?.title || "Unknown Tender"}
-                          </h3>
-                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">
-                            <span className="truncate max-w-[120px] sm:max-w-none">
-                              {request.tender?.category || "No category"}
-                            </span>
-                            <span className="hidden sm:inline">•</span>
-                            <span className="flex items-center space-x-1">
-                              <Calendar className="w-3 h-3" />
-                              <span className="hidden sm:inline">
-                                {formatDate(request.createdAt)}
-                              </span>
-                              <span className="sm:hidden">
-                                {formatDateMobile(request.createdAt)}
-                              </span>
-                            </span>
-                            <span className="hidden xs:inline">•</span>
-                            <span className="text-cyan-400 text-xs hidden xs:inline">
-                              {getTimeAgo(request.createdAt)}
-                            </span>
-                          </div>
 
-                          {/* Status Badge */}
-                          <div className="mb-3 sm:mb-4">
-                            {getStatusBadge(request.status)}
-                          </div>
+                        {/* Status Badge */}
+                        <div className="mb-3 sm:mb-4">
+                          {getStatusBadge(request.status)}
+                        </div>
 
-                          {/* Status Message - Responsive */}
-                          <div
-                            className={`p-3 sm:p-4 rounded-lg border ${
-                              request.status === "approved"
-                                ? "bg-green-500/10 border-green-400/20"
-                                : request.status === "rejected"
+                        {/* Status Message - Responsive */}
+                        <div
+                          className={`p-3 sm:p-4 rounded-lg border ${
+                            request.status === "approved"
+                              ? "bg-green-500/10 border-green-400/20"
+                              : request.status === "rejected"
                                 ? "bg-red-500/10 border-red-400/20"
                                 : "bg-yellow-500/10 border-yellow-400/20"
-                            }`}
-                          >
-                            <div className="flex items-start space-x-2">
-                              <Info
-                                className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0 ${
-                                  request.status === "approved"
-                                    ? "text-green-400"
-                                    : request.status === "rejected"
+                          }`}
+                        >
+                          <div className="flex items-start space-x-2">
+                            <Info
+                              className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0 ${
+                                request.status === "approved"
+                                  ? "text-green-400"
+                                  : request.status === "rejected"
                                     ? "text-red-400"
                                     : "text-yellow-400"
-                                }`}
-                              />
-                              <div className="flex-1">
-                                <p
-                                  className={`text-xs sm:text-sm ${
-                                    request.status === "approved"
-                                      ? "text-green-300"
-                                      : request.status === "rejected"
+                              }`}
+                            />
+                            <div className="flex-1">
+                              <p
+                                className={`text-xs sm:text-sm ${
+                                  request.status === "approved"
+                                    ? "text-green-300"
+                                    : request.status === "rejected"
                                       ? "text-red-300"
                                       : "text-yellow-300"
-                                  }`}
-                                >
-                                  {getStatusMessage(request)}
-                                </p>
+                                }`}
+                              >
+                                {getStatusMessage(request)}
+                              </p>
 
-                                {/* Show code if approved - Responsive */}
-                                {request.status === "approved" &&
-                                  request.code && (
-                                    <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-slate-900/50 border border-cyan-400/30 rounded-lg">
-                                      <p className="text-xs sm:text-sm text-gray-400 mb-2 text-center">
-                                        Your Verification Code
-                                      </p>
-                                      <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-3">
-                                        <div className="text-center sm:text-left">
-                                          <p className="text-xl sm:text-2xl font-mono font-bold text-cyan-400 tracking-wider">
-                                            **{request.code}**
-                                          </p>
-                                          <div className="w-full h-px bg-cyan-400/30 mt-2"></div>
-                                        </div>
-                                        <button
-                                          onClick={() =>
-                                            handleCopyCode(request.code)
-                                          }
-                                          className="w-full sm:w-auto px-4 py-2 sm:p-3 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-all duration-300 flex items-center justify-center space-x-2"
-                                          title="Copy code"
-                                        >
-                                          <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
-                                          <span className="sm:hidden text-sm">
-                                            Copy Code
-                                          </span>
-                                        </button>
+                              {/* Show code if approved - Responsive */}
+                              {request.status === "approved" &&
+                                request.code && (
+                                  <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-slate-900/50 border border-cyan-400/30 rounded-lg">
+                                    <p className="text-xs sm:text-sm text-gray-400 mb-2 text-center">
+                                      Your Verification Code
+                                    </p>
+                                    <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-3">
+                                      <div className="text-center sm:text-left">
+                                        <p className="text-xl sm:text-2xl font-mono font-bold text-cyan-400 tracking-wider">
+                                          **{request.code}**
+                                        </p>
+                                        <div className="w-full h-px bg-cyan-400/30 mt-2"></div>
                                       </div>
+                                      <button
+                                        onClick={() =>
+                                          handleCopyCode(request.code)
+                                        }
+                                        className="w-full sm:w-auto px-4 py-2 sm:p-3 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-all duration-300 flex items-center justify-center space-x-2"
+                                        title="Copy code"
+                                      >
+                                        <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        <span className="sm:hidden text-sm">
+                                          Copy Code
+                                        </span>
+                                      </button>
                                     </div>
-                                  )}
-                              </div>
+                                  </div>
+                                )}
                             </div>
                           </div>
+                        </div>
 
-                          {/* Additional Details - Responsive Grid */}
-                          <div className="mt-3 sm:mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
+                        {/* Additional Details - Responsive Grid */}
+                        <div className="mt-3 sm:mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
+                          <div>
+                            <p className="text-gray-500 mb-0.5 sm:mb-1">
+                              Request ID
+                            </p>
+                            <p className="text-gray-300 font-mono truncate">
+                              #{request._id?.slice(-8) || "N/A"}
+                            </p>
+                          </div>
+                          {request.approvedAt && (
                             <div>
                               <p className="text-gray-500 mb-0.5 sm:mb-1">
-                                Request ID
+                                Approved
                               </p>
-                              <p className="text-gray-300 font-mono truncate">
-                                #{request._id?.slice(-8) || "N/A"}
+                              <p className="text-gray-300 truncate">
+                                <span className="hidden sm:inline">
+                                  {formatDate(request.approvedAt)}
+                                </span>
+                                <span className="sm:hidden">
+                                  {formatDateMobile(request.approvedAt)}
+                                </span>
                               </p>
                             </div>
-                            {request.approvedAt && (
-                              <div>
-                                <p className="text-gray-500 mb-0.5 sm:mb-1">
-                                  Approved
-                                </p>
-                                <p className="text-gray-300 truncate">
-                                  <span className="hidden sm:inline">
-                                    {formatDate(request.approvedAt)}
-                                  </span>
-                                  <span className="sm:hidden">
-                                    {formatDateMobile(request.approvedAt)}
-                                  </span>
-                                </p>
-                              </div>
-                            )}
-                            {request.rejectedAt && (
-                              <div>
-                                <p className="text-gray-500 mb-0.5 sm:mb-1">
-                                  Rejected
-                                </p>
-                                <p className="text-gray-300 truncate">
-                                  <span className="hidden sm:inline">
-                                    {formatDate(request.rejectedAt)}
-                                  </span>
-                                  <span className="sm:hidden">
-                                    {formatDateMobile(request.rejectedAt)}
-                                  </span>
-                                </p>
-                              </div>
-                            )}
-                            {request.expiresAt && (
-                              <div>
-                                <p className="text-gray-500 mb-0.5 sm:mb-1">
-                                  Expires
-                                </p>
-                                <p className="text-gray-300 truncate">
-                                  <span className="hidden sm:inline">
-                                    {formatDate(request.expiresAt)}
-                                  </span>
-                                  <span className="sm:hidden">
-                                    {formatDateMobile(request.expiresAt)}
-                                  </span>
-                                </p>
-                              </div>
-                            )}
-                          </div>
+                          )}
+                          {request.rejectedAt && (
+                            <div>
+                              <p className="text-gray-500 mb-0.5 sm:mb-1">
+                                Rejected
+                              </p>
+                              <p className="text-gray-300 truncate">
+                                <span className="hidden sm:inline">
+                                  {formatDate(request.rejectedAt)}
+                                </span>
+                                <span className="sm:hidden">
+                                  {formatDateMobile(request.rejectedAt)}
+                                </span>
+                              </p>
+                            </div>
+                          )}
+                          {request.expiresAt && (
+                            <div>
+                              <p className="text-gray-500 mb-0.5 sm:mb-1">
+                                Expires
+                              </p>
+                              <p className="text-gray-300 truncate">
+                                <span className="hidden sm:inline">
+                                  {formatDate(request.expiresAt)}
+                                </span>
+                                <span className="sm:hidden">
+                                  {formatDateMobile(request.expiresAt)}
+                                </span>
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </div>
-
-                    {/* Actions - Mobile Responsive */}
-                    <div className="flex items-center justify-end sm:justify-start space-x-2 sm:ml-4">
-                      <button
-                        onClick={() => handleViewTender(request.tender)}
-                        className="p-2 sm:p-2 bg-slate-800/50 border border-cyan-400/20 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
-                        title="View Tender"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
                     </div>
                   </div>
-                </div>
 
-                {/* Expandable Section for Tender Details - Responsive */}
-                <button
-                  onClick={() =>
-                    setExpandedRequest(
-                      expandedRequest === request._id ? null : request._id
-                    )
-                  }
-                  className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-800/30 border-t border-cyan-400/10 flex items-center justify-between hover:bg-slate-800/50 transition-all duration-300"
-                >
-                  <span className="text-xs sm:text-sm text-gray-400">
-                    View Tender Details
-                  </span>
-                  <ChevronRight
-                    className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${
-                      expandedRequest === request._id ? "rotate-90" : ""
-                    }`}
-                  />
-                </button>
-
-                {/* Expanded Content - Responsive */}
-                <AnimatePresence>
-                  {expandedRequest === request._id && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="px-4 sm:px-6 pb-4 sm:pb-6 border-t border-cyan-400/10"
+                  {/* Actions - Mobile Responsive */}
+                  <div className="flex items-center justify-end sm:justify-start space-x-2 sm:ml-4">
+                    <button
+                      onClick={() => handleViewTender(request.tender)}
+                      className="p-2 sm:p-2 bg-slate-800/50 border border-cyan-400/20 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
+                      title="View Tender"
                     >
-                      <div className="pt-3 sm:pt-4 space-y-3">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
-                          <div>
-                            <p className="text-gray-500 mb-0.5 sm:mb-1">
-                              Company
-                            </p>
-                            <p className="text-gray-300 truncate">
-                              {request.tender?.companyName || "N/A"}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500 mb-0.5 sm:mb-1">
-                              Budget Range
-                            </p>
-                            <p className="text-cyan-400 truncate">
-                              R
-                              {request.tender?.budgetMin?.toLocaleString() || 0}{" "}
-                              - R
-                              {request.tender?.budgetMax?.toLocaleString() || 0}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500 mb-0.5 sm:mb-1">
-                              Deadline
-                            </p>
-                            <p className="text-gray-300">
-                              {request.tender?.deadline
-                                ? formatDateMobile(request.tender.deadline)
-                                : "N/A"}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500 mb-0.5 sm:mb-1">
-                              Status
-                            </p>
-                            <p className="text-gray-300">
-                              {request.tender?.status || "N/A"}
-                            </p>
-                          </div>
-                        </div>
-                        {request.tender?.description && (
-                          <div>
-                            <p className="text-gray-500 mb-0.5 sm:mb-1 text-xs sm:text-sm">
-                              Description
-                            </p>
-                            <p className="text-gray-300 line-clamp-3 text-xs sm:text-sm">
-                              {request.tender.description}
-                            </p>
-                          </div>
-                        )}
+                      <Eye className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Expandable Section for Tender Details - Responsive */}
+              <button
+                onClick={() =>
+                  setExpandedRequest(
+                    expandedRequest === request._id ? null : request._id,
+                  )
+                }
+                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-800/30 border-t border-cyan-400/10 flex items-center justify-between hover:bg-slate-800/50 transition-all duration-300"
+              >
+                <span className="text-xs sm:text-sm text-gray-400">
+                  View Tender Details
+                </span>
+                <ChevronRight
+                  className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${
+                    expandedRequest === request._id ? "rotate-90" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Expanded Content - Responsive */}
+
+              {expandedRequest === request._id && (
+                <div className="px-4 sm:px-6 pb-4 sm:pb-6 border-t border-cyan-400/10">
+                  <div className="pt-3 sm:pt-4 space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
+                      <div>
+                        <p className="text-gray-500 mb-0.5 sm:mb-1">Company</p>
+                        <p className="text-gray-300 truncate">
+                          {request.tender?.companyName || "N/A"}
+                        </p>
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                      <div>
+                        <p className="text-gray-500 mb-0.5 sm:mb-1">
+                          Budget Range
+                        </p>
+                        <p className="text-cyan-400 truncate">
+                          R{request.tender?.budgetMin?.toLocaleString() || 0} -
+                          R{request.tender?.budgetMax?.toLocaleString() || 0}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 mb-0.5 sm:mb-1">Deadline</p>
+                        <p className="text-gray-300">
+                          {request.tender?.deadline
+                            ? formatDateMobile(request.tender.deadline)
+                            : "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 mb-0.5 sm:mb-1">Status</p>
+                        <p className="text-gray-300">
+                          {request.tender?.status || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                    {request.tender?.description && (
+                      <div>
+                        <p className="text-gray-500 mb-0.5 sm:mb-1 text-xs sm:text-sm">
+                          Description
+                        </p>
+                        <p className="text-gray-300 line-clamp-3 text-xs sm:text-sm">
+                          {request.tender.description}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
@@ -691,12 +648,7 @@ const MyVerificationRequests = () => {
       />
 
       {/* Help Section - Responsive */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-400/20 rounded-lg sm:rounded-xl"
-      >
+      <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-400/20 rounded-lg sm:rounded-xl">
         <h3 className="text-base sm:text-lg font-semibold text-white mb-2 sm:mb-3 flex items-center space-x-2">
           <Info className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
           <span>How Verification Works</span>
@@ -723,7 +675,7 @@ const MyVerificationRequests = () => {
             Track all your requests and their status on this page
           </p>
         </div>
-      </motion.div>
+      </div>
     </DashboardLayout>
   );
 };

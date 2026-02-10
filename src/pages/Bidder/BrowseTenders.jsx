@@ -8,12 +8,15 @@ import ApplyModal from "../../components/UI/ApplyModal";
 import VerificationModal from "../../components/UI/VerificationModal";
 import EmptyState from "../../components/UI/EmptyState";
 import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import { tenderApi, applicationApi } from "../../services/api";
 import toast from "react-hot-toast";
+import { BIDDER_REQUIRED_DOCUMENTS } from "../../constants/documents";
 
 const BrowseTenders = () => {
   const [tenders, setTenders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
   const [filters, setFilters] = useState({
     search: "",
     category: "",
@@ -262,8 +265,33 @@ const BrowseTenders = () => {
     try {
       setApplyLoading(true);
       setApplyError("");
-      console.log("Applying to tender:", selectedTender);
-      console.log("Application form data:", applyForm);
+      const summarizeFile = (f) =>
+        f
+          ? {
+              name: f.name,
+              type: f.type,
+              size: f.size,
+            }
+          : null;
+
+      console.log("[APPLY] tenderId:", selectedTender?._id || selectedTender?.id);
+      console.log("[APPLY] selectedTender:", {
+        _id: selectedTender?._id,
+        id: selectedTender?.id,
+        title: selectedTender?.title,
+        status: selectedTender?.status,
+      });
+      const complianceKeys = BIDDER_REQUIRED_DOCUMENTS.map((d) => d.key);
+
+      console.log("[APPLY] raw applyForm:", {
+        ...applyForm,
+        // Summarize ALL compliance docs
+        ...Object.fromEntries(
+          complianceKeys.map((k) => [k, summarizeFile(applyForm?.[k])])
+        ),
+        // Optional
+        supportingDocuments: summarizeFile(applyForm.supportingDocuments),
+      });
 
       const payload = {
         companyName: applyForm.companyName,
@@ -276,15 +304,25 @@ const BrowseTenders = () => {
         bidAmount: Number(applyForm.bidAmount) || 0,
         timeframe: applyForm.timeframe || undefined,
         message: applyForm.message,
-        bidFileDocuments: applyForm.bidFileDocuments,
-        compiledDocuments: applyForm.compiledDocuments,
-        financialDocuments: applyForm.financialDocuments,
-        technicalProposal: applyForm.technicalProposal,
-        proofOfExperience: applyForm.proofOfExperience,
+
+        // Compliance docs
+        ...Object.fromEntries(complianceKeys.map((k) => [k, applyForm?.[k]])),
+
+        // Optional extra docs
         supportingDocuments: applyForm.supportingDocuments,
       };
 
       const tenderId = selectedTender._id || selectedTender.id;
+
+      console.log("[APPLY] payload (pre-submit):", {
+        ...payload,
+        // Summarize ALL compliance docs
+        ...Object.fromEntries(
+          complianceKeys.map((k) => [k, summarizeFile(payload?.[k])])
+        ),
+        // Optional
+        supportingDocuments: summarizeFile(payload.supportingDocuments),
+      });
 
       // Extra guard on submission
       const status = (selectedTender.status || "").toLowerCase();

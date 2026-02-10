@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import LoadingSpinner from "./LoadingSpinner";
 import { AlertTriangle, Trash2, X } from "lucide-react";
 
 const ConfirmDeleteModal = ({
@@ -56,21 +56,14 @@ const ConfirmDeleteModal = ({
   };
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+    
+      <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
         onClick={() => {
           if (!processing) onClose();
         }}
       >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+        <div
           className={`bg-gradient-to-b from-slate-900 to-slate-950 backdrop-blur-xl border ${getBorderColor()} rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl`}
           onClick={(e) => e.stopPropagation()}
         >
@@ -129,7 +122,7 @@ const ConfirmDeleteModal = ({
             >
               {processing ? (
                 <span className="flex items-center justify-center space-x-2">
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <LoadingSpinner variant="inline" size="sm" color="white" />
                   <span>{actionType === "withdraw" ? "Withdrawing..." : "Deleting..."}</span>
                 </span>
               ) : (
@@ -140,9 +133,9 @@ const ConfirmDeleteModal = ({
               )}
             </button>
           </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </div>
+      </div>
+    
   );
 };
 

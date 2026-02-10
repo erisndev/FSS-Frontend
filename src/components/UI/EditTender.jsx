@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import LoadingSpinner from "./LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import {
   FileText,
   Upload,
@@ -13,6 +14,7 @@ import DashboardLayout from "../../components/Layout/DashboardLayout";
 import { tenderApi } from "../../services/api";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { ISSUER_ISSUED_DOCUMENTS } from "../../constants/documents";
 
 const EditTender = () => {
   const { id } = useParams();
@@ -51,12 +53,17 @@ const EditTender = () => {
     // Keep a stable array for UI summary / compatibility with CreateTender
     documents: [],
 
-    // Individual document fields
-    bidFileDocuments: null,
-    compiledDocuments: null,
-    financialDocuments: null,
-    technicalProposal: null,
-    proofOfExperience: null,
+    // Individual document fields (issuer-issued tender documents)
+    termsOfReference: null,
+    sbd1: null,
+    sbd2: null,
+    sbd4DeclarationOfInterest: null,
+    sbd61: null,
+    bidTechnicalSubmissionTemplate: null,
+    bidFinancialSubmissionTemplate: null,
+    annexure1: null,
+    annexure2: null,
+    annexure3: null,
   });
 
   const categories = [
@@ -82,11 +89,16 @@ const EditTender = () => {
 
         // Process existing documents
         const existingDocs = {
-          bidFileDocuments: null,
-          compiledDocuments: null,
-          financialDocuments: null,
-          technicalProposal: null,
-          proofOfExperience: null,
+          termsOfReference: null,
+          sbd1: null,
+          sbd2: null,
+          sbd4DeclarationOfInterest: null,
+          sbd61: null,
+          bidTechnicalSubmissionTemplate: null,
+          bidFinancialSubmissionTemplate: null,
+          annexure1: null,
+          annexure2: null,
+          annexure3: null,
         };
 
         // Check if documents exist and have the label property (new format)
@@ -100,16 +112,9 @@ const EditTender = () => {
               label: doc.label,
             };
 
-            if (doc.label === "Bid File Documents") {
-              existingDocs.bidFileDocuments = mapped;
-            } else if (doc.label === "Compiled Documents") {
-              existingDocs.compiledDocuments = mapped;
-            } else if (doc.label === "Financial Documents") {
-              existingDocs.financialDocuments = mapped;
-            } else if (doc.label === "Technical Proposal") {
-              existingDocs.technicalProposal = mapped;
-            } else if (doc.label === "Proof of Experience (Reference Letter)") {
-              existingDocs.proofOfExperience = mapped;
+            const match = ISSUER_ISSUED_DOCUMENTS.find((d) => d.label === doc.label);
+            if (match) {
+              existingDocs[match.key] = mapped;
             }
           });
         }
@@ -124,28 +129,12 @@ const EditTender = () => {
         const normalizedDocumentsArray = Array.isArray(res.documents)
           ? res.documents
           : res.documents && typeof res.documents === "object"
-            ? [
-                {
-                  ...(res.documents.bidFileDocuments || {}),
-                  label: "Bid File Documents",
-                },
-                {
-                  ...(res.documents.compiledDocuments || {}),
-                  label: "Compiled Documents",
-                },
-                {
-                  ...(res.documents.financialDocuments || {}),
-                  label: "Financial Documents",
-                },
-                {
-                  ...(res.documents.technicalProposal || {}),
-                  label: "Technical Proposal",
-                },
-                {
-                  ...(res.documents.proofOfExperience || {}),
-                  label: "Proof of Experience (Reference Letter)",
-                },
-              ].filter((d) => d && d.url)
+            ? ISSUER_ISSUED_DOCUMENTS
+                .map((def) => ({
+                  ...(res.documents?.[def.key] || {}),
+                  label: def.label,
+                }))
+                .filter((d) => d && d.url)
             : [];
 
         setFormData((prev) => ({
@@ -168,16 +157,7 @@ const EditTender = () => {
     fetchTender();
   }, [id]);
 
-  const docTypeConfig = [
-    { key: "bidFileDocuments", label: "Bid File Documents" },
-    { key: "compiledDocuments", label: "Compiled Documents" },
-    { key: "financialDocuments", label: "Financial Documents" },
-    { key: "technicalProposal", label: "Technical Proposal" },
-    {
-      key: "proofOfExperience",
-      label: "Proof of Experience (Reference Letter)",
-    },
-  ];
+  const docTypeConfig = ISSUER_ISSUED_DOCUMENTS;
 
   const getDocLabel = (key) =>
     docTypeConfig.find((d) => d.key === key)?.label || key;
@@ -279,13 +259,7 @@ const EditTender = () => {
       };
 
       // Existing docs should NOT be re-sent as file uploads.
-      const documentFields = [
-        "bidFileDocuments",
-        "compiledDocuments",
-        "financialDocuments",
-        "technicalProposal",
-        "proofOfExperience",
-      ];
+      const documentFields = ISSUER_ISSUED_DOCUMENTS.map((d) => d.key);
 
       documentFields.forEach((field) => {
         const doc = submitData[field];
@@ -316,20 +290,16 @@ const EditTender = () => {
     <DashboardLayout title="Edit Tender" subtitle="Update tender details">
       <div className="max-w-4xl mx-auto -mx-3 sm:mx-auto sm:px-4">
         {isFetching ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+          <div
             className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8"
           >
             <div className="flex items-center space-x-3 text-gray-300">
-              <div className="w-5 h-5 border-2 border-cyan-400/60 border-t-transparent rounded-full animate-spin" />
+              <LoadingSpinner variant="inline" size="sm" />
               <span>Loading tender details...</span>
             </div>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+          <div
             className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-xl p-4 sm:p-6 lg:p-8"
           >
           {/* Back to Tenders Button */}
@@ -346,25 +316,21 @@ const EditTender = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+              <div
                 className="bg-red-500/20 border border-red-400/50 rounded-lg p-4 text-red-300"
               >
                 <div className="flex items-center space-x-2">
                   <AlertCircle className="w-5 h-5" />
                   <span>{error}</span>
                 </div>
-              </motion.div>
+              </div>
             )}
             {success && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+              <div
                 className="bg-green-500/20 border border-green-400/50 rounded-lg p-4 text-green-300"
               >
                 {success}
-              </motion.div>
+              </div>
             )}
             {/* Title & Category */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
@@ -690,16 +656,7 @@ const EditTender = () => {
 
               {/* Required Documents (match ViewTenderModal behavior) */}
               <div className="space-y-4 mb-4 sm:mb-6">
-                {[
-                  { label: "Bid File Documents", key: "bidFileDocuments" },
-                  { label: "Compiled Documents", key: "compiledDocuments" },
-                  { label: "Financial Documents", key: "financialDocuments" },
-                  { label: "Technical Proposal", key: "technicalProposal" },
-                  {
-                    label: "Proof of Experience (Reference Letter)",
-                    key: "proofOfExperience",
-                  },
-                ].map((required, index) => {
+                {ISSUER_ISSUED_DOCUMENTS.map((required, index) => {
                   const findDocInArray = () => {
                     if (!Array.isArray(formData.documents)) return null;
                     return (
@@ -846,7 +803,7 @@ const EditTender = () => {
               >
                 {loading ? (
                   <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <LoadingSpinner variant="inline" size="sm" color="white" />
                     <span>Updating...</span>
                   </div>
                 ) : (
@@ -858,7 +815,7 @@ const EditTender = () => {
               </button>
             </div>
           </form>
-        </motion.div>
+        </div>
         )}
       </div>
     </DashboardLayout>

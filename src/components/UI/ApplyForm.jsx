@@ -1,6 +1,7 @@
 import React from "react";
-import { motion } from "framer-motion";
+import LoadingSpinner from "./LoadingSpinner";
 import { Calendar, Upload, FileText, X, AlertCircle } from "lucide-react";
+import { BIDDER_REQUIRED_DOCUMENTS } from "../../constants/documents";
 
 const ApplyForm = ({
   formData,
@@ -24,23 +25,18 @@ const ApplyForm = ({
       <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
         {/* Error Display */}
         {error && (
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+          <div
             className="p-4 bg-red-500/20 border border-red-400/30 text-red-300 rounded-lg"
           >
             <div className="flex items-center space-x-2">
               <AlertCircle className="w-5 h-5" />
               <span>{error}</span>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Company Information Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <div
           className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
         >
           <h4 className="text-base font-semibold text-cyan-400 mb-3">
@@ -109,13 +105,10 @@ const ApplyForm = ({
               />
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Contact Information Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+        <div
           className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
         >
           <h4 className="text-base font-semibold text-cyan-400 mb-3">
@@ -167,13 +160,10 @@ const ApplyForm = ({
               />
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Bid Details Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+        <div
           className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
         >
           <h4 className="text-base font-semibold text-cyan-400 mb-3">
@@ -216,13 +206,10 @@ const ApplyForm = ({
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Cover Letter Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+        <div
           className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
         >
           <h4 className="text-base font-semibold text-cyan-400 mb-3">
@@ -237,258 +224,74 @@ const ApplyForm = ({
             className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300 resize-none"
             placeholder="Explain why you're the best fit for this tender. Include your relevant experience, qualifications, and what makes your proposal unique..."
           />
-        </motion.div>
+        </div>
 
         {/* Documents Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+        <div
           className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
         >
-          <h4 className="text-base font-semibold text-cyan-400 mb-4">
-            Documents
+          <h4 className="text-base font-semibold text-cyan-400 mb-1">
+            Compliance Documents
           </h4>
+          <p className="text-xs text-gray-400 mb-4">
+            Upload all required compliance documents to submit your application.
+          </p>
+
           <div className="space-y-4">
-            {/* Bid File Documents */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Bid File Documents
-              </label>
-              {formData.bidFileDocuments ? (
-                <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <FileText className="w-5 h-5 text-cyan-400" />
-                    <div>
-                      <p className="text-white text-sm font-medium">
-                        {formData.bidFileDocuments.name}
-                      </p>
-                      <p className="text-gray-500 text-xs">
-                        {formatFileSize(formData.bidFileDocuments.size)}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => onRemoveFile('bidFileDocuments')}
-                    className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                  >
-                    <X className="w-4 h-4 text-red-400" />
-                  </button>
-                </div>
-              ) : (
-                <div className="relative">
-                  <input
-                    type="file"
-                    id="bidFileDocuments"
-                    onChange={(e) => onFileUpload(e, 'bidFileDocuments')}
-                    className="hidden"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                  />
-                  <label
-                    htmlFor="bidFileDocuments"
-                    onDrop={(e) => onFileDrop(e, 'bidFileDocuments')}
-                    onDragOver={handleDragOver}
-                    className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
-                  >
-                    <Upload className="w-5 h-5 mr-2" />
-                    <span className="text-sm">Choose File or Drop Here</span>
-                  </label>
-                </div>
-              )}
-            </div>
+            {BIDDER_REQUIRED_DOCUMENTS.map((def) => {
+              const value = formData?.[def.key];
+              const inputId = def.key;
 
-            {/* Compiled Documents */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Compiled Documents
-              </label>
-              {formData.compiledDocuments ? (
-                <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <FileText className="w-5 h-5 text-cyan-400" />
-                    <div>
-                      <p className="text-white text-sm font-medium">
-                        {formData.compiledDocuments.name}
-                      </p>
-                      <p className="text-gray-500 text-xs">
-                        {formatFileSize(formData.compiledDocuments.size)}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => onRemoveFile('compiledDocuments')}
-                    className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                  >
-                    <X className="w-4 h-4 text-red-400" />
-                  </button>
-                </div>
-              ) : (
-                <div className="relative">
-                  <input
-                    type="file"
-                    id="compiledDocuments"
-                    onChange={(e) => onFileUpload(e, 'compiledDocuments')}
-                    className="hidden"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                  />
-                  <label
-                    htmlFor="compiledDocuments"
-                    onDrop={(e) => onFileDrop(e, 'compiledDocuments')}
-                    onDragOver={handleDragOver}
-                    className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
-                  >
-                    <Upload className="w-5 h-5 mr-2" />
-                    <span className="text-sm">Choose File or Drop Here</span>
+              return (
+                <div key={def.key}>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    {def.label}
                   </label>
-                </div>
-              )}
-            </div>
 
-            {/* Financial Documents */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Financial Documents
-              </label>
-              {formData.financialDocuments ? (
-                <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <FileText className="w-5 h-5 text-cyan-400" />
-                    <div>
-                      <p className="text-white text-sm font-medium">
-                        {formData.financialDocuments.name}
-                      </p>
-                      <p className="text-gray-500 text-xs">
-                        {formatFileSize(formData.financialDocuments.size)}
-                      </p>
+                  {value ? (
+                    <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <FileText className="w-5 h-5 text-cyan-400" />
+                        <div>
+                          <p className="text-white text-sm font-medium">
+                            {value.name}
+                          </p>
+                          <p className="text-gray-500 text-xs">
+                            {formatFileSize(value.size)}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onRemoveFile(def.key)}
+                        className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
+                      >
+                        <X className="w-4 h-4 text-red-400" />
+                      </button>
                     </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => onRemoveFile('financialDocuments')}
-                    className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                  >
-                    <X className="w-4 h-4 text-red-400" />
-                  </button>
-                </div>
-              ) : (
-                <div className="relative">
-                  <input
-                    type="file"
-                    id="financialDocuments"
-                    onChange={(e) => onFileUpload(e, 'financialDocuments')}
-                    className="hidden"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                  />
-                  <label
-                    htmlFor="financialDocuments"
-                    onDrop={(e) => onFileDrop(e, 'financialDocuments')}
-                    onDragOver={handleDragOver}
-                    className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
-                  >
-                    <Upload className="w-5 h-5 mr-2" />
-                    <span className="text-sm">Choose File or Drop Here</span>
-                  </label>
-                </div>
-              )}
-            </div>
-
-            {/* Technical Proposal */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Technical Proposal
-              </label>
-              {formData.technicalProposal ? (
-                <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <FileText className="w-5 h-5 text-cyan-400" />
-                    <div>
-                      <p className="text-white text-sm font-medium">
-                        {formData.technicalProposal.name}
-                      </p>
-                      <p className="text-gray-500 text-xs">
-                        {formatFileSize(formData.technicalProposal.size)}
-                      </p>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        type="file"
+                        id={inputId}
+                        onChange={(e) => onFileUpload(e, def.key)}
+                        className="hidden"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                      />
+                      <label
+                        htmlFor={inputId}
+                        onDrop={(e) => onFileDrop(e, def.key)}
+                        onDragOver={handleDragOver}
+                        className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
+                      >
+                        <Upload className="w-5 h-5 mr-2" />
+                        <span className="text-sm">Choose File or Drop Here</span>
+                      </label>
                     </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => onRemoveFile('technicalProposal')}
-                    className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                  >
-                    <X className="w-4 h-4 text-red-400" />
-                  </button>
+                  )}
                 </div>
-              ) : (
-                <div className="relative">
-                  <input
-                    type="file"
-                    id="technicalProposal"
-                    onChange={(e) => onFileUpload(e, 'technicalProposal')}
-                    className="hidden"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                  />
-                  <label
-                    htmlFor="technicalProposal"
-                    onDrop={(e) => onFileDrop(e, 'technicalProposal')}
-                    onDragOver={handleDragOver}
-                    className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
-                  >
-                    <Upload className="w-5 h-5 mr-2" />
-                    <span className="text-sm">Choose File or Drop Here</span>
-                  </label>
-                </div>
-              )}
-            </div>
-
-            {/* Proof of Experience */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Proof of Experience (Reference Letter)
-              </label>
-              {formData.proofOfExperience ? (
-                <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <FileText className="w-5 h-5 text-cyan-400" />
-                    <div>
-                      <p className="text-white text-sm font-medium">
-                        {formData.proofOfExperience.name}
-                      </p>
-                      <p className="text-gray-500 text-xs">
-                        {formatFileSize(formData.proofOfExperience.size)}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => onRemoveFile('proofOfExperience')}
-                    className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                  >
-                    <X className="w-4 h-4 text-red-400" />
-                  </button>
-                </div>
-              ) : (
-                <div className="relative">
-                  <input
-                    type="file"
-                    id="proofOfExperience"
-                    onChange={(e) => onFileUpload(e, 'proofOfExperience')}
-                    className="hidden"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                  />
-                  <label
-                    htmlFor="proofOfExperience"
-                    onDrop={(e) => onFileDrop(e, 'proofOfExperience')}
-                    onDragOver={handleDragOver}
-                    className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
-                  >
-                    <Upload className="w-5 h-5 mr-2" />
-                    <span className="text-sm">Choose File or Drop Here</span>
-                  </label>
-                </div>
-              )}
-            </div>
+              );
+            })}
 
             {/* Extra/Supporting Documents */}
             <div>
@@ -538,14 +341,12 @@ const ApplyForm = ({
               )}
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Footer - Fixed at bottom */}
       <div className="flex items-center justify-between p-3 border-t border-cyan-400/10 bg-gradient-to-r from-slate-900 to-slate-950">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        <button
           type="button"
           onClick={onCancel}
           disabled={loading}
@@ -554,23 +355,21 @@ const ApplyForm = ({
           }`}
         >
           Cancel
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        </button>
+        <button
           type="submit"
           disabled={loading}
           className="px-4 py-1.5 text-sm bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium"
         >
           {loading ? (
             <div className="flex items-center space-x-1.5">
-              <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <LoadingSpinner variant="inline" size="sm" color="white" />
               <span>Submitting...</span>
             </div>
           ) : (
             "Submit Application"
           )}
-        </motion.button>
+        </button>
       </div>
     </form>
   );

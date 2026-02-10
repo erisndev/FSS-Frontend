@@ -1,14 +1,17 @@
 import React from "react";
+import LoadingSpinner from "./UI/LoadingSpinner";
+import useMinLoadingTime from "../utils/useMinLoadingTime";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 const ProtectedRoute = ({ children, roles = [] }) => {
   const { user, loading } = useAuth();
+  const showLoading = useMinLoadingTime(loading);
 
-  if (loading) {
+  if (showLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+        <LoadingSpinner variant="section" />
       </div>
     );
   }

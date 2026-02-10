@@ -9,6 +9,9 @@ import {
   Plus,
   Eye,
   Calendar,
+  ArrowRight,
+  Building,
+  DollarSign,
 } from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import ViewTenderModal from "../../components/UI/ViewTenderModal";
@@ -230,7 +233,10 @@ const IssuerDashboard = () => {
         subtitle="Manage your tenders and applications"
       >
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <div
+            className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full motion-safe:animate-spin
+"
+          ></div>
         </div>
       </DashboardLayout>
     );
@@ -245,46 +251,37 @@ const IssuerDashboard = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statCards.map((stat, index) => (
-            <motion.div
-              key={`${stat.title}-${index}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`${stat.bgColor} backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:shadow-lg hover:shadow-cyan-400/10 transition-all duration-300 group`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <p className="text-gray-400 text-sm font-medium mb-2">
+            <div className="group relative bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5 hover:bg-white/[0.07] hover:border-cyan-400/20 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.02] to-purple-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+              <div className="relative flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3">
                     {stat.title}
                   </p>
-                  <p className="text-3xl font-bold text-white">
+                  <p className="text-3xl font-bold text-white tracking-tight">
                     {stat.value.toLocaleString()}
                   </p>
                 </div>
                 <div
-                  className={`w-14 h-14 rounded-xl ${stat.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300`}
                 >
-                  <div
-                    className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}
-                  >
-                    <stat.icon className="w-5 h-5 text-white" />
-                  </div>
+                  <stat.icon className="w-5 h-5 text-white" />
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Tenders */}
-          <motion.div
+          <div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
+            className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-white">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-lg font-semibold text-white">
                 My Recent Tenders
               </h3>
               <button
@@ -350,17 +347,17 @@ const IssuerDashboard = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Recent Applications */}
-          <motion.div
+          <div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
+            className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-white">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-lg font-semibold text-white">
                 Recent Applications
               </h3>
               <button
@@ -371,64 +368,101 @@ const IssuerDashboard = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
-              {recentApplications.map((application) => (
-                <div
-                  key={application._id}
-                  className="p-4 bg-slate-800/50 rounded-lg hover:bg-slate-800/70 transition-all duration-300"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="text-white font-medium">
-                        {application.companyName}
-                      </h4>
-                      <p className="text-gray-400 text-sm mt-1">
-                        {application.tenderTitle}
-                      </p>
-                      <div className="flex items-center space-x-4 mt-2">
-                        <span className="text-cyan-400 text-sm">
-                          R{application.bidAmount?.toLocaleString()}
+            <div className="space-y-3">
+              {recentApplications.length === 0 ? (
+                <div className="text-center py-8">
+                  <Users className="w-10 h-10 text-gray-600 mx-auto mb-2" />
+                  <p className="text-gray-500 text-sm">No applications yet</p>
+                </div>
+              ) : (
+                recentApplications.map((application) => (
+                  <div
+                    key={application._id}
+                    className="group bg-slate-800/50 border border-cyan-400/10 rounded-xl overflow-hidden hover:bg-slate-800/70 hover:border-cyan-400/20 transition-all duration-300"
+                  >
+                    {/* Status accent bar */}
+                    <div
+                      className={`h-0.5 ${
+                        application.status === "pending"
+                          ? "bg-gradient-to-r from-yellow-400 to-amber-500"
+                          : application.status === "accepted"
+                            ? "bg-gradient-to-r from-green-400 to-emerald-500"
+                            : application.status === "rejected"
+                              ? "bg-gradient-to-r from-red-400 to-pink-500"
+                              : "bg-gradient-to-r from-gray-400 to-gray-500"
+                      }`}
+                    />
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                          <div className="w-8 h-8 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-lg flex items-center justify-center border border-cyan-400/10 flex-shrink-0">
+                            <Building className="w-4 h-4 text-cyan-400" />
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-white font-medium text-sm truncate">
+                              {application.companyName || "Unknown Company"}
+                            </h4>
+                            <p className="text-gray-500 text-xs truncate">
+                              {application.tenderTitle ||
+                                application.tender?.title ||
+                                "—"}
+                            </p>
+                          </div>
+                        </div>
+                        <span
+                          className={`px-1.5 py-0.5 text-[10px] rounded-full font-semibold flex-shrink-0 ${getStatusColor(
+                            application.status,
+                          )}`}
+                        >
+                          {application.status}
                         </span>
-                        <span className="text-gray-400 text-sm">
+                      </div>
+
+                      <div className="flex items-center space-x-3 mb-3">
+                        <span className="text-cyan-400 text-sm font-semibold">
+                          R{(application.bidAmount || 0).toLocaleString()}
+                        </span>
+                        <span className="text-gray-500 text-xs flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
                           {formatDate(
                             application.appliedAt || application.createdAt,
                           )}
                         </span>
                       </div>
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2 pt-2 border-t border-cyan-400/5">
+                        <button
+                          onClick={() => handleViewApplication(application)}
+                          className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 bg-slate-700/50 border border-cyan-400/15 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/30 transition-all duration-200 text-xs font-medium"
+                        >
+                          <Eye className="w-3 h-3" />
+                          <span>View</span>
+                        </button>
+                        <button
+                          onClick={() => navigate("/issuer/applications")}
+                          className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/20 text-white rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-200 text-xs font-medium"
+                        >
+                          <ArrowRight className="w-3 h-3" />
+                          <span>Review</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between mt-4">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                        application.status,
-                      )}`}
-                    >
-                      {application.status}
-                    </span>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleViewApplication(application)}
-                        className="text-cyan-400 hover:text-cyan-300 p-1 rounded-lg hover:bg-cyan-400/10 transition-all duration-200"
-                        title="View Application Details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Quick Actions */}
-        <motion.div
+        <div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
+          className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5"
         >
-          <h3 className="text-xl font-semibold text-white mb-6">
+          <h3 className="text-lg font-semibold text-white mb-5">
             Quick Actions
           </h3>
           <div
@@ -464,7 +498,7 @@ const IssuerDashboard = () => {
               </span>
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Modals */}

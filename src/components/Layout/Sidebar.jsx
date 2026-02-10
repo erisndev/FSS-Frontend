@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Home,
   FileText,
@@ -135,19 +134,16 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const menuItems = getMenuItems();
 
   const MobileMenuButton = () => (
-    <motion.button
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+    <button
       onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       className="fixed top-4 left-4 z-50 lg:hidden p-2 bg-gradient-to-r from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-lg shadow-2xl"
-      whileTap={{ scale: 0.95 }}
     >
       {isMobileMenuOpen ? (
         <X className="w-6 h-6 text-cyan-400" />
       ) : (
         <Menu className="w-6 h-6 text-cyan-400" />
       )}
-    </motion.button>
+    </button>
   );
 
   const SidebarContent = ({ isMobileVersion = false }) => (
@@ -196,21 +192,29 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
               <NavLink
                 key={item.name}
                 to={item.path}
-                className={`flex items-center justify-between p-3.5 md:p-3 lg:p-3 rounded-lg transition-all duration-300 group touch-manipulation min-h-[48px] ${
+                className={`relative flex items-center justify-between p-3 rounded-lg transition-all duration-200 group touch-manipulation min-h-[44px] ${
                   isActive
-                    ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 text-cyan-400"
-                    : "text-gray-300 hover:text-white hover:bg-white/5 active:bg-white/10"
+                    ? "bg-gradient-to-r from-cyan-500/15 to-purple-500/15 text-cyan-400"
+                    : "text-gray-400 hover:text-white hover:bg-white/5 active:bg-white/10"
                 }`}
               >
-                <div className="flex items-center space-x-3">
+                {/* Active indicator bar */}
+                {isActive && (
+                  <div
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-r-full"
+                  />
+                )}
+                <div className="flex items-center space-x-3 pl-1">
                   <item.icon
-                    className={`w-5 h-5 md:w-5 md:h-5 lg:w-5 lg:h-5 flex-shrink-0 ${
+                    className={`w-[18px] h-[18px] flex-shrink-0 transition-colors duration-200 ${
                       isActive
                         ? "text-cyan-400"
-                        : "text-gray-400 group-hover:text-white"
+                        : "text-gray-500 group-hover:text-gray-200"
                     }`}
                   />
-                  <span className="font-medium text-base md:text-base lg:text-base truncate">
+                  <span className={`text-sm truncate transition-colors duration-200 ${
+                    isActive ? "font-semibold" : "font-medium"
+                  }`}>
                     {item.name}
                   </span>
                 </div>
@@ -243,21 +247,14 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
       </div>
 
       {/* Mobile Sidebar */}
-      <AnimatePresence>
+      
         {isMobileMenuOpen && isMobile && (
           <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+            <div
               onClick={() => setIsMobileMenuOpen(false)}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
             />
-            <motion.div
-              initial={{ x: -300 }}
-              animate={{ x: 0 }}
-              exit={{ x: -300 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            <div
               className="fixed left-0 top-0 h-full w-full sm:w-80 sm:max-w-[85vw] bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border-r border-cyan-400/20 shadow-2xl z-50 lg:hidden"
             >
               <button
@@ -268,26 +265,19 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
                 <X className="w-5 h-5" />
               </button>
               <SidebarContent isMobileVersion={true} />
-            </motion.div>
+            </div>
           </>
         )}
-      </AnimatePresence>
+      
 
       {/* Logout Modal */}
-      <AnimatePresence>
+      
         {showLogoutModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
             onClick={() => setShowLogoutModal(false)}
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            <div
               className="bg-gradient-to-b from-slate-900 to-slate-950 border border-red-400/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
@@ -340,10 +330,10 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
                   <span>Logout</span>
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
+      
     </>
   );
 };

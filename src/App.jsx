@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
 // Landing Page
 import LandingPage from "./pages/Landing/LandingPage";
@@ -273,10 +273,95 @@ function App() {
           position="top-right"
           toastOptions={{
             duration: 4000,
-            // Adds a close button on all toasts (clicking it dismisses the toast)
-            style: { pointerEvents: "auto" },
           }}
-        />
+        >
+          {(t) => {
+            const accent =
+              t.type === "success"
+                ? {
+                    bar: "from-emerald-400 to-teal-400",
+                    border: "border-emerald-400/30",
+                    title: "text-emerald-300",
+                    icon: "✓",
+                    iconBg: "bg-emerald-500/15 border-emerald-400/30 text-emerald-300",
+                    close: "text-emerald-300 hover:text-emerald-200 focus:ring-emerald-400/40",
+                  }
+                : t.type === "error"
+                  ? {
+                      bar: "from-red-400 to-pink-400",
+                      border: "border-red-400/30",
+                      title: "text-red-300",
+                      icon: "!",
+                      iconBg: "bg-red-500/15 border-red-400/30 text-red-300",
+                      close: "text-red-300 hover:text-red-200 focus:ring-red-400/40",
+                    }
+                  : t.type === "loading"
+                    ? {
+                        bar: "from-cyan-400 to-purple-400",
+                        border: "border-cyan-400/30",
+                        title: "text-cyan-300",
+                        icon: "…",
+                        iconBg: "bg-cyan-500/15 border-cyan-400/30 text-cyan-300",
+                        close: "text-cyan-300 hover:text-cyan-200 focus:ring-cyan-400/40",
+                      }
+                    : {
+                        bar: "from-cyan-400 to-purple-400",
+                        border: "border-cyan-400/30",
+                        title: "text-cyan-300",
+                        icon: "i",
+                        iconBg: "bg-cyan-500/15 border-cyan-400/30 text-cyan-300",
+                        close: "text-cyan-300 hover:text-cyan-200 focus:ring-cyan-400/40",
+                      };
+
+            return (
+              <div
+                className={`${
+                  t.visible ? "animate-enter" : "animate-leave"
+                } max-w-md w-full bg-slate-900/95 ${accent.border} shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black/5 overflow-hidden`}
+              >
+                <div className={`w-1.5 bg-gradient-to-b ${accent.bar}`} />
+
+                <div className="flex-1 w-0 p-4">
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`w-7 h-7 rounded-full flex items-center justify-center border ${accent.iconBg} flex-shrink-0 mt-0.5`}
+                      aria-hidden="true"
+                    >
+                      <span className="text-xs font-bold">{accent.icon}</span>
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      {t.type === "success" ? (
+                        <p className={`text-sm font-semibold ${accent.title}`}>Success</p>
+                      ) : t.type === "error" ? (
+                        <p className={`text-sm font-semibold ${accent.title}`}>Error</p>
+                      ) : t.type === "loading" ? (
+                        <p className={`text-sm font-semibold ${accent.title}`}>Loading</p>
+                      ) : null}
+
+                      {typeof t.message === "string" ? (
+                        <p className="text-sm text-gray-200 whitespace-pre-line break-words">
+                          {t.message}
+                        </p>
+                      ) : (
+                        t.message
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex border-l border-white/5">
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className={`w-full rounded-none rounded-r-lg px-4 py-3 flex items-center justify-center text-sm font-medium ${accent.close} hover:bg-white/5 focus:outline-none focus:ring-2`}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            );
+          }}
+        </Toaster>
         </div>
       </AuthProvider>
     </ErrorBoundary>

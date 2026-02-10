@@ -33,7 +33,7 @@ const Profile = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [organization, setOrganization] = useState(null);
   const [loadingOrg, setLoadingOrg] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -41,19 +41,19 @@ const Profile = () => {
     company: user?.company || "",
     description: user?.description || "",
   });
-  
+
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-  
+
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
     confirm: false,
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -77,7 +77,9 @@ const Profile = () => {
   const fetchOrganization = async () => {
     try {
       setLoadingOrg(true);
-      const response = await organizationApi.getOrganization(user.organizationId);
+      const response = await organizationApi.getOrganization(
+        user.organizationId,
+      );
       setOrganization(response.organization || response);
     } catch (error) {
       console.error("Failed to fetch organization:", error);
@@ -136,7 +138,7 @@ const Profile = () => {
     try {
       await authApi.changePassword(
         passwordData.currentPassword,
-        passwordData.newPassword
+        passwordData.newPassword,
       );
       setSuccess("Password changed successfully!");
       toast.success("Password changed successfully!");
@@ -188,17 +190,13 @@ const Profile = () => {
     >
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Profile Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4 sm:p-6 md:p-8"
-        >
+        <div className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6 md:p-8">
           <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 lg:space-x-8">
             {/* Profile Picture */}
             <div className="relative">
               <div
                 className={`w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-r ${getRoleColor(
-                  user?.role
+                  user?.role,
                 )} flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-bold text-white`}
               >
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
@@ -210,11 +208,13 @@ const Profile = () => {
               <h2 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2 break-words">
                 {user?.name}
               </h2>
-              <p className="text-sm sm:text-base text-gray-400 mb-3 sm:mb-4 break-all">{user?.email}</p>
+              <p className="text-sm sm:text-base text-gray-400 mb-3 sm:mb-4 break-all">
+                {user?.email}
+              </p>
               <div className="flex flex-wrap gap-2 sm:gap-3 justify-center md:justify-start">
                 <span
                   className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm rounded-full border ${getRoleBadgeColor(
-                    user?.role
+                    user?.role,
                   )}`}
                 >
                   {user?.role}
@@ -243,9 +243,9 @@ const Profile = () => {
                 onClick={() => {
                   setIsEditing(!isEditing);
                   setTimeout(() => {
-                    editProfileRef.current?.scrollIntoView({ 
-                      behavior: 'smooth', 
-                      block: 'start' 
+                    editProfileRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
                     });
                   }, 100);
                 }}
@@ -258,9 +258,9 @@ const Profile = () => {
                 onClick={() => {
                   setIsChangingPassword(!isChangingPassword);
                   setTimeout(() => {
-                    changePasswordRef.current?.scrollIntoView({ 
-                      behavior: 'smooth', 
-                      block: 'start' 
+                    changePasswordRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
                     });
                   }, 100);
                 }}
@@ -272,7 +272,7 @@ const Profile = () => {
               </button>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Success/Error Messages */}
         {(success || error) && (
@@ -314,7 +314,10 @@ const Profile = () => {
 
             {loadingOrg ? (
               <div className="flex items-center justify-center py-8">
-                <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                <div
+                  className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full motion-safe:animate-spin
+"
+                ></div>
               </div>
             ) : organization ? (
               <div className="space-y-4">
@@ -323,7 +326,9 @@ const Profile = () => {
                     <Building2 className="w-5 h-5 text-cyan-400 mt-0.5" />
                     <div>
                       <p className="text-sm text-gray-400">Organization Name</p>
-                      <p className="text-white font-medium">{organization.companyName || user.company}</p>
+                      <p className="text-white font-medium">
+                        {organization.companyName || user.company}
+                      </p>
                     </div>
                   </div>
 
@@ -331,7 +336,9 @@ const Profile = () => {
                     <Mail className="w-5 h-5 text-cyan-400 mt-0.5" />
                     <div>
                       <p className="text-sm text-gray-400">Shared Email</p>
-                      <p className="text-white font-medium break-all">{organization.email || "N/A"}</p>
+                      <p className="text-white font-medium break-all">
+                        {organization.email || "N/A"}
+                      </p>
                     </div>
                   </div>
 
@@ -340,7 +347,9 @@ const Profile = () => {
                       <Phone className="w-5 h-5 text-cyan-400 mt-0.5" />
                       <div>
                         <p className="text-sm text-gray-400">Contact Phone</p>
-                        <p className="text-white font-medium">{organization.contactPhone}</p>
+                        <p className="text-white font-medium">
+                          {organization.contactPhone}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -349,19 +358,25 @@ const Profile = () => {
                     <Shield className="w-5 h-5 text-cyan-400 mt-0.5" />
                     <div>
                       <p className="text-sm text-gray-400">Status</p>
-                      <span className={`inline-flex items-center space-x-1 px-2 py-0.5 text-xs rounded-full ${
-                        organization.isActive !== false
-                          ? "text-green-400 bg-green-400/20 border border-green-400/30"
-                          : "text-red-400 bg-red-400/20 border border-red-400/30"
-                      }`}>
-                        {organization.isActive !== false ? "Active" : "Inactive"}
+                      <span
+                        className={`inline-flex items-center space-x-1 px-2 py-0.5 text-xs rounded-full ${
+                          organization.isActive !== false
+                            ? "text-green-400 bg-green-400/20 border border-green-400/30"
+                            : "text-red-400 bg-red-400/20 border border-red-400/30"
+                        }`}
+                      >
+                        {organization.isActive !== false
+                          ? "Active"
+                          : "Inactive"}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-400">Organization details not available</p>
+              <p className="text-gray-400">
+                Organization details not available
+              </p>
             )}
           </motion.div>
         )}
@@ -402,9 +417,11 @@ const Profile = () => {
                     ) : (
                       <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
                     )}
-                    <span className={`text-sm font-medium ${
-                      hasPermission ? "text-white" : "text-gray-400"
-                    }`}>
+                    <span
+                      className={`text-sm font-medium ${
+                        hasPermission ? "text-white" : "text-gray-400"
+                      }`}
+                    >
                       {label}
                     </span>
                   </div>
@@ -417,9 +434,12 @@ const Profile = () => {
                 <div className="flex items-start space-x-3">
                   <Info className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm text-yellow-300 font-medium mb-1">Note</p>
+                    <p className="text-sm text-yellow-300 font-medium mb-1">
+                      Note
+                    </p>
                     <p className="text-sm text-gray-300">
-                      Your permissions are managed by your team leader. Contact them if you need additional access.
+                      Your permissions are managed by your team leader. Contact
+                      them if you need additional access.
                     </p>
                   </div>
                 </div>
@@ -429,11 +449,7 @@ const Profile = () => {
         )}
 
         {/* Login Information Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4 sm:p-6 md:p-8"
-        >
+        <div className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6 md:p-8">
           <h3 className="text-lg sm:text-xl font-semibold text-white mb-6 flex items-center space-x-2">
             <Lock className="w-5 h-5 text-cyan-400" />
             <span>Login Information</span>
@@ -445,7 +461,9 @@ const Profile = () => {
               <div>
                 <p className="text-sm text-gray-400">Login Method</p>
                 <p className="text-white font-medium">
-                  {isPartOfOrganization ? "Organization Login" : "Standard Login"}
+                  {isPartOfOrganization
+                    ? "Organization Login"
+                    : "Standard Login"}
                 </p>
               </div>
             </div>
@@ -455,7 +473,9 @@ const Profile = () => {
               <div>
                 <p className="text-sm text-gray-400">Login Email</p>
                 <p className="text-white font-medium break-all">
-                  {isPartOfOrganization ? (organization?.email || "Loading...") : user?.email}
+                  {isPartOfOrganization
+                    ? organization?.email || "Loading..."
+                    : user?.email}
                 </p>
               </div>
             </div>
@@ -465,11 +485,21 @@ const Profile = () => {
                 <div className="flex items-start space-x-3">
                   <Info className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm text-cyan-300 font-medium mb-2">How to login:</p>
+                    <p className="text-sm text-cyan-300 font-medium mb-2">
+                      How to login:
+                    </p>
                     <ol className="text-sm text-gray-300 space-y-1 list-decimal list-inside">
                       <li>Go to Organization Login page</li>
-                      <li>Enter: <code className="px-2 py-0.5 bg-slate-800 rounded text-cyan-400">{organization?.email || "organization email"}</code></li>
-                      <li>Select your name: <strong className="text-white">{user?.name}</strong></li>
+                      <li>
+                        Enter:{" "}
+                        <code className="px-2 py-0.5 bg-slate-800 rounded text-cyan-400">
+                          {organization?.email || "organization email"}
+                        </code>
+                      </li>
+                      <li>
+                        Select your name:{" "}
+                        <strong className="text-white">{user?.name}</strong>
+                      </li>
                       <li>Enter your password</li>
                     </ol>
                   </div>
@@ -477,7 +507,7 @@ const Profile = () => {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* Edit Profile Form */}
         {isEditing && (
@@ -488,7 +518,9 @@ const Profile = () => {
             className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4 sm:p-6 md:p-8"
           >
             <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h3 className="text-lg sm:text-xl font-semibold text-white">Edit Profile</h3>
+              <h3 className="text-lg sm:text-xl font-semibold text-white">
+                Edit Profile
+              </h3>
               <button
                 onClick={() => setIsEditing(false)}
                 className="text-gray-400 hover:text-white transition-colors duration-200 p-1 hover:bg-white/10 rounded-lg"
@@ -497,7 +529,10 @@ const Profile = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSaveProfile} className="space-y-4 sm:space-y-6">
+            <form
+              onSubmit={handleSaveProfile}
+              className="space-y-4 sm:space-y-6"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {/* Full Name */}
                 <div>
@@ -533,7 +568,9 @@ const Profile = () => {
                       placeholder="Enter your email"
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Email cannot be changed
+                  </p>
                 </div>
 
                 {/* Phone */}
@@ -596,7 +633,10 @@ const Profile = () => {
                   className="flex items-center justify-center space-x-2 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
                   {loading ? (
-                    <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div
+                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full motion-safe:animate-spin
+"
+                    ></div>
                   ) : (
                     <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   )}
@@ -627,15 +667,18 @@ const Profile = () => {
               </button>
             </div>
 
-            <form onSubmit={handleChangePassword} className="space-y-4 sm:space-y-6">
+            <form
+              onSubmit={handleChangePassword}
+              className="space-y-4 sm:space-y-6"
+            >
               {["current", "new", "confirm"].map((type, index) => (
                 <div key={index}>
                   <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
                     {type === "current"
                       ? "Current Password"
                       : type === "new"
-                      ? "New Password"
-                      : "Confirm New Password"}
+                        ? "New Password"
+                        : "Confirm New Password"}
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
@@ -645,15 +688,15 @@ const Profile = () => {
                         type === "current"
                           ? "currentPassword"
                           : type === "new"
-                          ? "newPassword"
-                          : "confirmPassword"
+                            ? "newPassword"
+                            : "confirmPassword"
                       }
                       value={
                         type === "current"
                           ? passwordData.currentPassword
                           : type === "new"
-                          ? passwordData.newPassword
-                          : passwordData.confirmPassword
+                            ? passwordData.newPassword
+                            : passwordData.confirmPassword
                       }
                       onChange={handlePasswordChange}
                       required
@@ -662,8 +705,8 @@ const Profile = () => {
                         type === "current"
                           ? "Enter current password"
                           : type === "new"
-                          ? "Enter new password"
-                          : "Confirm new password"
+                            ? "Enter new password"
+                            : "Confirm new password"
                       }
                     />
                     <button
@@ -700,7 +743,10 @@ const Profile = () => {
                   className="flex items-center justify-center space-x-2 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
                   {loading ? (
-                    <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div
+                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full motion-safe:animate-spin
+"
+                    ></div>
                   ) : (
                     <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   )}

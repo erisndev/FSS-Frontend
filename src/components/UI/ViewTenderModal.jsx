@@ -1,5 +1,4 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   AlertCircle,
@@ -12,6 +11,7 @@ import {
   File,
 } from "lucide-react";
 import { format } from "date-fns";
+import { ISSUER_ISSUED_DOCUMENTS } from "../../constants/documents";
 
 const ViewTenderModal = ({ isOpen, onClose, tender }) => {
   if (!isOpen || !tender) return null;
@@ -55,20 +55,13 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
   };
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+    
+      <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
         onClick={onClose}
       >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          transition={{ type: "spring", damping: 20, stiffness: 300 }}
-          className="bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 max-w-4xl w-full max-h-[95vh] sm:max-h-[92vh] overflow-y-auto custom-scrollbar shadow-2xl"
+        <div
+          className="bg-gradient-to-b from-slate-900 to-slate-950 border border-white/[0.08] rounded-2xl p-4 sm:p-6 md:p-8 max-w-4xl w-full max-h-[95vh] sm:max-h-[92vh] overflow-y-auto custom-scrollbar shadow-2xl shadow-black/40"
           onClick={(e) => e.stopPropagation()}
         >
         {/* Header */}
@@ -103,10 +96,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
 
         {/* Description */}
         {tender.description && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+          <div
             className="mb-4 sm:mb-6 md:mb-8"
           >
             <h4 className="text-base sm:text-lg font-semibold text-cyan-400 mb-2 sm:mb-3">
@@ -117,14 +107,11 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                 {tender.description}
               </p>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Core Information */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+        <div
           className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8"
         >
           {/* Basic Details */}
@@ -220,13 +207,10 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Contact & Metadata */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+        <div
           className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8"
         >
           {/* Contact Information */}
@@ -318,14 +302,11 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Requirements */}
         {tender.requirements && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+          <div
             className="mb-4 sm:mb-6 md:mb-8"
           >
             <h4 className="text-base sm:text-lg font-semibold text-cyan-400 mb-2 sm:mb-3">
@@ -349,15 +330,12 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                 </p>
               )}
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Tags */}
         {tender.tags?.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+          <div
             className="mb-4 sm:mb-6 md:mb-8"
           >
             <h4 className="text-base sm:text-lg font-semibold text-cyan-400 mb-2 sm:mb-3">
@@ -373,7 +351,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                 </span>
               ))}
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Documents */}
@@ -383,10 +361,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
           tender.documents?.financialDocuments || 
           tender.documents?.technicalProposal || 
           tender.documents?.proofOfExperience) && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+          <div
             className="mb-2 sm:mb-4"
           >
             <div className="flex items-center space-x-2 mb-4">
@@ -395,7 +370,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
               </div>
               <div>
                 <h4 className="text-base sm:text-lg font-semibold text-white">
-                  Required Documents
+                  Issuer Issued Documents
                 </h4>
                 <p className="text-xs text-gray-400">
                   Download tender documentation
@@ -407,8 +382,9 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
               {Array.isArray(tender.documents) && tender.documents.length > 0 && tender.documents[0]?.label ? (
                 // New format: Array with label property
                 <>
-                  {/* Always show these 5 required document labels */}
-                  {['Bid File Documents', 'Compiled Documents', 'Financial Documents', 'Technical Proposal', 'Proof of Experience (Reference Letter)'].map((requiredLabel, index) => {
+                  {/* Always show the issuer-issued document labels */}
+                  {ISSUER_ISSUED_DOCUMENTS.map((def, index) => {
+                    const requiredLabel = def.label;
                     const doc = tender.documents.find(d => d.label === requiredLabel);
                     const getFileExtension = (filename) => {
                       if (!filename) return 'file';
@@ -433,11 +409,8 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                     };
                     
                     return (
-                      <motion.div 
+                      <div 
                         key={requiredLabel}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 * index }}
                         className="group"
                       >
                         <div className="flex items-center space-x-2 mb-2">
@@ -505,206 +478,60 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                             </div>
                           </div>
                         )}
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </>
               ) : tender.documents && typeof tender.documents === 'object' && !Array.isArray(tender.documents) ? (
                 <>
-                  {/* Bid File Documents */}
-                  {tender.documents.bidFileDocuments && (
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-                        Bid File Documents
-                      </label>
-                      <div className="flex items-center justify-between gap-2 p-3 sm:p-4 bg-slate-800/30 border border-cyan-400/10 rounded-lg hover:bg-slate-800/50 transition-all duration-200">
-                        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs sm:text-sm text-white font-medium truncate">
-                              {typeof tender.documents.bidFileDocuments === 'string' 
-                                ? tender.documents.bidFileDocuments.split('/').pop() 
-                                : tender.documents.bidFileDocuments.name || 'Bid File Documents'}
-                            </p>
-                            {tender.documents.bidFileDocuments.size && (
-                              <p className="text-xs text-gray-400">
-                                {formatFileSize(tender.documents.bidFileDocuments.size)}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <a
-                          href={typeof tender.documents.bidFileDocuments === 'string' 
-                            ? tender.documents.bidFileDocuments 
-                            : tender.documents.bidFileDocuments.url}
-                          target="_blank"
-                          download={true}
-                          rel="noopener noreferrer"
-                          className="px-2 sm:px-4 py-1.5 sm:py-2 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 hover:border-cyan-400/50 transition-all duration-200 text-xs sm:text-sm font-medium flex-shrink-0"
-                        >
-                          Download
-                        </a>
-                      </div>
-                    </div>
-                  )}
+                  {ISSUER_ISSUED_DOCUMENTS.map((def) => {
+                    const docValue = tender.documents?.[def.key];
+                    if (!docValue) return null;
 
-                  {/* Compiled Documents */}
-                  {tender.documents.compiledDocuments && (
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-                        Compiled Documents
-                      </label>
-                      <div className="flex items-center justify-between gap-2 p-3 sm:p-4 bg-slate-800/30 border border-cyan-400/10 rounded-lg hover:bg-slate-800/50 transition-all duration-200">
-                        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs sm:text-sm text-white font-medium truncate">
-                              {typeof tender.documents.compiledDocuments === 'string' 
-                                ? tender.documents.compiledDocuments.split('/').pop() 
-                                : tender.documents.compiledDocuments.name || 'Compiled Documents'}
-                            </p>
-                            {tender.documents.compiledDocuments.size && (
-                              <p className="text-xs text-gray-400">
-                                {formatFileSize(tender.documents.compiledDocuments.size)}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <a
-                          href={typeof tender.documents.compiledDocuments === 'string' 
-                            ? tender.documents.compiledDocuments 
-                            : tender.documents.compiledDocuments.url}
-                          target="_blank"
-                          download={true}
-                          rel="noopener noreferrer"
-                          className="px-2 sm:px-4 py-1.5 sm:py-2 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 hover:border-cyan-400/50 transition-all duration-200 text-xs sm:text-sm font-medium flex-shrink-0"
-                        >
-                          Download
-                        </a>
-                      </div>
-                    </div>
-                  )}
+                    const name =
+                      typeof docValue === "string"
+                        ? docValue.split("/").pop()
+                        : docValue.name || def.label;
+                    const size = typeof docValue === "object" ? docValue.size : undefined;
+                    const url =
+                      typeof docValue === "string" ? docValue : docValue.url;
 
-                  {/* Financial Documents */}
-                  {tender.documents.financialDocuments && (
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-                        Financial Documents
-                      </label>
-                      <div className="flex items-center justify-between gap-2 p-3 sm:p-4 bg-slate-800/30 border border-cyan-400/10 rounded-lg hover:bg-slate-800/50 transition-all duration-200">
-                        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs sm:text-sm text-white font-medium truncate">
-                              {typeof tender.documents.financialDocuments === 'string' 
-                                ? tender.documents.financialDocuments.split('/').pop() 
-                                : tender.documents.financialDocuments.name || 'Financial Documents'}
-                            </p>
-                            {tender.documents.financialDocuments.size && (
-                              <p className="text-xs text-gray-400">
-                                {formatFileSize(tender.documents.financialDocuments.size)}
+                    return (
+                      <div key={def.key}>
+                        <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                          {def.label}
+                        </label>
+                        <div className="flex items-center justify-between gap-2 p-3 sm:p-4 bg-slate-800/30 border border-cyan-400/10 rounded-lg hover:bg-slate-800/50 transition-all duration-200">
+                          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm text-white font-medium truncate">
+                                {name}
                               </p>
-                            )}
+                              {size && (
+                                <p className="text-xs text-gray-400">
+                                  {formatFileSize(size)}
+                                </p>
+                              )}
+                            </div>
                           </div>
+                          {url && (
+                            <a
+                              href={url}
+                              target="_blank"
+                              download={true}
+                              rel="noopener noreferrer"
+                              className="px-2 sm:px-4 py-1.5 sm:py-2 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 hover:border-cyan-400/50 transition-all duration-200 text-xs sm:text-sm font-medium flex-shrink-0"
+                            >
+                              Download
+                            </a>
+                          )}
                         </div>
-                        <a
-                          href={typeof tender.documents.financialDocuments === 'string' 
-                            ? tender.documents.financialDocuments 
-                            : tender.documents.financialDocuments.url}
-                          target="_blank"
-                          download={true}
-                          rel="noopener noreferrer"
-                          className="px-2 sm:px-4 py-1.5 sm:py-2 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 hover:border-cyan-400/50 transition-all duration-200 text-xs sm:text-sm font-medium flex-shrink-0"
-                        >
-                          Download
-                        </a>
                       </div>
-                    </div>
-                  )}
-
-                  {/* Technical Proposal */}
-                  {tender.documents.technicalProposal && (
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-                        Technical Proposal
-                      </label>
-                      <div className="flex items-center justify-between gap-2 p-3 sm:p-4 bg-slate-800/30 border border-cyan-400/10 rounded-lg hover:bg-slate-800/50 transition-all duration-200">
-                        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs sm:text-sm text-white font-medium truncate">
-                              {typeof tender.documents.technicalProposal === 'string' 
-                                ? tender.documents.technicalProposal.split('/').pop() 
-                                : tender.documents.technicalProposal.name || 'Technical Proposal'}
-                            </p>
-                            {tender.documents.technicalProposal.size && (
-                              <p className="text-xs text-gray-400">
-                                {formatFileSize(tender.documents.technicalProposal.size)}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <a
-                          href={typeof tender.documents.technicalProposal === 'string' 
-                            ? tender.documents.technicalProposal 
-                            : tender.documents.technicalProposal.url}
-                          target="_blank"
-                          download={true}
-                          rel="noopener noreferrer"
-                          className="px-2 sm:px-4 py-1.5 sm:py-2 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 hover:border-cyan-400/50 transition-all duration-200 text-xs sm:text-sm font-medium flex-shrink-0"
-                        >
-                          Download
-                        </a>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Proof of Experience */}
-                  {tender.documents.proofOfExperience && (
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-                        Proof of Experience (Reference Letter)
-                      </label>
-                      <div className="flex items-center justify-between gap-2 p-3 sm:p-4 bg-slate-800/30 border border-cyan-400/10 rounded-lg hover:bg-slate-800/50 transition-all duration-200">
-                        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs sm:text-sm text-white font-medium truncate">
-                              {typeof tender.documents.proofOfExperience === 'string' 
-                                ? tender.documents.proofOfExperience.split('/').pop() 
-                                : tender.documents.proofOfExperience.name || 'Proof of Experience'}
-                            </p>
-                            {tender.documents.proofOfExperience.size && (
-                              <p className="text-xs text-gray-400">
-                                {formatFileSize(tender.documents.proofOfExperience.size)}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <a
-                          href={typeof tender.documents.proofOfExperience === 'string' 
-                            ? tender.documents.proofOfExperience 
-                            : tender.documents.proofOfExperience.url}
-                          target="_blank"
-                          download={true}
-                          rel="noopener noreferrer"
-                          className="px-2 sm:px-4 py-1.5 sm:py-2 bg-cyan-500/20 border border-cyan-400/30 text-cyan-400 rounded-lg hover:bg-cyan-500/30 hover:border-cyan-400/50 transition-all duration-200 text-xs sm:text-sm font-medium flex-shrink-0"
-                        >
-                          Download
-                        </a>
-                      </div>
-                    </div>
-                  )}
+                    );
+                  })}
                 </>
               ) : (
                 /* Fallback for old array format */
@@ -754,7 +581,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                 })
               )}
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Custom scrollbar styles */}
@@ -774,9 +601,9 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
             background: linear-gradient(to bottom, #0891b2, #9333ea);
           }
         `}</style>
-      </motion.div>
-    </motion.div>
-    </AnimatePresence>
+      </div>
+    </div>
+    
   );
 };
 

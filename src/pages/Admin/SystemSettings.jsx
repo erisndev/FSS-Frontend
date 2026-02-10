@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import {
   Settings,
   Save,
@@ -549,9 +548,7 @@ const SystemSettings = () => {
       <div className="space-y-6">
         {/* Success/Error Messages */}
         {(success || error) && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
+          <div
             className={`p-4 rounded-lg border flex items-center space-x-2 ${
               success
                 ? "bg-green-500/20 border-green-400/50 text-green-300"
@@ -564,16 +561,12 @@ const SystemSettings = () => {
               <AlertTriangle className="w-5 h-5" />
             )}
             <span>{success || error}</span>
-          </motion.div>
+          </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-1"
-          >
+          <div className="lg:col-span-1">
             <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4">
               <nav className="space-y-2">
                 {tabs.map((tab) => (
@@ -592,14 +585,10 @@ const SystemSettings = () => {
                 ))}
               </nav>
             </div>
-          </motion.div>
+          </div>
 
           {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-3"
-          >
+          <div className="lg:col-span-3">
             <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8">
               <div className="flex items-center justify-between mb-8">
                 <h3 className="text-xl font-semibold text-white">
@@ -611,7 +600,10 @@ const SystemSettings = () => {
                   className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
                   {loading ? (
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <RefreshCw
+                      className="w-4 h-4 motion-safe:animate-spin
+"
+                    />
                   ) : (
                     <Save className="w-4 h-4" />
                   )}
@@ -621,7 +613,7 @@ const SystemSettings = () => {
 
               {renderTabContent()}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </DashboardLayout>

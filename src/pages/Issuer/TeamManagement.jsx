@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import {
   Users,
   Activity,
@@ -32,6 +33,7 @@ const TeamManagement = () => {
   const { user, isTeamLeader } = useAuth();
   const [activeTab, setActiveTab] = useState("members");
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
   const [teamMembers, setTeamMembers] = useState([]);
   const [pendingInvitations, setPendingInvitations] = useState([]);
   const [activities, setActivities] = useState([]);
@@ -267,7 +269,7 @@ const TeamManagement = () => {
         <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-3 sm:p-4 md:p-6">
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+              <LoadingSpinner variant="section" />
             </div>
           ) : (
             <>
@@ -413,15 +415,13 @@ const TeamMembersTab = ({
           <h2 className="text-lg sm:text-xl font-bold text-white">
             Team Members ({allMembers.length})
           </h2>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             onClick={onInvite}
             className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-200 text-sm sm:text-base w-full sm:w-auto justify-center"
           >
             <UserPlus className="w-4 h-4" />
             <span>Invite Member</span>
-          </motion.button>
+          </button>
         </div>
 
         {allMembers.length === 0 ? (
@@ -474,15 +474,13 @@ const ActivityLogTab = ({
     <div className="space-y-3 sm:space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <h2 className="text-lg sm:text-xl font-bold text-white">Activity Log</h2>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        <button
           onClick={onExport}
           className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-200 text-sm sm:text-base w-full sm:w-auto justify-center"
         >
           <Download className="w-4 h-4" />
           <span>Export CSV</span>
-        </motion.button>
+        </button>
       </div>
 
       {/* Filters */}
@@ -610,15 +608,13 @@ const OrganizationSettingsTab = ({ organization, onUpdate }) => {
           </div>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           type="submit"
           disabled={saving}
           className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 disabled:opacity-50 transition-all duration-200"
         >
           {saving ? "Saving..." : "Save Changes"}
-        </motion.button>
+        </button>
       </form>
     </div>
   );

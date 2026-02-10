@@ -1,17 +1,20 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { Inbox } from "lucide-react";
 
-const EmptyState = ({ icon: Icon, title, description }) => {
+const EmptyState = ({ icon: Icon = Inbox, title, description, action }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="text-center py-12"
+    <div
+      className="flex flex-col items-center justify-center py-16 px-6"
     >
-      <Icon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
-      <p className="text-gray-400">{description}</p>
-    </motion.div>
+      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-white/[0.06] flex items-center justify-center mb-5">
+        <Icon className="w-9 h-9 text-gray-500" />
+      </div>
+      <h3 className="text-lg font-semibold text-white mb-1.5">{title}</h3>
+      <p className="text-gray-500 text-sm text-center max-w-sm leading-relaxed">
+        {description}
+      </p>
+      {action && <div className="mt-5">{action}</div>}
+    </div>
   );
 };
 

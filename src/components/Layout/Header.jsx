@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Bell, X, FileText, User, LogOut } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { notificationApi } from "../../services/api";
@@ -250,13 +249,9 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
       </button>
 
       {/* Dropdown */}
-      <AnimatePresence mode="wait">
+      
         {notifOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
+          <div
             ref={notifMenuRef}
             className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto lg:mt-2 w-80 sm:w-96 z-[9999]"
             style={{ pointerEvents: "auto" }}
@@ -350,9 +345,9 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
                 </button>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      
     </div>
   );
 
@@ -372,13 +367,9 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
       </button>
 
       {/* Dropdown */}
-      <AnimatePresence mode="wait">
+      
         {userMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
+          <div
             ref={userMenuRef}
             className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto lg:mt-2 w-72 z-[9999]"
             style={{ pointerEvents: "auto" }}
@@ -426,23 +417,21 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
                 </button>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      
     </div>
   );
 
   return (
     <>
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <header
         onClick={() => {
           if (isMobile && isMobileMenuOpen) {
             setIsMobileMenuOpen(false);
           }
         }}
-        className={`relative lg:sticky lg:top-0 z-40 bg-gradient-to-r from-slate-800/50 to-purple-900/30 backdrop-blur-xl border-b border-cyan-400/20 p-3 sm:p-4 lg:p-6 transition-all duration-300 ${
+        className={`relative lg:sticky lg:top-0 z-40 bg-slate-900/70 backdrop-blur-xl border-b border-white/[0.06] p-3 sm:p-4 lg:px-8 lg:py-5 transition-all duration-300 ${
           isMobile && isMobileMenuOpen
             ? "blur-sm pointer-events-auto cursor-pointer"
             : ""
@@ -457,10 +446,7 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
               <div className="w-10 h-10 flex-shrink-0"></div>
 
               {/* User Info - Compact on mobile */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
+              <div
                 className="flex items-center space-x-2"
               >
                 {/* Notifications - Mobile */}
@@ -468,28 +454,22 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
                 {/* User Menu - Mobile */}
                 <UserMenu />
-              </motion.div>
+              </div>
             </div>
 
             {/* Title row */}
             <div className="text-center">
-              <motion.h1
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
+              <h1
                 className="text-xl font-bold text-white"
               >
                 {title}
-              </motion.h1>
+              </h1>
               {subtitle && (
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
+                <p
                   className="text-cyan-400/70 mt-1 text-sm"
                 >
                   {subtitle}
-                </motion.p>
+                </p>
               )}
             </div>
           </div>
@@ -497,23 +477,17 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
           /* Desktop Layout */
           <div className="flex items-center justify-between">
             <div>
-              <motion.h1
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
+              <h1
                 className="text-2xl font-bold text-white"
               >
                 {title}
-              </motion.h1>
+              </h1>
               {subtitle && (
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
+                <p
                   className="text-cyan-400/70 mt-1"
                 >
                   {subtitle}
-                </motion.p>
+                </p>
               )}
             </div>
             <div className="flex items-center space-x-4">
@@ -521,33 +495,23 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
               <NotificationBell />
 
               {/* User Menu - Desktop */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
+              <div
               >
                 <UserMenu />
-              </motion.div>
+              </div>
             </div>
           </div>
         )}
-      </motion.header>
+      </header>
 
       {/* Logout Confirmation Modal */}
-      <AnimatePresence>
+      
         {showLogoutModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
             onClick={() => setShowLogoutModal(false)}
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            <div
               className="bg-gradient-to-b from-slate-900 to-slate-950 border border-red-400/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
@@ -598,10 +562,10 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
                   <span>Logout</span>
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
+      
     </>
   );
 };

@@ -1,14 +1,11 @@
 import React from "react";
-import { motion } from "framer-motion";
 import { Mail, Send, X as XIcon } from "lucide-react";
 
 const PendingInvitationCard = ({ invitation, onResend, onCancel }) => {
   const isExpired = new Date(invitation.expiresAt) < new Date();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className={`bg-slate-800/50 border rounded-lg p-4 ${
         isExpired ? "border-red-400/20" : "border-yellow-400/20"
       }`}
@@ -40,27 +37,23 @@ const PendingInvitationCard = ({ invitation, onResend, onCancel }) => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+          <button
             onClick={() => onResend(invitation._id)}
             className="p-2 text-cyan-400 hover:bg-cyan-400/10 rounded-lg transition-colors"
             title="Resend Invitation"
           >
             <Send className="w-4 h-4" />
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+          </button>
+          <button
             onClick={() => onCancel(invitation._id)}
             className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
             title="Cancel Invitation"
           >
             <XIcon className="w-4 h-4" />
-          </motion.button>
+          </button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

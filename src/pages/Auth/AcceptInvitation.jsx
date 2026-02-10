@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
   Shield,
   Lock,
@@ -20,6 +21,7 @@ const AcceptInvitation = () => {
   const { token } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
   const [submitting, setSubmitting] = useState(false);
   const [invitationData, setInvitationData] = useState(null);
   const [error, setError] = useState("");
@@ -130,10 +132,10 @@ const AcceptInvitation = () => {
     }
   };
 
-  if (loading) {
+  if (showLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+        <LoadingSpinner variant="section" />
       </div>
     );
   }
@@ -141,9 +143,7 @@ const AcceptInvitation = () => {
   if (error && !invitationData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="max-w-md w-full bg-white/5 backdrop-blur-xl border border-red-400/20 rounded-2xl p-8 text-center"
         >
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
@@ -155,7 +155,7 @@ const AcceptInvitation = () => {
           >
             Go to Login
           </Link>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -163,9 +163,7 @@ const AcceptInvitation = () => {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+        <div
           className="max-w-2xl w-full bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8"
         >
           <div className="text-center mb-8">
@@ -231,7 +229,7 @@ const AcceptInvitation = () => {
               Go to Login Now
             </Link>
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -240,9 +238,7 @@ const AcceptInvitation = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="max-w-md w-full space-y-6"
       >
         {/* Header */}
@@ -264,13 +260,11 @@ const AcceptInvitation = () => {
         <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+              <div
                 className="bg-red-500/20 border border-red-400/50 rounded-lg p-3 text-red-300 text-sm"
               >
                 {error}
-              </motion.div>
+              </div>
             )}
 
             {/* Password Field */}
@@ -359,22 +353,20 @@ const AcceptInvitation = () => {
             </div>
 
             {/* Submit Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               type="submit"
               disabled={submitting}
               className="w-full py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             >
               {submitting ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <LoadingSpinner variant="inline" size="sm" color="white" />
                   <span>Accepting Invitation...</span>
                 </div>
               ) : (
                 "Accept & Join Team"
               )}
-            </motion.button>
+            </button>
           </form>
         </div>
 
@@ -391,7 +383,7 @@ const AcceptInvitation = () => {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

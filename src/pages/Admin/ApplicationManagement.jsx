@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import {
   Users,
   Eye,
@@ -32,6 +33,7 @@ const ApplicationManagement = () => {
   const [applications, setApplications] = useState([]);
   const [tenders, setTenders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [tenderFilter, setTenderFilter] = useState("");
@@ -143,14 +145,14 @@ const ApplicationManagement = () => {
     return matchesSearch && matchesStatus && matchesTender;
   });
 
-  if (loading) {
+  if (showLoading) {
     return (
       <DashboardLayout
         title="Application Management"
         subtitle="Manage all system applications"
       >
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <LoadingSpinner variant="section" />
         </div>
       </DashboardLayout>
     );
@@ -163,9 +165,7 @@ const ApplicationManagement = () => {
     >
       <div className="space-y-6">
         {/* Header Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0"
         >
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 flex-1">
@@ -216,12 +216,10 @@ const ApplicationManagement = () => {
               </select>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Applications Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl overflow-hidden"
         >
           <div className="overflow-x-auto">
@@ -250,11 +248,8 @@ const ApplicationManagement = () => {
               </thead>
               <tbody className="divide-y divide-cyan-400/10">
                 {filteredApplications.map((application, index) => (
-                  <motion.tr
+                  <tr
                     key={application._id || application.id || index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
                     className="hover:bg-slate-800/30 transition-all duration-300"
                   >
                     <td className="px-6 py-4">
@@ -309,7 +304,7 @@ const ApplicationManagement = () => {
                         </button>
                       </div>
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))}
               </tbody>
             </table>
@@ -328,7 +323,7 @@ const ApplicationManagement = () => {
               </p>
             </div>
           )}
-        </motion.div>
+        </div>
 
         {/* Modal */}
         <ApplicationModal

@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import LoadingSpinner from "./LoadingSpinner";
 import { Send, X, AlertCircle, CheckCircle2 } from "lucide-react";
 
 const ConfirmSubmitModal = ({
@@ -13,21 +13,14 @@ const ConfirmSubmitModal = ({
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+    
+      <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
         onClick={() => {
           if (!isLoading) onClose();
         }}
       >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+        <div
           className="bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
@@ -104,7 +97,7 @@ const ConfirmSubmitModal = ({
             >
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <LoadingSpinner variant="inline" size="sm" color="white" />
                   <span>Submitting...</span>
                 </>
               ) : (
@@ -115,9 +108,9 @@ const ConfirmSubmitModal = ({
               )}
             </button>
           </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </div>
+      </div>
+    
   );
 };
 

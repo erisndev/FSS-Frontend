@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import {
   Users,
   FileText,
@@ -29,6 +30,7 @@ const AdminDashboard = () => {
   const [recentTenders, setRecentTenders] = useState([]);
   const [recentApplications, setRecentApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
 
   const navigate = useNavigate();
 
@@ -163,14 +165,14 @@ const AdminDashboard = () => {
     },
   ];
 
-  if (loading) {
+  if (showLoading) {
     return (
       <DashboardLayout
         title="Admin Dashboard"
         subtitle="System overview and management"
       >
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <LoadingSpinner variant="section" />
         </div>
       </DashboardLayout>
     );
@@ -185,11 +187,8 @@ const AdminDashboard = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {statCards.map((stat, index) => (
-            <motion.div
+            <div
               key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
               className={`${stat.bgColor} backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:shadow-lg hover:shadow-cyan-400/10 transition-all duration-300 group`}
             >
               <div className="flex items-start justify-between">
@@ -211,16 +210,13 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Users */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
+          <div
             className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
           >
             <div className="flex items-center justify-between mb-6">
@@ -269,13 +265,10 @@ const AdminDashboard = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Recent Tenders */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
+          <div
             className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
           >
             <div className="flex items-center justify-between mb-6">
@@ -338,14 +331,11 @@ const AdminDashboard = () => {
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* System Health */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
         >
           <h3 className="text-xl font-semibold text-white mb-6">
@@ -381,13 +371,10 @@ const AdminDashboard = () => {
               <p className="text-yellow-400 text-sm">Excellent</p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
         >
           <h3 className="text-xl font-semibold text-white mb-6">
@@ -423,7 +410,7 @@ const AdminDashboard = () => {
               <span className="text-white font-medium">View Applications</span>
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     </DashboardLayout>
   );

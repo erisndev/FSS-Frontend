@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield,
   Mail,
@@ -105,23 +105,18 @@ const TeamLogin = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+        <LoadingSpinner variant="section" />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-3 sm:p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="max-w-md w-full space-y-6 sm:space-y-8"
       >
         {/* Logo and Title */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <div
           className="text-center"
         >
           <div className="flex justify-center">
@@ -153,23 +148,17 @@ const TeamLogin = () => {
               />
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* Login Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-2xl p-5 sm:p-8 shadow-2xl"
         >
-          <AnimatePresence mode="wait">
+          
             {/* Step 1: Email Input */}
             {step === 1 && (
-              <motion.form
+              <form
                 key="step1"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
                 onSubmit={handleEmailSubmit}
                 className="space-y-4 sm:space-y-6"
               >
@@ -196,32 +185,27 @@ const TeamLogin = () => {
                   </div>
                 </div>
 
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <button
                   type="submit"
                   disabled={isLoading}
                   className="w-full py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center space-x-2">
-                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <LoadingSpinner variant="inline" size="sm" color="white" />
                       <span>Checking...</span>
                     </div>
                   ) : (
                     "Continue"
                   )}
-                </motion.button>
-              </motion.form>
+                </button>
+              </form>
             )}
 
             {/* Step 2: Member Selection */}
             {step === 2 && organizationData && (
-              <motion.div
+              <div
                 key="step2"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
                 className="space-y-4"
               >
                 <button
@@ -243,10 +227,8 @@ const TeamLogin = () => {
 
                 <div className="space-y-3">
                   {organizationData.members.map((member) => (
-                    <motion.button
+                    <button
                       key={member.id}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleMemberSelect(member)}
                       className="w-full p-4 bg-slate-800/50 border border-cyan-400/20 rounded-lg hover:border-cyan-400/50 hover:bg-slate-800/70 transition-all duration-300 text-left"
                     >
@@ -271,19 +253,16 @@ const TeamLogin = () => {
                         </div>
                         <CheckCircle className="w-5 h-5 text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                    </motion.button>
+                    </button>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Step 3: Password Input */}
             {step === 3 && selectedMember && (
-              <motion.form
+              <form
                 key="step3"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
                 onSubmit={handlePasswordSubmit}
                 className="space-y-4 sm:space-y-6"
               >
@@ -345,25 +324,23 @@ const TeamLogin = () => {
                   </div>
                 </div>
 
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <button
                   type="submit"
                   disabled={isLoading}
                   className="w-full py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center space-x-2">
-                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <LoadingSpinner variant="inline" size="sm" color="white" />
                       <span>Signing In...</span>
                     </div>
                   ) : (
                     "Sign In"
                   )}
-                </motion.button>
-              </motion.form>
+                </button>
+              </form>
             )}
-          </AnimatePresence>
+          
 
           {/* Links */}
           {step === 1 && (
@@ -385,8 +362,8 @@ const TeamLogin = () => {
               </p>
             </div>
           )}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 };

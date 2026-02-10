@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
   Shield,
   Mail,
@@ -155,23 +155,18 @@ const Register = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+        <LoadingSpinner variant="section" />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-3 sm:p-4 py-6 sm:py-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="max-w-md w-full space-y-4 sm:space-y-6 md:space-y-8"
       >
         {/* Logo and Title */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <div
           className="text-center"
         >
           <div className="flex justify-center">
@@ -185,13 +180,10 @@ const Register = () => {
           <p className="text-cyan-400/70 mt-1 sm:mt-2 text-sm sm:text-base">
             Join TenderFlow System
           </p>
-        </motion.div>
+        </div>
 
         {/* Register Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl"
         >
           <form
@@ -199,13 +191,11 @@ const Register = () => {
             className="space-y-3 sm:space-y-4 md:space-y-5"
           >
             {/* {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+              <div
                 className="bg-red-500/20 border border-red-400/50 rounded-lg p-2 sm:p-2.5 md:p-3 text-red-300 text-xs sm:text-sm break-words"
               >
                 {error}
-              </motion.div>
+              </div>
             )} */}
 
             {/* Name Field */}
@@ -370,22 +360,20 @@ const Register = () => {
             </div>
 
             {/* Submit Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               type="submit"
               disabled={isLoading}
               className="w-full py-2 sm:py-2.5 md:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <LoadingSpinner variant="inline" size="sm" color="white" />
                   <span>Creating Account...</span>
                 </div>
               ) : (
                 "Create Account"
               )}
-            </motion.button>
+            </button>
           </form>
 
           {/* Login Link */}
@@ -400,8 +388,8 @@ const Register = () => {
               </Link>
             </p>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   FileText,
@@ -25,8 +24,10 @@ import {
   Award,
   Building2,
 } from "lucide-react";
+import LoadingSpinner from "./LoadingSpinner";
 import { tenderApi } from "../../services/api";
 import toast from "react-hot-toast";
+import { ISSUER_ISSUED_DOCUMENTS } from "../../constants/documents";
 
 const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
   const contentRef = React.useRef(null);
@@ -56,12 +57,17 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     status: "active",
     // Keep a stable array for UI summary (length access) and future support for multi-file uploads
     documents: [],
-    // Individual document fields
-    bidFileDocuments: null,
-    compiledDocuments: null,
-    financialDocuments: null,
-    technicalProposal: null,
-    proofOfExperience: null,
+    // Individual document fields (issuer-issued tender documents)
+    termsOfReference: null,
+    sbd1: null,
+    sbd2: null,
+    sbd4DeclarationOfInterest: null,
+    sbd61: null,
+    bidTechnicalSubmissionTemplate: null,
+    bidFinancialSubmissionTemplate: null,
+    annexure1: null,
+    annexure2: null,
+    annexure3: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -448,11 +454,16 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
 
         status: "active",
         documents: [],
-        bidFileDocuments: null,
-        compiledDocuments: null,
-        financialDocuments: null,
-        technicalProposal: null,
-        proofOfExperience: null,
+        termsOfReference: null,
+        sbd1: null,
+        sbd2: null,
+        sbd4DeclarationOfInterest: null,
+        sbd61: null,
+        bidTechnicalSubmissionTemplate: null,
+        bidFinancialSubmissionTemplate: null,
+        annexure1: null,
+        annexure2: null,
+        annexure3: null,
       });
       setCurrentStep(1);
       setErrors({});
@@ -525,23 +536,16 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
+    
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+        <div
           onClick={handleClose}
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         />
 
         {/* Modal */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+        <div
           className="relative w-full max-w-5xl max-h-[92vh] bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Header with gradient */}
@@ -549,13 +553,11 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 animate-pulse" />
             <div className="relative flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <motion.div
-                  animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                <div
                   className="w-9 h-9 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center shadow-lg"
                 >
                   <Sparkles className="w-5 h-5 text-white" />
-                </motion.div>
+                </div>
                 <div>
                   <h3 className="text-lg font-bold text-white">
                     Create New Tender
@@ -583,10 +585,8 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                 </span>
               </div>
               <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
+                <div
                   animate={{ width: `${getOverallProgress()}%` }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
                   className="h-full bg-gradient-to-r from-cyan-400 to-purple-500"
                 />
               </div>
@@ -668,11 +668,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                 </span>
               </div>
               <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
-                <motion.div
+                <div
                   key={currentStep}
-                  initial={{ width: 0 }}
                   animate={{ width: `${getStepProgress()}%` }}
-                  transition={{ duration: 0.3 }}
                   className="h-full bg-gradient-to-r from-purple-400 to-pink-500"
                 />
               </div>
@@ -685,15 +683,11 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
             className="flex-1 overflow-y-auto p-6 custom-scrollbar"
           >
             <form onSubmit={handleSubmit}>
-              <AnimatePresence mode="wait">
+              
                 {/* Step 1: Basic Information */}
                 {currentStep === 1 && (
-                  <motion.div
+                  <div
                     key="step1"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
                     className="space-y-6"
                   >
                     <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-cyan-400/20 rounded-lg p-4">
@@ -729,14 +723,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                       />
                       {touched.title && errors.title && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
+                        <p
                           className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                         >
                           <AlertCircle className="w-3 h-3" />
                           <span>{errors.title}</span>
-                        </motion.p>
+                        </p>
                       )}
                       <p className="mt-1 text-xs text-gray-500">
                         {formData.title.length}/100 characters
@@ -767,14 +759,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           ))}
                         </select>
                         {touched.category && errors.category && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
+                          <p
                             className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                           >
                             <AlertCircle className="w-3 h-3" />
                             <span>{errors.category}</span>
-                          </motion.p>
+                          </p>
                         )}
                       </div>
                     </div>
@@ -797,14 +787,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200 resize-none`}
                       />
                       {touched.description && errors.description && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
+                        <p
                           className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                         >
                           <AlertCircle className="w-3 h-3" />
                           <span>{errors.description}</span>
-                        </motion.p>
+                        </p>
                       )}
                       <p className="mt-1 text-xs text-gray-500">
                         {formData.description.length}/2000 characters
@@ -851,17 +839,13 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         </span>
                       </label>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* Step 2: Budget & Timeline */}
                 {currentStep === 2 && (
-                  <motion.div
+                  <div
                     key="step2"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
                     className="space-y-6"
                   >
                     <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-400/20 rounded-lg p-4">
@@ -903,14 +887,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           />
                         </div>
                         {touched.budgetMin && errors.budgetMin && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
+                          <p
                             className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                           >
                             <AlertCircle className="w-3 h-3" />
                             <span>{errors.budgetMin}</span>
-                          </motion.p>
+                          </p>
                         )}
                       </div>
 
@@ -936,22 +918,18 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           />
                         </div>
                         {touched.budgetMax && errors.budgetMax && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
+                          <p
                             className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                           >
                             <AlertCircle className="w-3 h-3" />
                             <span>{errors.budgetMax}</span>
-                          </motion.p>
+                          </p>
                         )}
                       </div>
                     </div>
 
                     {formData.budgetMin && formData.budgetMax && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
+                      <div
                         className="p-4 bg-cyan-500/10 border border-cyan-400/20 rounded-lg"
                       >
                         <p className="text-sm text-cyan-400">
@@ -961,7 +939,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             {Number(formData.budgetMax).toLocaleString()}
                           </span>
                         </p>
-                      </motion.div>
+                      </div>
                     )}
 
                     <div>
@@ -985,19 +963,15 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         />
                       </div>
                       {touched.deadline && errors.deadline && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
+                        <p
                           className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                         >
                           <AlertCircle className="w-3 h-3" />
                           <span>{errors.deadline}</span>
-                        </motion.p>
+                        </p>
                       )}
                       {formData.deadline && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
+                        <div
                           className="mt-3 p-3 bg-purple-500/10 border border-purple-400/20 rounded-lg"
                         >
                           <div className="flex items-center space-x-2">
@@ -1014,7 +988,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             )}{" "}
                             days from now
                           </p>
-                        </motion.div>
+                        </div>
                       )}
                     </div>
 
@@ -1037,17 +1011,13 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         </option>
                       </select>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* Step 3: Company Details */}
                 {currentStep === 3 && (
-                  <motion.div
+                  <div
                     key="step3"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
                     className="space-y-6"
                   >
                     <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-400/20 rounded-lg p-4">
@@ -1086,14 +1056,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         />
                       </div>
                       {touched.companyName && errors.companyName && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
+                        <p
                           className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                         >
                           <AlertCircle className="w-3 h-3" />
                           <span>{errors.companyName}</span>
-                        </motion.p>
+                        </p>
                       )}
                     </div>
 
@@ -1170,14 +1138,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             </div>
                             {touched.technicalContactEmail &&
                               errors.technicalContactEmail && (
-                                <motion.p
-                                  initial={{ opacity: 0, y: -10 }}
-                                  animate={{ opacity: 1, y: 0 }}
+                                <p
                                   className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                                 >
                                   <AlertCircle className="w-3 h-3" />
                                   <span>{errors.technicalContactEmail}</span>
-                                </motion.p>
+                                </p>
                               )}
                           </div>
 
@@ -1204,14 +1170,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             </div>
                             {touched.technicalContactPhone &&
                               errors.technicalContactPhone && (
-                                <motion.p
-                                  initial={{ opacity: 0, y: -10 }}
-                                  animate={{ opacity: 1, y: 0 }}
+                                <p
                                   className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                                 >
                                   <AlertCircle className="w-3 h-3" />
                                   <span>{errors.technicalContactPhone}</span>
-                                </motion.p>
+                                </p>
                               )}
                           </div>
                         </div>
@@ -1264,14 +1228,12 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             </div>
                             {touched.generalContactEmail &&
                               errors.generalContactEmail && (
-                                <motion.p
-                                  initial={{ opacity: 0, y: -10 }}
-                                  animate={{ opacity: 1, y: 0 }}
+                                <p
                                   className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                                 >
                                   <AlertCircle className="w-3 h-3" />
                                   <span>{errors.generalContactEmail}</span>
-                                </motion.p>
+                                </p>
                               )}
                           </div>
 
@@ -1298,30 +1260,24 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                             </div>
                             {touched.generalContactPhone &&
                               errors.generalContactPhone && (
-                                <motion.p
-                                  initial={{ opacity: 0, y: -10 }}
-                                  animate={{ opacity: 1, y: 0 }}
+                                <p
                                   className="mt-1 text-sm text-red-400 flex items-center space-x-1"
                                 >
                                   <AlertCircle className="w-3 h-3" />
                                   <span>{errors.generalContactPhone}</span>
-                                </motion.p>
+                                </p>
                               )}
                           </div>
                         </div>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* Step 4: Requirements & Documents */}
                 {currentStep === 4 && (
-                  <motion.div
+                  <div
                     key="step4"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
                     className="space-y-6"
                   >
                     <div>
@@ -1347,293 +1303,64 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         Documents
                       </h3>
                       <div className="space-y-4">
-                        {/* Bid File Documents */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Bid File Documents
-                          </label>
-                          {formData.bidFileDocuments ? (
-                            <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-                              <div className="flex items-center space-x-3">
-                                <FileText className="w-5 h-5 text-cyan-400" />
-                                <div>
-                                  <p className="text-white text-sm font-medium">
-                                    {formData.bidFileDocuments.name}
-                                  </p>
-                                  <p className="text-gray-500 text-xs">
-                                    {formatFileSize(
-                                      formData.bidFileDocuments.size
-                                    )}
-                                  </p>
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleRemoveDocument("bidFileDocuments")
-                                }
-                                className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                              >
-                                <X className="w-4 h-4 text-red-400" />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="relative">
-                              <input
-                                type="file"
-                                id="bidFileDocuments"
-                                onChange={(e) =>
-                                  handleDocumentUpload(e, "bidFileDocuments")
-                                }
-                                className="hidden"
-                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                              />
-                              <label
-                                htmlFor="bidFileDocuments"
-                                onDrop={(e) => handleDocumentDrop(e, 'bidFileDocuments')}
-                                onDragOver={handleDragOver}
-                                className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
-                              >
-                                <Upload className="w-5 h-5 mr-2" />
-                                <span className="text-sm">
-                                  Choose File or Drop Here
-                                </span>
-                              </label>
-                            </div>
-                          )}
-                        </div>
+                        {ISSUER_ISSUED_DOCUMENTS.map((def) => {
+                          const value = formData[def.key];
+                          const inputId = def.key;
 
-                        {/* Compiled Documents */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Compiled Documents
-                          </label>
-                          {formData.compiledDocuments ? (
-                            <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-                              <div className="flex items-center space-x-3">
-                                <FileText className="w-5 h-5 text-cyan-400" />
-                                <div>
-                                  <p className="text-white text-sm font-medium">
-                                    {formData.compiledDocuments.name}
-                                  </p>
-                                  <p className="text-gray-500 text-xs">
-                                    {formatFileSize(
-                                      formData.compiledDocuments.size
-                                    )}
-                                  </p>
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleRemoveDocument("compiledDocuments")
-                                }
-                                className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                              >
-                                <X className="w-4 h-4 text-red-400" />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="relative">
-                              <input
-                                type="file"
-                                id="compiledDocuments"
-                                onChange={(e) =>
-                                  handleDocumentUpload(e, "compiledDocuments")
-                                }
-                                className="hidden"
-                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                              />
-                              <label
-                                htmlFor="compiledDocuments"
-                                onDrop={(e) => handleDocumentDrop(e, 'compiledDocuments')}
-                                onDragOver={handleDragOver}
-                                className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
-                              >
-                                <Upload className="w-5 h-5 mr-2" />
-                                <span className="text-sm">
-                                  Choose File or Drop Here
-                                </span>
+                          return (
+                            <div key={def.key}>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">
+                                {def.label}
                               </label>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Financial Documents */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Financial Documents
-                          </label>
-                          {formData.financialDocuments ? (
-                            <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-                              <div className="flex items-center space-x-3">
-                                <FileText className="w-5 h-5 text-cyan-400" />
-                                <div>
-                                  <p className="text-white text-sm font-medium">
-                                    {formData.financialDocuments.name}
-                                  </p>
-                                  <p className="text-gray-500 text-xs">
-                                    {formatFileSize(
-                                      formData.financialDocuments.size
-                                    )}
-                                  </p>
+                              {value ? (
+                                <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
+                                  <div className="flex items-center space-x-3">
+                                    <FileText className="w-5 h-5 text-cyan-400" />
+                                    <div>
+                                      <p className="text-white text-sm font-medium">
+                                        {value.name}
+                                      </p>
+                                      <p className="text-gray-500 text-xs">
+                                        {formatFileSize(value.size)}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveDocument(def.key)}
+                                    className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
+                                  >
+                                    <X className="w-4 h-4 text-red-400" />
+                                  </button>
                                 </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleRemoveDocument("financialDocuments")
-                                }
-                                className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                              >
-                                <X className="w-4 h-4 text-red-400" />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="relative">
-                              <input
-                                type="file"
-                                id="financialDocuments"
-                                onChange={(e) =>
-                                  handleDocumentUpload(e, "financialDocuments")
-                                }
-                                className="hidden"
-                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                              />
-                              <label
-                                htmlFor="financialDocuments"
-                                onDrop={(e) => handleDocumentDrop(e, 'financialDocuments')}
-                                onDragOver={handleDragOver}
-                                className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
-                              >
-                                <Upload className="w-5 h-5 mr-2" />
-                                <span className="text-sm">
-                                  Choose File or Drop Here
-                                </span>
-                              </label>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Technical Proposal */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Technical Proposal
-                          </label>
-                          {formData.technicalProposal ? (
-                            <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-                              <div className="flex items-center space-x-3">
-                                <FileText className="w-5 h-5 text-cyan-400" />
-                                <div>
-                                  <p className="text-white text-sm font-medium">
-                                    {formData.technicalProposal.name}
-                                  </p>
-                                  <p className="text-gray-500 text-xs">
-                                    {formatFileSize(
-                                      formData.technicalProposal.size
-                                    )}
-                                  </p>
+                              ) : (
+                                <div className="relative">
+                                  <input
+                                    type="file"
+                                    id={inputId}
+                                    onChange={(e) => handleDocumentUpload(e, def.key)}
+                                    className="hidden"
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                                  />
+                                  <label
+                                    htmlFor={inputId}
+                                    onDrop={(e) => handleDocumentDrop(e, def.key)}
+                                    onDragOver={handleDragOver}
+                                    className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
+                                  >
+                                    <Upload className="w-5 h-5 mr-2" />
+                                    <span className="text-sm">Choose File or Drop Here</span>
+                                  </label>
                                 </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleRemoveDocument("technicalProposal")
-                                }
-                                className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                              >
-                                <X className="w-4 h-4 text-red-400" />
-                              </button>
+                              )}
                             </div>
-                          ) : (
-                            <div className="relative">
-                              <input
-                                type="file"
-                                id="technicalProposal"
-                                onChange={(e) =>
-                                  handleDocumentUpload(e, "technicalProposal")
-                                }
-                                className="hidden"
-                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                              />
-                              <label
-                                htmlFor="technicalProposal"
-                                onDrop={(e) => handleDocumentDrop(e, 'technicalProposal')}
-                                onDragOver={handleDragOver}
-                                className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
-                              >
-                                <Upload className="w-5 h-5 mr-2" />
-                                <span className="text-sm">
-                                  Choose File or Drop Here
-                                </span>
-                              </label>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Proof of Experience */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Proof of Experience (Reference Letter)
-                          </label>
-                          {formData.proofOfExperience ? (
-                            <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-cyan-400/10 rounded-lg">
-                              <div className="flex items-center space-x-3">
-                                <FileText className="w-5 h-5 text-cyan-400" />
-                                <div>
-                                  <p className="text-white text-sm font-medium">
-                                    {formData.proofOfExperience.name}
-                                  </p>
-                                  <p className="text-gray-500 text-xs">
-                                    {formatFileSize(
-                                      formData.proofOfExperience.size
-                                    )}
-                                  </p>
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleRemoveDocument("proofOfExperience")
-                                }
-                                className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
-                              >
-                                <X className="w-4 h-4 text-red-400" />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="relative">
-                              <input
-                                type="file"
-                                id="proofOfExperience"
-                                onChange={(e) =>
-                                  handleDocumentUpload(e, "proofOfExperience")
-                                }
-                                className="hidden"
-                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                              />
-                              <label
-                                htmlFor="proofOfExperience"
-                                onDrop={(e) => handleDocumentDrop(e, 'proofOfExperience')}
-                                onDragOver={handleDragOver}
-                                className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
-                              >
-                                <Upload className="w-5 h-5 mr-2" />
-                                <span className="text-sm">
-                                  Choose File or Drop Here
-                                </span>
-                              </label>
-                            </div>
-                          )}
-                        </div>
+                          );
+                        })}
                       </div>
                     </div>
 
                     {/* Final Summary */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
+                    <div
                       className="p-6 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-cyan-500/10 border border-purple-400/20 rounded-xl"
                     >
                       <h4 className="text-lg font-semibold text-purple-400 mb-4 flex items-center space-x-2">
@@ -1716,10 +1443,10 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           )}
                         </div>
                       </div>
-                    </motion.div>
-                  </motion.div>
+                    </div>
+                  </div>
                 )}
-              </AnimatePresence>
+              
             </form>
           </div>
 
@@ -1727,9 +1454,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="flex items-center justify-between p-3 border-t border-cyan-400/10 bg-gradient-to-r from-slate-900 to-slate-950">
             <div className="flex items-center space-x-2">
               {currentStep > 1 && (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
                   type="button"
                   onClick={handleBack}
                   disabled={isSubmitting || isSavingDraft}
@@ -1737,12 +1462,10 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Back</span>
-                </motion.button>
+                </button>
               )}
               {currentStep === 4 && formData.status === "active" && (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
                   type="button"
                   onClick={handleSaveDraft}
                   disabled={isSubmitting || isSavingDraft}
@@ -1750,7 +1473,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                 >
                   {isSavingDraft ? (
                     <>
-                      <div className="w-3.5 h-3.5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      <LoadingSpinner variant="inline" size="sm" />
                       <span>Saving...</span>
                     </>
                   ) : (
@@ -1759,44 +1482,38 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       <span>Save as Draft</span>
                     </>
                   )}
-                </motion.button>
+                </button>
               )}
             </div>
 
             <div className="flex items-center space-x-2">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 type="button"
                 onClick={handleClose}
                 disabled={isSubmitting || isSavingDraft}
                 className="px-3 py-1.5 text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50"
               >
                 Cancel
-              </motion.button>
+              </button>
 
               {currentStep < 4 ? (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
                   type="button"
                   onClick={handleNext}
                   className="flex items-center space-x-1.5 px-4 py-1.5 text-sm bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   <span>Next</span>
                   <ArrowRight className="w-3.5 h-3.5" />
-                </motion.button>
+                </button>
               ) : (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
                   onClick={handleSubmit}
                   disabled={isSubmitting || isSavingDraft}
                   className="flex items-center space-x-1.5 px-4 py-1.5 text-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-emerald-700 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <LoadingSpinner variant="inline" size="sm" color="white" />
                       <span>Creating...</span>
                     </>
                   ) : (
@@ -1805,11 +1522,11 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       <span>Create Tender</span>
                     </>
                   )}
-                </motion.button>
+                </button>
               )}
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Custom scrollbar styles */}
         <style jsx>{`
@@ -1829,7 +1546,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           }
         `}</style>
       </div>
-    </AnimatePresence>
+    
   );
 };
 

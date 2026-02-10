@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import LoadingSpinner from "./LoadingSpinner";
 import { X, AlertCircle, MessageSquare, XOctagon } from "lucide-react";
 
 const RejectionReasonModal = ({
@@ -26,20 +26,13 @@ const RejectionReasonModal = ({
   };
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]"
           onClick={handleClose}
         >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+          <div
             onClick={(e) => e.stopPropagation()}
             className="bg-gradient-to-b from-slate-900 to-slate-950 border border-red-400/20 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
           >
@@ -99,14 +92,12 @@ const RejectionReasonModal = ({
                     {reason.length}/500 characters
                   </p>
                   {error && (
-                    <motion.p
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
+                    <p
                       className="text-sm text-red-400 flex items-center space-x-1"
                     >
                       <AlertCircle className="w-4 h-4" />
                       <span>{error}</span>
-                    </motion.p>
+                    </p>
                   )}
                 </div>
               </div>
@@ -128,7 +119,7 @@ const RejectionReasonModal = ({
               >
                 {isLoading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <LoadingSpinner variant="inline" size="sm" color="white" />
                     <span>Rejecting...</span>
                   </>
                 ) : (
@@ -139,10 +130,10 @@ const RejectionReasonModal = ({
                 )}
               </button>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 };
 

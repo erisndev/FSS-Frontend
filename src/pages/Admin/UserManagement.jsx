@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import {
   Users,
   UserPlus,
@@ -18,6 +19,7 @@ import toast from "react-hot-toast";
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -155,17 +157,11 @@ const UserManagement = () => {
   });
 
   const UserModal = ({ isEdit = false, onClose, onSubmit }) => (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+    <div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
+      <div
         className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6 max-w-md w-full"
         onClick={(e) => e.stopPropagation()}
       >
@@ -298,18 +294,18 @@ const UserManagement = () => {
             </button>
           </div>
         </form>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 
-  if (loading) {
+  if (showLoading) {
     return (
       <DashboardLayout
         title="User Management"
         subtitle="Manage system users and permissions"
       >
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <LoadingSpinner variant="section" />
         </div>
       </DashboardLayout>
     );
@@ -322,9 +318,7 @@ const UserManagement = () => {
     >
       <div className="space-y-6">
         {/* Header Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0"
         >
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 flex-1">
@@ -376,11 +370,9 @@ const UserManagement = () => {
             <UserPlus className="w-5 h-5" />
             <span>Add New User</span>
           </button>
-        </motion.div>
+        </div>
         {/* Users Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl overflow-hidden"
         >
           <div className="overflow-x-auto">
@@ -409,11 +401,8 @@ const UserManagement = () => {
               </thead>
               <tbody className="divide-y divide-cyan-400/10">
                 {filteredUsers.map((user, index) => (
-                  <motion.tr
+                  <tr
                     key={user.id || user._id || index} // <-- fixed key
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
                     className="hover:bg-slate-800/30 transition-all duration-300"
                   >
                     <td className="px-6 py-4">
@@ -485,7 +474,7 @@ const UserManagement = () => {
                         </button>
                       </div>
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))}
               </tbody>
             </table>
@@ -504,7 +493,7 @@ const UserManagement = () => {
               </p>
             </div>
           )}
-        </motion.div>
+        </div>
         {/* Modals */}
         {showCreateModal && (
           <UserModal

@@ -1,14 +1,11 @@
 import React from "react";
-import { motion } from "framer-motion";
 import { Users, Crown, Edit, Trash2, Mail, Calendar } from "lucide-react";
 
 const TeamMemberCard = ({ member, onEdit, onRemove }) => {
   const isTeamLeader = member.role === "team_leader";
   
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className="bg-slate-800/50 border border-cyan-400/20 rounded-lg p-3 sm:p-4 hover:border-cyan-400/40 transition-all duration-200"
     >
       {/* Header Section */}
@@ -74,26 +71,22 @@ const TeamMemberCard = ({ member, onEdit, onRemove }) => {
         {/* Actions */}
         {!isTeamLeader && (
           <div className="flex items-center gap-2 sm:self-start">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={() => onEdit(member)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-cyan-400 hover:bg-cyan-400/10 rounded-lg transition-colors text-xs sm:text-sm"
               title="Edit Permissions"
             >
               <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Edit</span>
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            </button>
+            <button
               onClick={() => onRemove(member._id)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors text-xs sm:text-sm"
               title="Remove Member"
             >
               <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Remove</span>
-            </motion.button>
+            </button>
           </div>
         )}
       </div>
@@ -129,7 +122,7 @@ const TeamMemberCard = ({ member, onEdit, onRemove }) => {
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 

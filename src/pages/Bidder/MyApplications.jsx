@@ -6,6 +6,7 @@ import ApplicationModal from "../../components/UI/ApplicationModal";
 import ConfirmDeleteModal from "../../components/UI/ConfirmDeleteModal";
 import EmptyState from "../../components/UI/EmptyState";
 import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import { applicationApi } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
@@ -14,6 +15,7 @@ const MyApplications = () => {
   const { user } = useAuth();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -57,7 +59,7 @@ const MyApplications = () => {
     setShowWithdrawModal(true);
   };
 
-  if (loading) {
+  if (showLoading) {
     return (
       <DashboardLayout
         title="My Applications"

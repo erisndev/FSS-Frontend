@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText,
   Users,
@@ -94,9 +93,7 @@ const ActivityLogItem = ({ activity }) => {
   const hasDetails = activity.details && Object.keys(activity.details).length > 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className="bg-slate-800/50 border border-cyan-400/20 rounded-lg p-3 sm:p-4 hover:border-cyan-400/40 transition-all duration-200"
     >
       <div className="flex items-start gap-2 sm:gap-3">
@@ -140,9 +137,7 @@ const ActivityLogItem = ({ activity }) => {
 
           {/* Details Toggle */}
           {hasDetails && (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="flex items-center gap-1.5 mt-2 text-cyan-400 hover:text-cyan-300 text-xs font-medium transition-colors"
             >
@@ -157,17 +152,13 @@ const ActivityLogItem = ({ activity }) => {
                   <span>Show Details</span>
                 </>
               )}
-            </motion.button>
+            </button>
           )}
 
           {/* Expanded Details */}
-          <AnimatePresence>
+          
             {isExpanded && hasDetails && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
+              <div
                 className="mt-3 overflow-hidden"
               >
                 <div className="p-3 bg-slate-900/50 rounded-lg border border-cyan-400/10">
@@ -189,12 +180,12 @@ const ActivityLogItem = ({ activity }) => {
                     ))}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
+          
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import LoadingSpinner from "./LoadingSpinner";
 import { X, Shield, Lock, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { verificationCodeApi } from "../../services/api";
 import toast from "react-hot-toast";
@@ -248,32 +248,23 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+    
+      <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
         onClick={onClose}
       >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+        <div
           onClick={(e) => e.stopPropagation()}
           className="relative w-full max-w-md bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-xl sm:rounded-2xl shadow-2xl max-h-[95vh] sm:max-h-[92vh] overflow-y-auto"
         >
           {/* Header */}
           <div className="flex items-start justify-between p-4 sm:p-6 border-b border-cyan-400/10">
             <div className="flex items-center space-x-3 min-w-0 flex-1 pr-2">
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+              <div
                 className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-cyan-400/30"
               >
                 <Shield className="w-6 h-6 text-cyan-400" />
-              </motion.div>
+              </div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-lg font-bold text-white truncate">
                   Tender Verification
@@ -317,9 +308,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
 
                 {/* Display code if approved and available */}
                 {requestStatus === "approved" && existingRequest?.code && (
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
+                  <div
                     className="mt-4 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl"
                   >
                     <p className="text-xs text-gray-400 mb-3 text-center font-medium">
@@ -330,23 +319,21 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                         {existingRequest.code}
                       </p>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
               </>
             )}
 
             {/* Error Message */}
             {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+              <div
                 className="p-2 sm:p-3 bg-red-500/20 border border-red-400/30 rounded-lg"
               >
                 <p className="text-red-400 text-xs sm:text-sm flex items-center space-x-2">
                   <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                   <span className="break-words">{error}</span>
                 </p>
-              </motion.div>
+              </div>
             )}
 
             {/* Already Verified State */}
@@ -365,7 +352,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
               </div>
             ) : isCheckingStatus ? (
               <div className="flex justify-center py-6 sm:py-8">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                <LoadingSpinner variant="section" />
               </div>
             ) : (
               <>
@@ -381,7 +368,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                       </label>
                       <div className="flex justify-center gap-2 flex-wrap">
                         {code.map((digit, index) => (
-                          <motion.input
+                          <input
                             key={index}
                             id={`verify-code-${index}`}
                             type="text"
@@ -412,7 +399,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                         >
                           {isRequesting ? (
                             <div className="flex items-center justify-center space-x-2">
-                              <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                              <LoadingSpinner variant="inline" size="sm" />
                               <span>Requesting...</span>
                             </div>
                           ) : (
@@ -431,7 +418,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                       >
                         {isLoading ? (
                           <div className="flex items-center justify-center space-x-2">
-                            <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <LoadingSpinner variant="inline" size="sm" color="white" />
                             <span>Verifying...</span>
                           </div>
                         ) : (
@@ -489,9 +476,9 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
               </>
             )}
           </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </div>
+      </div>
+    
   );
 };
 

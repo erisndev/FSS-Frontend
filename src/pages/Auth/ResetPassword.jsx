@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Shield, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
@@ -72,9 +72,7 @@ const ResetPassword = () => {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+        <div
           className="max-w-md w-full text-center"
         >
           <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8 shadow-2xl">
@@ -88,25 +86,20 @@ const ResetPassword = () => {
               Your password has been successfully reset. You will be redirected
               to the login page.
             </p>
-            <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <LoadingSpinner variant="section" />
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="max-w-md w-full space-y-8"
       >
         {/* Logo and Title */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <div
           className="text-center"
         >
           <div className="flex justify-center">
@@ -118,24 +111,19 @@ const ResetPassword = () => {
           <p className="text-cyan-400/70 mt-2">
             Enter your new password for {email}
           </p>
-        </motion.div>
+        </div>
 
         {/* Reset Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8 shadow-2xl"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+              <div
                 className="bg-red-500/20 border border-red-400/50 rounded-lg p-3 text-red-300 text-sm"
               >
                 {error}
-              </motion.div>
+              </div>
             )}
 
             {/* New Password Field */}
@@ -204,25 +192,23 @@ const ResetPassword = () => {
             </div>
 
             {/* Submit Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               type="submit"
               disabled={isLoading}
               className="w-full py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <LoadingSpinner variant="inline" size="sm" color="white" />
                   <span>Resetting Password...</span>
                 </div>
               ) : (
                 "Reset Password"
               )}
-            </motion.button>
+            </button>
           </form>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 };

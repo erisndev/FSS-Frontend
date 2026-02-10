@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
   Shield,
   Mail,
@@ -114,23 +114,18 @@ const Login = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+        <LoadingSpinner variant="section" />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-3 sm:p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="max-w-md w-full space-y-6 sm:space-y-8"
       >
         {/* Logo and Title */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <div
           className="text-center"
         >
           <div className="flex justify-center">
@@ -144,24 +139,19 @@ const Login = () => {
           <p className="text-cyan-400/70 mt-1 sm:mt-2 text-sm sm:text-base">
             Sign in to TenderFlow System
           </p>
-        </motion.div>
+        </div>
 
         {/* Login Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-2xl p-5 sm:p-8 shadow-2xl"
         >
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+              <div
                 className="bg-red-500/20 border border-red-400/50 rounded-lg p-2.5 sm:p-3 text-red-300 text-xs sm:text-sm break-words"
               >
                 {error}
-              </motion.div>
+              </div>
             )} */}
 
             {/* Email Field */}
@@ -224,22 +214,20 @@ const Login = () => {
             </div>
 
             {/* Submit Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               type="submit"
               disabled={isLoading}
               className="w-full py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <LoadingSpinner variant="inline" size="sm" color="white" />
                   <span>Signing In...</span>
                 </div>
               ) : (
                 "Sign In"
               )}
-            </motion.button>
+            </button>
           </form>
 
           {/* Team Login Option */}
@@ -254,9 +242,7 @@ const Login = () => {
             </div>
 
             <Link to="/team-login">
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              <div
                 className="mt-4 p-4 bg-gradient-to-r from-cyan-500/10 to-purple-600/10 border border-cyan-400/30 rounded-lg hover:border-cyan-400/50 transition-all duration-200 cursor-pointer"
               >
                 <div className="flex items-center justify-between">
@@ -275,7 +261,7 @@ const Login = () => {
                   </div>
                   <ArrowRight className="w-5 h-5 text-cyan-400" />
                 </div>
-              </motion.div>
+              </div>
             </Link>
           </div>
 
@@ -291,8 +277,8 @@ const Login = () => {
               </Link>
             </p>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 };

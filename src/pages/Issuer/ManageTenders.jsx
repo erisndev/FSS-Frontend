@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import {
   FileText,
   Edit,
@@ -19,6 +20,7 @@ import { tenderApi } from "../../services/api";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import ConfirmDeleteModal from "../../components/UI/ConfirmDeleteModal";
+import EditTenderModal from "../../components/UI/EditTenderModal";
 import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { canPerformTenderAction } from "../../utils/permissions";
@@ -27,6 +29,7 @@ const ManageTenders = () => {
   const { user, permissions } = useAuth();
   const [tenders, setTenders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const navigate = useNavigate();
@@ -34,6 +37,8 @@ const ManageTenders = () => {
   const [selectedTender, setSelectedTender] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editTenderId, setEditTenderId] = useState(null);
 
   // Use permissions from user object if available, otherwise fallback to context permissions
   const userPermissions = user?.permissions || permissions;
@@ -121,14 +126,14 @@ const ManageTenders = () => {
     return matchesSearch && matchesStatus;
   });
 
-  if (loading) {
+  if (showLoading) {
     return (
       <DashboardLayout
         title="Manage Tenders"
         subtitle="View and manage all your tenders"
       >
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <LoadingSpinner variant="section" />
         </div>
       </DashboardLayout>
     );
@@ -141,11 +146,7 @@ const ManageTenders = () => {
     >
       <div className="space-y-6">
         {/* Header Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
-        >
+        <div className="space-y-4">
           {/* Search Bar - Full Width on Mobile */}
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-cyan-400" />
@@ -202,15 +203,11 @@ const ManageTenders = () => {
               </button>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* Tenders Grid */}
         {filteredTenders.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
+          <div className="text-center py-12">
             <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">
               {searchTerm || statusFilter
@@ -222,15 +219,12 @@ const ManageTenders = () => {
                 ? "Try adjusting your search criteria."
                 : "Create your first tender to get started."}
             </p>
-          </motion.div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredTenders.map((tender, index) => (
-              <motion.div
+              <div
                 key={`${tender.id}-${index}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
                 className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6 hover:bg-white/10 hover:border-cyan-400/40 transition-all duration-300"
               >
                 {/* Header */}
@@ -250,7 +244,7 @@ const ManageTenders = () => {
                     )}
                     <span
                       className={`px-2 py-1 text-xs rounded-full border ${getStatusColor(
-                        tender.status
+                        tender.status,
                       )}`}
                     >
                       {tender.status}
@@ -269,9 +263,9 @@ const ManageTenders = () => {
                     <span className="text-cyan-400 font-medium">
                       {tender.budgetMin || tender.budgetMax
                         ? `R${Number(
-                            tender.budgetMin || 0
+                            tender.budgetMin || 0,
                           ).toLocaleString()} - R${Number(
-                            tender.budgetMax || 0
+                            tender.budgetMax || 0,
                           ).toLocaleString()}`
                         : `R${Number(tender.budget || 0).toLocaleString()}`}
                     </span>
@@ -308,7 +302,10 @@ const ManageTenders = () => {
                         // Count documents based on structure
                         if (Array.isArray(tender.documents)) {
                           return tender.documents.length;
-                        } else if (tender.documents && typeof tender.documents === 'object') {
+                        } else if (
+                          tender.documents &&
+                          typeof tender.documents === "object"
+                        ) {
                           // Count individual document fields
                           let count = 0;
                           if (tender.documents.bidFileDocuments) count++;
@@ -319,7 +316,8 @@ const ManageTenders = () => {
                           return count;
                         }
                         return 0;
-                      })()} documents
+                      })()}{" "}
+                      documents
                     </span>
                   </div>
                 </div>
@@ -335,7 +333,7 @@ const ManageTenders = () => {
                       user,
                       userPermissions,
                       tender,
-                      "view"
+                      "view",
                     ) && (
                       <button
                         onClick={() => {
@@ -353,12 +351,13 @@ const ManageTenders = () => {
                       user,
                       userPermissions,
                       tender,
-                      "edit"
+                      "edit",
                     ) && (
                       <button
-                        onClick={() =>
-                          navigate(`/issuer/edit-tender/${tender._id}`)
-                        }
+                        onClick={() => {
+                          setEditTenderId(tender._id);
+                          setShowEditModal(true);
+                        }}
                         className="p-2 bg-slate-800/50 border border-purple-400/20 text-purple-400 rounded-lg hover:bg-purple-400/10 hover:border-purple-400/50 transition-all duration-300"
                       >
                         <Edit className="w-4 h-4" />
@@ -370,7 +369,7 @@ const ManageTenders = () => {
                       user,
                       userPermissions,
                       tender,
-                      "delete"
+                      "delete",
                     ) && (
                       <button
                         onClick={() => {
@@ -384,7 +383,7 @@ const ManageTenders = () => {
                     )}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}
@@ -406,6 +405,18 @@ const ManageTenders = () => {
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
         tender={selectedTender}
+      />
+
+      <EditTenderModal
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditTenderId(null);
+        }}
+        tenderId={editTenderId}
+        onSuccess={() => {
+          fetchTenders();
+        }}
       />
 
       {canCreate && (

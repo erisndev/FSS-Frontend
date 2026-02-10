@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import { Bell, BellOff, Check, Trash2, CheckCircle2, Clock } from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import { notificationApi } from "../../services/api";
@@ -179,11 +178,8 @@ const AdminNotifications = () => {
         ) : (
           <div className="space-y-3">
             {visible.map((n, idx) => (
-              <motion.div
+              <div
                 key={n.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
                 className={`p-4 rounded-xl border backdrop-blur-xl ${
                   n.isRead
                     ? "bg-white/5 border-gray-400/20"
@@ -217,7 +213,7 @@ const AdminNotifications = () => {
                     </button>
                   )}
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Shield, ArrowLeft } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
@@ -229,16 +229,11 @@ const OTPVerification = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="max-w-md w-full space-y-8"
       >
         {/* Logo and Title */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <div
           className="text-center"
         >
           <div className="flex justify-center">
@@ -254,20 +249,15 @@ const OTPVerification = () => {
               ? `Enter the verification code sent to ${email}`
               : `Enter the 6-digit code sent to ${email}`}
           </p>
-        </motion.div>
+        </div>
 
         {/* OTP Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8 shadow-2xl"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+              <div
                 className={`border rounded-lg p-3 text-sm ${
                   error.toLowerCase().includes("expired") ||
                   error.toLowerCase().includes("invalid")
@@ -276,7 +266,7 @@ const OTPVerification = () => {
                 }`}
               >
                 {error}
-              </motion.div>
+              </div>
             )}
 
             <div>
@@ -299,22 +289,20 @@ const OTPVerification = () => {
               </div>
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               type="submit"
               disabled={isLoading}
               className="w-full py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <LoadingSpinner variant="inline" size="sm" color="white" />
                   <span>Verifying...</span>
                 </div>
               ) : (
                 "Verify Code"
               )}
-            </motion.button>
+            </button>
           </form>
 
           {/* Resend OTP */}
@@ -334,7 +322,7 @@ const OTPVerification = () => {
               >
                 {isResending ? (
                   <div className="flex items-center justify-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                    <LoadingSpinner variant="inline" size="sm" />
                     <span>Resending...</span>
                   </div>
                 ) : (
@@ -358,8 +346,8 @@ const OTPVerification = () => {
               </span>
             </button>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 };

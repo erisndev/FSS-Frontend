@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import {
   Shield,
   Check,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import EmptyState from "../../components/UI/EmptyState";
 import ConfirmActionModal from "../../components/UI/ConfirmActionModal";
 import RejectionReasonModal from "../../components/UI/RejectionReasonModal";
@@ -28,6 +28,7 @@ const VerificationRequests = () => {
   const { user } = useAuth();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const showLoading = useMinLoadingTime(loading);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [tenderFilter, setTenderFilter] = useState("all");
@@ -228,9 +229,7 @@ const VerificationRequests = () => {
     >
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4"
         >
           <div className="flex items-center justify-between">
@@ -244,12 +243,9 @@ const VerificationRequests = () => {
               <Shield className="w-5 h-5 text-purple-400" />
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4"
         >
           <div className="flex items-center justify-between">
@@ -263,12 +259,9 @@ const VerificationRequests = () => {
               <Clock className="w-5 h-5 text-yellow-400" />
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4"
         >
           <div className="flex items-center justify-between">
@@ -282,12 +275,9 @@ const VerificationRequests = () => {
               <CheckCircle className="w-5 h-5 text-green-400" />
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+        <div
           className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4"
         >
           <div className="flex items-center justify-between">
@@ -301,7 +291,7 @@ const VerificationRequests = () => {
               <XCircle className="w-5 h-5 text-red-400" />
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Filters */}
@@ -387,10 +377,8 @@ const VerificationRequests = () => {
               </thead>
               <tbody className="divide-y divide-cyan-400/10">
                 {filteredRequests.map((request) => (
-                  <motion.tr
+                  <tr
                     key={request._id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
                     className="hover:bg-white/5 transition-colors"
                   >
                     <td className="px-6 py-4">
@@ -464,7 +452,7 @@ const VerificationRequests = () => {
                         </span>
                       )}
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))}
               </tbody>
             </table>

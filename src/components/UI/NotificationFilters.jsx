@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "framer-motion";
 import { Filter, AlertCircle, User, FileText, ClipboardList } from "lucide-react";
 
 const NotificationFilters = ({
@@ -37,9 +36,7 @@ const NotificationFilters = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
     >
       <div className="flex items-center space-x-2 mb-4">
@@ -80,7 +77,7 @@ const NotificationFilters = ({
           </button>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
