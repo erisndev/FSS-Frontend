@@ -40,7 +40,7 @@ const ApplicationModal = ({
     user,
     userPermissions,
     tender,
-    "view"
+    "view",
   );
 
   // Check if user can accept/reject applications
@@ -48,7 +48,7 @@ const ApplicationModal = ({
     user,
     userPermissions,
     tender,
-    "accept"
+    "accept",
   );
 
   const canChangeStatus = () => {
@@ -87,7 +87,7 @@ const ApplicationModal = ({
       setStatusAction("");
       onClose?.();
     },
-    [onStatusUpdate, application, statusAction, onClose]
+    [onStatusUpdate, application, statusAction, onClose],
   );
 
   if (!isOpen || !application) return null;
@@ -116,10 +116,10 @@ const ApplicationModal = ({
                   (application.status || "").toUpperCase() === "PENDING"
                     ? "text-yellow-400 bg-yellow-400/20 border-yellow-400/30"
                     : (application.status || "").toUpperCase() === "ACCEPTED"
-                    ? "text-green-400 bg-green-400/20 border-green-400/30"
-                    : (application.status || "").toUpperCase() === "REJECTED"
-                    ? "text-red-400 bg-red-400/20 border-red-400/30"
-                    : "text-gray-400 bg-gray-400/20 border-gray-400/30"
+                      ? "text-green-400 bg-green-400/20 border-green-400/30"
+                      : (application.status || "").toUpperCase() === "REJECTED"
+                        ? "text-red-400 bg-red-400/20 border-red-400/30"
+                        : "text-gray-400 bg-gray-400/20 border-gray-400/30"
                 }`}
               >
                 {application.status}
@@ -135,9 +135,7 @@ const ApplicationModal = ({
         </div>
 
         {/* Application Summary */}
-        <div
-          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8"
-        >
+        <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
           <h5 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
             Application Summary
           </h5>
@@ -188,9 +186,7 @@ const ApplicationModal = ({
         </div>
 
         {/* Company Information */}
-        <div
-          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8"
-        >
+        <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
           <h5 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
             Company Information
           </h5>
@@ -248,9 +244,7 @@ const ApplicationModal = ({
         </div>
 
         {/* Contact Information */}
-        <div
-          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8"
-        >
+        <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
           <h5 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
             Contact Information
           </h5>
@@ -285,9 +279,7 @@ const ApplicationModal = ({
 
         {/* Cover Letter */}
         {application.message && (
-          <div
-            className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8"
-          >
+          <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
             <h5 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4 flex items-center">
               <MessageSquare className="w-5 h-5 mr-2" />
               Cover Letter
@@ -301,9 +293,7 @@ const ApplicationModal = ({
         )}
 
         {/* Documents */}
-        <div
-          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8"
-        >
+        <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
           <div className="flex items-center space-x-2 mb-4">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
               <FileText className="w-5 h-5 text-cyan-400" />
@@ -320,8 +310,12 @@ const ApplicationModal = ({
           {(() => {
             // Resolve the documents source: prefer complianceDocuments, then files, then keyed fields
             const docsArray =
-              (Array.isArray(application.complianceDocuments) && application.complianceDocuments.length > 0 && application.complianceDocuments) ||
-              (Array.isArray(application.files) && application.files.length > 0 && application.files) ||
+              (Array.isArray(application.complianceDocuments) &&
+                application.complianceDocuments.length > 0 &&
+                application.complianceDocuments) ||
+              (Array.isArray(application.files) &&
+                application.files.length > 0 &&
+                application.files) ||
               null;
 
             // Helper: find a doc in the array by matching label or fieldName against def.label / def.key
@@ -347,10 +341,14 @@ const ApplicationModal = ({
             };
             const getFileTypeColor = (filename) => {
               const ext = getFileExtension(filename);
-              if (["pdf"].includes(ext)) return "from-red-500/20 to-red-600/20 border-red-400/30";
-              if (["doc", "docx"].includes(ext)) return "from-blue-500/20 to-blue-600/20 border-blue-400/30";
-              if (["xls", "xlsx"].includes(ext)) return "from-green-500/20 to-green-600/20 border-green-400/30";
-              if (["jpg", "jpeg", "png"].includes(ext)) return "from-purple-500/20 to-purple-600/20 border-purple-400/30";
+              if (["pdf"].includes(ext))
+                return "from-red-500/20 to-red-600/20 border-red-400/30";
+              if (["doc", "docx"].includes(ext))
+                return "from-blue-500/20 to-blue-600/20 border-blue-400/30";
+              if (["xls", "xlsx"].includes(ext))
+                return "from-green-500/20 to-green-600/20 border-green-400/30";
+              if (["jpg", "jpeg", "png"].includes(ext))
+                return "from-purple-500/20 to-purple-600/20 border-purple-400/30";
               return "from-cyan-500/20 to-cyan-600/20 border-cyan-400/30";
             };
             const getFileTypeIcon = (filename) => {
@@ -365,7 +363,9 @@ const ApplicationModal = ({
             // If we have a docs array (complianceDocuments or files), render by matching against BIDDER_REQUIRED_DOCUMENTS
             if (docsArray) {
               // Count how many matched by label/fieldName
-              const matchedByLabel = BIDDER_REQUIRED_DOCUMENTS.some((def) => findDoc(def));
+              const matchedByLabel = BIDDER_REQUIRED_DOCUMENTS.some((def) =>
+                findDoc(def),
+              );
 
               if (matchedByLabel) {
                 return (
@@ -375,10 +375,7 @@ const ApplicationModal = ({
                       const fileName = doc?.name || doc?.originalName || "";
 
                       return (
-                        <div
-                          key={def.key}
-                          className="group"
-                        >
+                        <div key={def.key} className="group">
                           <div className="flex items-center space-x-2 mb-2">
                             <div className="w-1 h-4 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></div>
                             <label className="text-xs sm:text-sm font-semibold text-gray-200">
@@ -391,11 +388,15 @@ const ApplicationModal = ({
                             )}
                           </div>
                           {doc ? (
-                            <div className={`relative flex items-center justify-between gap-3 p-4 bg-gradient-to-r ${getFileTypeColor(fileName)} border rounded-xl hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 group-hover:scale-[1.01]`}>
+                            <div
+                              className={`relative flex items-center justify-between gap-3 p-4 bg-gradient-to-r ${getFileTypeColor(fileName)} border rounded-xl hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 group-hover:scale-[1.01]`}
+                            >
                               <div className="flex items-center space-x-3 min-w-0 flex-1">
                                 <div className="relative flex-shrink-0">
                                   <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border border-cyan-400/20 shadow-lg">
-                                    <span className="text-xl">{getFileTypeIcon(fileName)}</span>
+                                    <span className="text-xl">
+                                      {getFileTypeIcon(fileName)}
+                                    </span>
                                   </div>
                                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-slate-900">
                                     <CheckCircle className="w-2.5 h-2.5 text-white" />
@@ -411,7 +412,9 @@ const ApplicationModal = ({
                                         {formatFileSize(doc.size)}
                                       </span>
                                     )}
-                                    <span className="text-xs text-gray-500">•</span>
+                                    <span className="text-xs text-gray-500">
+                                      •
+                                    </span>
                                     <span className="text-xs text-cyan-400 uppercase font-bold">
                                       {getFileExtension(fileName)}
                                     </span>
@@ -426,7 +429,9 @@ const ApplicationModal = ({
                                   className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-400/40 text-cyan-300 rounded-lg hover:from-cyan-500/40 hover:to-purple-500/40 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 text-sm font-semibold flex-shrink-0 group/btn"
                                 >
                                   <Download className="w-4 h-4 group-hover/btn:animate-bounce" />
-                                  <span className="hidden sm:inline">Download</span>
+                                  <span className="hidden sm:inline">
+                                    Download
+                                  </span>
                                 </a>
                               )}
                             </div>
@@ -437,8 +442,12 @@ const ApplicationModal = ({
                                   <XCircle className="w-5 h-5 text-red-400" />
                                 </div>
                                 <div>
-                                  <p className="text-sm font-semibold text-red-400">Not Uploaded</p>
-                                  <p className="text-xs text-gray-500">This document was not provided</p>
+                                  <p className="text-sm font-semibold text-red-400">
+                                    Not Uploaded
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    This document was not provided
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -450,20 +459,20 @@ const ApplicationModal = ({
                     {/* Show any extra docs not in the standard list (e.g. supportingDocuments) */}
                     {docsArray
                       .filter((d) => {
-                        const dLabel = (d.label || d.fieldName || "").toLowerCase().trim();
+                        const dLabel = (d.label || d.fieldName || "")
+                          .toLowerCase()
+                          .trim();
                         return !BIDDER_REQUIRED_DOCUMENTS.some(
                           (def) =>
                             def.label.toLowerCase().trim() === dLabel ||
-                            def.key.toLowerCase().trim() === dLabel
+                            def.key.toLowerCase().trim() === dLabel,
                         );
                       })
                       .map((doc, idx) => {
-                        const fileName = doc.name || doc.originalName || "Supporting Document";
+                        const fileName =
+                          doc.name || doc.originalName || "Supporting Document";
                         return (
-                          <div
-                            key={`extra-${idx}`}
-                            className="group"
-                          >
+                          <div key={`extra-${idx}`} className="group">
                             <div className="flex items-center space-x-2 mb-2">
                               <div className="w-1 h-4 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></div>
                               <label className="text-xs sm:text-sm font-semibold text-gray-200">
@@ -471,19 +480,31 @@ const ApplicationModal = ({
                               </label>
                               <CheckCircle className="w-4 h-4 text-green-400" />
                             </div>
-                            <div className={`relative flex items-center justify-between gap-3 p-4 bg-gradient-to-r ${getFileTypeColor(fileName)} border rounded-xl hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 group-hover:scale-[1.01]`}>
+                            <div
+                              className={`relative flex items-center justify-between gap-3 p-4 bg-gradient-to-r ${getFileTypeColor(fileName)} border rounded-xl hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 group-hover:scale-[1.01]`}
+                            >
                               <div className="flex items-center space-x-3 min-w-0 flex-1">
                                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border border-cyan-400/20 shadow-lg flex-shrink-0">
-                                  <span className="text-xl">{getFileTypeIcon(fileName)}</span>
+                                  <span className="text-xl">
+                                    {getFileTypeIcon(fileName)}
+                                  </span>
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-semibold text-white truncate mb-0.5">{fileName}</p>
+                                  <p className="text-sm font-semibold text-white truncate mb-0.5">
+                                    {fileName}
+                                  </p>
                                   <div className="flex items-center space-x-2">
                                     {doc.size && (
-                                      <span className="text-xs text-gray-400 font-medium">{formatFileSize(doc.size)}</span>
+                                      <span className="text-xs text-gray-400 font-medium">
+                                        {formatFileSize(doc.size)}
+                                      </span>
                                     )}
-                                    <span className="text-xs text-gray-500">•</span>
-                                    <span className="text-xs text-cyan-400 uppercase font-bold">{getFileExtension(fileName)}</span>
+                                    <span className="text-xs text-gray-500">
+                                      •
+                                    </span>
+                                    <span className="text-xs text-cyan-400 uppercase font-bold">
+                                      {getFileExtension(fileName)}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -495,7 +516,9 @@ const ApplicationModal = ({
                                   className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-400/40 text-cyan-300 rounded-lg hover:from-cyan-500/40 hover:to-purple-500/40 hover:border-cyan-400/60 transition-all duration-300 text-sm font-semibold flex-shrink-0"
                                 >
                                   <Download className="w-4 h-4" />
-                                  <span className="hidden sm:inline">Download</span>
+                                  <span className="hidden sm:inline">
+                                    Download
+                                  </span>
                                 </a>
                               )}
                             </div>
@@ -510,7 +533,8 @@ const ApplicationModal = ({
               return (
                 <div className="space-y-3">
                   {docsArray.map((doc, idx) => {
-                    const fileName = doc.originalName || doc.name || `Document ${idx + 1}`;
+                    const fileName =
+                      doc.originalName || doc.name || `Document ${idx + 1}`;
                     return (
                       <div
                         key={doc._id || idx}
@@ -518,18 +542,28 @@ const ApplicationModal = ({
                       >
                         <div className="flex items-center space-x-3 min-w-0 flex-1">
                           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border border-cyan-400/20 shadow-lg flex-shrink-0">
-                            <span className="text-xl">{getFileTypeIcon(fileName)}</span>
+                            <span className="text-xl">
+                              {getFileTypeIcon(fileName)}
+                            </span>
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold text-white truncate mb-0.5">{fileName}</p>
+                            <p className="text-sm font-semibold text-white truncate mb-0.5">
+                              {fileName}
+                            </p>
                             <div className="flex items-center space-x-2">
                               {doc.size && (
-                                <span className="text-xs text-gray-400 font-medium">{formatFileSize(doc.size)}</span>
+                                <span className="text-xs text-gray-400 font-medium">
+                                  {formatFileSize(doc.size)}
+                                </span>
                               )}
                               {doc.label && (
                                 <>
-                                  <span className="text-xs text-gray-500">•</span>
-                                  <span className="text-xs text-purple-400">{doc.label}</span>
+                                  <span className="text-xs text-gray-500">
+                                    •
+                                  </span>
+                                  <span className="text-xs text-purple-400">
+                                    {doc.label}
+                                  </span>
                                 </>
                               )}
                             </div>
@@ -554,15 +588,15 @@ const ApplicationModal = ({
             }
 
             // No array — show "no documents"
-            return <p className="text-gray-400 text-sm">No documents uploaded</p>;
+            return (
+              <p className="text-gray-400 text-sm">No documents uploaded</p>
+            );
           })()}
         </div>
 
         {/* Tender Information */}
         {application.tender && (
-          <div
-            className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8"
-          >
+          <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
             <h5 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
               Tender Information
             </h5>
@@ -575,7 +609,15 @@ const ApplicationModal = ({
               </div>
               {application.tender.description && (
                 <div>
-                  <p className="text-gray-400 text-sm">Description</p>
+                  <p
+                    className="text-gray-300 whitespace-pre-line break-words max-w-full"
+                    style={{
+                      overflowWrap: "anywhere",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    Description
+                  </p>
                   <p className="text-gray-300">
                     {application.tender.description}
                   </p>
@@ -596,25 +638,23 @@ const ApplicationModal = ({
         {/* Actions */}
         {application.status?.toLowerCase() === "pending" &&
           canChangeStatus() && (
-            <div
-              className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-2 sm:mb-4"
-            >
+            <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6 mb-2 sm:mb-4">
               <h5 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
                 Application Actions
               </h5>
-              <div className="flex items-center justify-end space-x-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
                 <button
                   onClick={() => openStatusModal("Reject")}
-                  className="flex items-center space-x-2 px-6 py-3 bg-red-500/20 border border-red-400/30 text-red-400 rounded-lg hover:bg-red-500/30 hover:border-red-400/50 transition-all duration-300"
+                  className="flex items-center justify-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-red-500/20 border border-red-400/30 text-red-400 rounded-lg hover:bg-red-500/30 hover:border-red-400/50 transition-all duration-300 text-sm sm:text-base w-full sm:w-auto"
                 >
-                  <XIcon className="w-5 h-5" />
+                  <XIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Reject Application</span>
                 </button>
                 <button
                   onClick={() => openStatusModal("Accept")}
-                  className="flex items-center space-x-2 px-6 py-3 bg-green-500/20 border border-green-400/30 text-green-400 rounded-lg hover:bg-green-500/30 hover:border-green-400/50 transition-all duration-300"
+                  className="flex items-center justify-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-green-500/20 border border-green-400/30 text-green-400 rounded-lg hover:bg-green-500/30 hover:border-green-400/50 transition-all duration-300 text-sm sm:text-base w-full sm:w-auto"
                 >
-                  <Check className="w-5 h-5" />
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Accept Application</span>
                 </button>
               </div>

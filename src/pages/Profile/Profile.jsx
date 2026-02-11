@@ -315,7 +315,7 @@ const Profile = () => {
             {loadingOrg ? (
               <div className="flex items-center justify-center py-8">
                 <div
-                  className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full motion-safe:animate-spin
+                  className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin
 "
                 ></div>
               </div>
@@ -634,7 +634,7 @@ const Profile = () => {
                 >
                   {loading ? (
                     <div
-                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full motion-safe:animate-spin
+                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin
 "
                     ></div>
                   ) : (
@@ -744,7 +744,7 @@ const Profile = () => {
                 >
                   {loading ? (
                     <div
-                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full motion-safe:animate-spin
+                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin
 "
                     ></div>
                   ) : (

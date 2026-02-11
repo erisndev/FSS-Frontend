@@ -601,7 +601,7 @@ const SystemSettings = () => {
                 >
                   {loading ? (
                     <RefreshCw
-                      className="w-4 h-4 motion-safe:animate-spin
+                      className="w-4 h-4 animate-spin
 "
                     />
                   ) : (

@@ -33,7 +33,7 @@ const LoadingSpinner = ({
   if (resolvedSize === "sm") {
     return (
       <div
-        className={`${s.wrapper} ${s.border} ${borderColor} rounded-full motion-safe:animate-spin
+        className={`${s.wrapper} ${s.border} ${borderColor} rounded-full animate-spin
  ${className}`}
       />
     );
@@ -43,12 +43,12 @@ const LoadingSpinner = ({
   const rings = (
     <div className={`relative ${s.wrapper}`}>
       <div
-        className={`absolute inset-0 rounded-full ${s.border} border-transparent border-t-cyan-400 motion-safe:animate-spin
+        className={`absolute inset-0 rounded-full ${s.border} border-transparent border-t-cyan-400 animate-spin
 `}
         style={color === "white" ? { borderTopColor: "white" } : undefined}
       />
       <div
-        className={`absolute inset-1 rounded-full ${s.border} border-transparent border-b-purple-400 motion-safe:animate-spin
+        className={`absolute inset-1 rounded-full ${s.border} border-transparent border-b-purple-400 animate-spin
 `}
         style={{
           animationDirection: "reverse",
