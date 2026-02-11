@@ -61,19 +61,26 @@ const UserManagement = () => {
         ...formData,
         email: formData.email.toLowerCase().trim(),
       };
-      
+
       // Only include company and contactPhone for issuer role
       if (formData.role !== "issuer") {
         delete userData.company;
         delete userData.contactPhone;
       }
-      
+
       await userApi.createUser(userData);
 
       fetchUsers();
       toast.success("User created successfully");
       setShowCreateModal(false);
-      setFormData({ name: "", email: "", role: "bidder", company: "", contactPhone: "", isActive: true });
+      setFormData({
+        name: "",
+        email: "",
+        role: "bidder",
+        company: "",
+        contactPhone: "",
+        isActive: true,
+      });
     } catch (error) {
       toast.error("Failed to create user");
       console.error("Error creating user:", error);
@@ -88,19 +95,26 @@ const UserManagement = () => {
         ...formData,
         email: formData.email.toLowerCase().trim(),
       };
-      
+
       // Only include company and contactPhone for issuer role
       if (formData.role !== "issuer") {
         delete userData.company;
         delete userData.contactPhone;
       }
-      
+
       await userApi.updateUser(selectedUser.id || selectedUser._id, userData);
       fetchUsers();
       toast.success("User updated successfully");
       setShowEditModal(false);
       setSelectedUser(null);
-      setFormData({ name: "", email: "", role: "bidder", company: "", contactPhone: "", isActive: true });
+      setFormData({
+        name: "",
+        email: "",
+        role: "bidder",
+        company: "",
+        contactPhone: "",
+        isActive: true,
+      });
     } catch (error) {
       toast.error("Failed to update user");
       console.error("Error updating user:", error);
@@ -305,7 +319,7 @@ const UserManagement = () => {
         subtitle="Manage system users and permissions"
       >
         <div className="flex items-center justify-center h-64">
-          <LoadingSpinner variant="section" />
+          <LoadingSpinner />
         </div>
       </DashboardLayout>
     );
@@ -318,9 +332,7 @@ const UserManagement = () => {
     >
       <div className="space-y-6">
         {/* Header Actions */}
-        <div
-          className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0"
-        >
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 flex-1">
             {/* Search */}
             <div className="relative flex-1 max-w-md">
@@ -372,9 +384,7 @@ const UserManagement = () => {
           </button>
         </div>
         {/* Users Table */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl overflow-hidden"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-800/50 border-b border-cyan-400/10">
@@ -416,7 +426,9 @@ const UserManagement = () => {
                           <p className="text-white font-medium">{user.name}</p>
                           <p className="text-gray-400 text-sm">{user.email}</p>
                           {user.company && (
-                            <p className="text-gray-500 text-xs">{user.company}</p>
+                            <p className="text-gray-500 text-xs">
+                              {user.company}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -424,7 +436,7 @@ const UserManagement = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`px-3 py-1 text-xs rounded-full border ${getRoleColor(
-                          user.role
+                          user.role,
                         )}`}
                       >
                         {user.role}

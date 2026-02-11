@@ -27,7 +27,7 @@ const OTPVerification = () => {
 
   const normalizedEmail = useMemo(
     () => (email ? email.toLowerCase().trim() : ""),
-    [email]
+    [email],
   );
 
   const resendTimer = useMemo(() => {
@@ -101,7 +101,7 @@ const OTPVerification = () => {
     if (isLoading) return;
 
     const otpString = otp.join("");
-    
+
     if (!normalizedEmail) {
       setError("Missing email. Please register again.");
       return;
@@ -120,18 +120,17 @@ const OTPVerification = () => {
         const user = await verifyRegisterOTP(normalizedEmail, otpString);
         toast.success("Registration successful");
 
-        
         if (user && user.role) {
           const dashboardPath =
             user.role === "admin"
               ? "/admin"
               : user.role === "issuer"
-              ? "/issuer"
-              : "/bidder";
+                ? "/issuer"
+                : "/bidder";
           navigate(dashboardPath, { replace: true });
         } else {
           setError(
-            "Registration completed, but user info is missing. Please login."
+            "Registration completed, but user info is missing. Please login.",
           );
           toast.error("Please login to continue");
           navigate("/login", { replace: true });
@@ -146,7 +145,6 @@ const OTPVerification = () => {
       const message =
         err?.response?.data?.message || err?.message || "Verification failed";
 
-      
       // Match spec messaging for register flow
       if (
         isRegistration &&
@@ -154,7 +152,7 @@ const OTPVerification = () => {
         message === "Invalid or expired registration OTP"
       ) {
         setError(
-          "Incorrect code. Please check the latest email or resend a new code."
+          "Incorrect code. Please check the latest email or resend a new code.",
         );
       } else if (isRegistration && err?.response?.status === 404) {
         setError("User not found. Please register again.");
@@ -177,7 +175,6 @@ const OTPVerification = () => {
     setIsResending(true);
     setError("");
 
-    
     try {
       let res;
       if (isRegistration) {
@@ -186,7 +183,6 @@ const OTPVerification = () => {
         res = await resendResetOTP(normalizedEmail);
       }
 
-      
       // Spec: backend may return resendAvailableInSeconds when reusing cooldown
       const seconds =
         Number(res?.resendAvailableInSeconds) > 0
@@ -212,7 +208,6 @@ const OTPVerification = () => {
       const message =
         err?.response?.data?.message || err?.message || "Failed to resend OTP";
 
-      
       // Spec: already verified should redirect to login
       if (isRegistration && err?.response?.status === 400) {
         if (message === "Email already verified") {
@@ -229,13 +224,9 @@ const OTPVerification = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div
-        className="max-w-md w-full space-y-8"
-      >
+      <div className="max-w-md w-full space-y-8">
         {/* Logo and Title */}
-        <div
-          className="text-center"
-        >
+        <div className="text-center">
           <div className="flex justify-center">
             <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-2xl flex items-center justify-center mb-4">
               <Shield className="w-8 h-8 text-white" />
@@ -252,9 +243,7 @@ const OTPVerification = () => {
         </div>
 
         {/* OTP Form */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8 shadow-2xl"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div
@@ -296,7 +285,7 @@ const OTPVerification = () => {
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <LoadingSpinner variant="inline" size="sm" color="white" />
+                  <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
                   <span>Verifying...</span>
                 </div>
               ) : (

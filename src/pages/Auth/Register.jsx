@@ -44,8 +44,8 @@ const Register = () => {
       user.role === "admin"
         ? "/admin"
         : user.role === "issuer"
-        ? "/issuer"
-        : "/bidder";
+          ? "/issuer"
+          : "/bidder";
     return <Navigate to={dashboardPath} replace />;
   }
 
@@ -53,7 +53,10 @@ const Register = () => {
     return (
       <Navigate
         to="/verify-otp"
-        state={{ email: formData.email.toLowerCase().trim(), isRegistration: true }}
+        state={{
+          email: formData.email.toLowerCase().trim(),
+          isRegistration: true,
+        }}
         replace
       />
     );
@@ -155,20 +158,16 @@ const Register = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <LoadingSpinner variant="section" />
+        <LoadingSpinner fullScreen />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-3 sm:p-4 py-6 sm:py-4">
-      <div
-        className="max-w-md w-full space-y-4 sm:space-y-6 md:space-y-8"
-      >
+      <div className="max-w-md w-full space-y-4 sm:space-y-6 md:space-y-8">
         {/* Logo and Title */}
-        <div
-          className="text-center"
-        >
+        <div className="text-center">
           <div className="flex justify-center">
             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-xl sm:rounded-2xl flex items-center justify-center mb-2 sm:mb-3 md:mb-4">
               <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
@@ -183,9 +182,7 @@ const Register = () => {
         </div>
 
         {/* Register Form */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl">
           <form
             onSubmit={handleSubmit}
             className="space-y-3 sm:space-y-4 md:space-y-5"
@@ -367,7 +364,7 @@ const Register = () => {
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <LoadingSpinner variant="inline" size="sm" color="white" />
+                  <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
                   <span>Creating Account...</span>
                 </div>
               ) : (

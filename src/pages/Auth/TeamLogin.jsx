@@ -35,8 +35,8 @@ const TeamLogin = () => {
       user.role === "admin"
         ? "/admin"
         : user.role === "issuer"
-        ? "/issuer"
-        : "/bidder";
+          ? "/issuer"
+          : "/bidder";
     return <Navigate to={dashboardPath} replace />;
   }
 
@@ -59,7 +59,7 @@ const TeamLogin = () => {
         setTimeout(() => navigate("/login"), 1500);
       } else {
         setError(
-          err?.response?.data?.message || "Failed to fetch team members"
+          err?.response?.data?.message || "Failed to fetch team members",
         );
       }
     } finally {
@@ -105,20 +105,16 @@ const TeamLogin = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <LoadingSpinner variant="section" />
+        <LoadingSpinner fullScreen />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-3 sm:p-4">
-      <div
-        className="max-w-md w-full space-y-6 sm:space-y-8"
-      >
+      <div className="max-w-md w-full space-y-6 sm:space-y-8">
         {/* Logo and Title */}
-        <div
-          className="text-center"
-        >
+        <div className="text-center">
           <div className="flex justify-center">
             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4">
               <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
@@ -142,8 +138,8 @@ const TeamLogin = () => {
                   s === step
                     ? "w-8 bg-cyan-400"
                     : s < step
-                    ? "w-2 bg-cyan-400/50"
-                    : "w-2 bg-gray-600"
+                      ? "w-2 bg-cyan-400/50"
+                      : "w-2 bg-gray-600"
                 }`}
               />
             ))}
@@ -151,196 +147,189 @@ const TeamLogin = () => {
         </div>
 
         {/* Login Form */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-2xl p-5 sm:p-8 shadow-2xl"
-        >
-          
-            {/* Step 1: Email Input */}
-            {step === 1 && (
-              <form
-                key="step1"
-                onSubmit={handleEmailSubmit}
-                className="space-y-4 sm:space-y-6"
-              >
-                {/* {error && (
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-2xl p-5 sm:p-8 shadow-2xl">
+          {/* Step 1: Email Input */}
+          {step === 1 && (
+            <form
+              key="step1"
+              onSubmit={handleEmailSubmit}
+              className="space-y-4 sm:space-y-6"
+            >
+              {/* {error && (
                   <div className="bg-red-500/20 border border-red-400/50 rounded-lg p-2.5 sm:p-3 text-red-300 text-xs sm:text-sm break-words">
                     {error}
                   </div>
                 )} */}
 
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
-                    Organization Email
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-                      placeholder="Enter organization email"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <LoadingSpinner variant="inline" size="sm" color="white" />
-                      <span>Checking...</span>
-                    </div>
-                  ) : (
-                    "Continue"
-                  )}
-                </button>
-              </form>
-            )}
-
-            {/* Step 2: Member Selection */}
-            {step === 2 && organizationData && (
-              <div
-                key="step2"
-                className="space-y-4"
-              >
-                <button
-                  onClick={handleBack}
-                  className="flex items-center text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200 mb-4"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-1" />
-                  Back
-                </button>
-
-                <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold text-white">
-                    {organizationData.organizationName}
-                  </h3>
-                  <p className="text-gray-400 text-sm mt-1">
-                    Select your profile to continue
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  {organizationData.members.map((member) => (
-                    <button
-                      key={member.id}
-                      onClick={() => handleMemberSelect(member)}
-                      className="w-full p-4 bg-slate-800/50 border border-cyan-400/20 rounded-lg hover:border-cyan-400/50 hover:bg-slate-800/70 transition-all duration-300 text-left"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center">
-                            <Users className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <div className="flex items-center space-x-2">
-                              <p className="text-white font-medium">
-                                {member.name}
-                              </p>
-                              {member.role === "team_leader" && (
-                                <Crown className="w-4 h-4 text-yellow-400" />
-                              )}
-                            </div>
-                            <p className="text-gray-400 text-sm capitalize">
-                              {member.role.replace("_", " ")}
-                            </p>
-                          </div>
-                        </div>
-                        <CheckCircle className="w-5 h-5 text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </button>
-                  ))}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
+                  Organization Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
+                    placeholder="Enter organization email"
+                  />
                 </div>
               </div>
-            )}
 
-            {/* Step 3: Password Input */}
-            {step === 3 && selectedMember && (
-              <form
-                key="step3"
-                onSubmit={handlePasswordSubmit}
-                className="space-y-4 sm:space-y-6"
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="flex items-center text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200 mb-4"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-1" />
-                  Back
-                </button>
+                {isLoading ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                    <span>Checking...</span>
+                  </div>
+                ) : (
+                  "Continue"
+                )}
+              </button>
+            </form>
+          )}
 
-                {/* {error && (
+          {/* Step 2: Member Selection */}
+          {step === 2 && organizationData && (
+            <div key="step2" className="space-y-4">
+              <button
+                onClick={handleBack}
+                className="flex items-center text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200 mb-4"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Back
+              </button>
+
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-bold text-white">
+                  {organizationData.organizationName}
+                </h3>
+                <p className="text-gray-400 text-sm mt-1">
+                  Select your profile to continue
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {organizationData.members.map((member) => (
+                  <button
+                    key={member.id}
+                    onClick={() => handleMemberSelect(member)}
+                    className="w-full p-4 bg-slate-800/50 border border-cyan-400/20 rounded-lg hover:border-cyan-400/50 hover:bg-slate-800/70 transition-all duration-300 text-left"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center">
+                          <Users className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <p className="text-white font-medium">
+                              {member.name}
+                            </p>
+                            {member.role === "team_leader" && (
+                              <Crown className="w-4 h-4 text-yellow-400" />
+                            )}
+                          </div>
+                          <p className="text-gray-400 text-sm capitalize">
+                            {member.role.replace("_", " ")}
+                          </p>
+                        </div>
+                      </div>
+                      <CheckCircle className="w-5 h-5 text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Password Input */}
+          {step === 3 && selectedMember && (
+            <form
+              key="step3"
+              onSubmit={handlePasswordSubmit}
+              className="space-y-4 sm:space-y-6"
+            >
+              <button
+                type="button"
+                onClick={handleBack}
+                className="flex items-center text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200 mb-4"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Back
+              </button>
+
+              {/* {error && (
                   <div className="bg-red-500/20 border border-red-400/50 rounded-lg p-2.5 sm:p-3 text-red-300 text-xs sm:text-sm break-words">
                     {error}
                   </div>
                 )} */}
 
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Users className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white flex items-center justify-center space-x-2">
-                    <span>{selectedMember.name}</span>
-                    {selectedMember.role === "team_leader" && (
-                      <Crown className="w-5 h-5 text-yellow-400" />
-                    )}
-                  </h3>
-                  <p className="text-gray-400 text-sm mt-1 capitalize">
-                    {selectedMember.role.replace("_", " ")}
-                  </p>
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Users className="w-8 h-8 text-white" />
                 </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
-                      placeholder="Enter your password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-cyan-400 transition-colors duration-200"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
-                      ) : (
-                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <LoadingSpinner variant="inline" size="sm" color="white" />
-                      <span>Signing In...</span>
-                    </div>
-                  ) : (
-                    "Sign In"
+                <h3 className="text-xl font-bold text-white flex items-center justify-center space-x-2">
+                  <span>{selectedMember.name}</span>
+                  {selectedMember.role === "team_leader" && (
+                    <Crown className="w-5 h-5 text-yellow-400" />
                   )}
-                </button>
-              </form>
-            )}
-          
+                </h3>
+                <p className="text-gray-400 text-sm mt-1 capitalize">
+                  {selectedMember.role.replace("_", " ")}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-cyan-400 transition-colors duration-200"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                    ) : (
+                      <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                    <span>Signing In...</span>
+                  </div>
+                ) : (
+                  "Sign In"
+                )}
+              </button>
+            </form>
+          )}
 
           {/* Links */}
           {step === 1 && (

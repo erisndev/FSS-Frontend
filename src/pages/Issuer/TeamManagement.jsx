@@ -75,7 +75,9 @@ const TeamManagement = () => {
       if (results[0].status === "fulfilled") {
         const response = results[0].value;
         // Backend returns array directly, not wrapped in { members: [...] }
-        fetchedMembers = Array.isArray(response) ? response : (response?.members || []);
+        fetchedMembers = Array.isArray(response)
+          ? response
+          : response?.members || [];
       }
       setTeamMembers(fetchedMembers);
 
@@ -83,7 +85,7 @@ const TeamManagement = () => {
       setPendingInvitations(
         results[1].status === "fulfilled"
           ? results[1].value.invitations || results[1].value || []
-          : []
+          : [],
       );
       setOrganization(
         results[2].status === "fulfilled"
@@ -98,7 +100,7 @@ const TeamManagement = () => {
               companyName: user.company || "",
               contactPhone: "",
               address: "",
-            }
+            },
       );
 
       const membersCount =
@@ -113,11 +115,11 @@ const TeamManagement = () => {
               activeMembers: membersCount + 1,
               totalTenders: 0,
               activeTenders: 0,
-            }
+            },
       );
 
       setPermissionPresets(
-        results[4].status === "fulfilled" ? results[4].value.presets || [] : []
+        results[4].status === "fulfilled" ? results[4].value.presets || [] : [],
       );
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -130,7 +132,7 @@ const TeamManagement = () => {
   const fetchActivities = async () => {
     try {
       const activitiesRes = await activityLogApi.getOrganizationActivities(
-        user.organizationId
+        user.organizationId,
       );
       setActivities(activitiesRes.activities || []);
     } catch (error) {
@@ -166,7 +168,7 @@ const TeamManagement = () => {
     } catch (error) {
       console.error("Error resending invitation:", error);
       toast.error(
-        error?.response?.data?.message || "Failed to resend invitation"
+        error?.response?.data?.message || "Failed to resend invitation",
       );
     }
   };
@@ -181,7 +183,7 @@ const TeamManagement = () => {
     } catch (error) {
       console.error("Error cancelling invitation:", error);
       toast.error(
-        error?.response?.data?.message || "Failed to cancel invitation"
+        error?.response?.data?.message || "Failed to cancel invitation",
       );
     }
   };
@@ -199,7 +201,7 @@ const TeamManagement = () => {
     } catch (error) {
       console.error("Error exporting activities:", error);
       toast.error(
-        error?.response?.data?.message || "Export feature not available yet"
+        error?.response?.data?.message || "Export feature not available yet",
       );
     }
   };
@@ -269,7 +271,7 @@ const TeamManagement = () => {
         <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-3 sm:p-4 md:p-6">
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <LoadingSpinner variant="section" />
+              <LoadingSpinner />
             </div>
           ) : (
             <>
@@ -378,7 +380,7 @@ const TeamMembersTab = ({
 
   // Check if team leader is already in the members list from backend
   const hasTeamLeader = members.some(
-    (m) => m.role === "team_leader" || m.user?._id === user._id
+    (m) => m.role === "team_leader" || m.user?._id === user._id,
   );
 
   // Always show team leader first, then other members
@@ -427,7 +429,9 @@ const TeamMembersTab = ({
         {allMembers.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
             <Users className="w-12 h-12 sm:w-16 sm:h-16 text-gray-500 mx-auto mb-3 sm:mb-4" />
-            <p className="text-gray-400 text-base sm:text-lg mb-1 sm:mb-2">No team members yet</p>
+            <p className="text-gray-400 text-base sm:text-lg mb-1 sm:mb-2">
+              No team members yet
+            </p>
             <p className="text-gray-500 text-xs sm:text-sm">
               Click "Invite Member" to invite your first team member
             </p>
@@ -473,7 +477,9 @@ const ActivityLogTab = ({
   return (
     <div className="space-y-3 sm:space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <h2 className="text-lg sm:text-xl font-bold text-white">Activity Log</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-white">
+          Activity Log
+        </h2>
         <button
           onClick={onExport}
           className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-200 text-sm sm:text-base w-full sm:w-auto justify-center"
@@ -519,7 +525,9 @@ const ActivityLogTab = ({
         {filteredActivities.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
             <Activity className="w-12 h-12 sm:w-16 sm:h-16 text-gray-500 mx-auto mb-3 sm:mb-4" />
-            <p className="text-gray-400 text-base sm:text-lg mb-1 sm:mb-2">No activities yet</p>
+            <p className="text-gray-400 text-base sm:text-lg mb-1 sm:mb-2">
+              No activities yet
+            </p>
             <p className="text-gray-500 text-xs sm:text-sm">
               Team activities will appear here
             </p>
@@ -561,7 +569,9 @@ const OrganizationSettingsTab = ({ organization, onUpdate }) => {
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      <h2 className="text-lg sm:text-xl font-bold text-white">Organization Settings</h2>
+      <h2 className="text-lg sm:text-xl font-bold text-white">
+        Organization Settings
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -655,7 +665,9 @@ const StatisticsTab = ({ stats }) => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <h2 className="text-lg sm:text-xl font-bold text-white">Statistics & Analytics</h2>
+      <h2 className="text-lg sm:text-xl font-bold text-white">
+        Statistics & Analytics
+      </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {statCards.map((stat, index) => (

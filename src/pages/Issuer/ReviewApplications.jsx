@@ -82,7 +82,7 @@ const ReviewApplications = () => {
         setSelectedTender(tenderToSelect);
         localStorage.setItem(
           "selectedTenderId",
-          tenderToSelect._id || tenderToSelect.id
+          tenderToSelect._id || tenderToSelect.id,
         );
       }
     } catch (error) {
@@ -122,7 +122,7 @@ const ReviewApplications = () => {
       await applicationApi.updateApplicationStatus(
         applicationId,
         normalized,
-        comment
+        comment,
       );
       toast.success("Application status changed successfully");
       fetchApplications(selectedTender._id || selectedTender.id);
@@ -147,13 +147,13 @@ const ReviewApplications = () => {
     user,
     userPermissions,
     selectedTender,
-    "view"
+    "view",
   );
   const canAcceptRejectApp = canPerformApplicationAction(
     user,
     userPermissions,
     selectedTender,
-    "accept"
+    "accept",
   );
   const canChangeStatus = () => canAcceptRejectApp;
 
@@ -161,16 +161,16 @@ const ReviewApplications = () => {
   const stats = useMemo(() => {
     const all = applications.length;
     const pending = applications.filter(
-      (a) => normalizeStatus(a.status) === "pending"
+      (a) => normalizeStatus(a.status) === "pending",
     ).length;
     const accepted = applications.filter(
-      (a) => normalizeStatus(a.status) === "accepted"
+      (a) => normalizeStatus(a.status) === "accepted",
     ).length;
     const rejected = applications.filter(
-      (a) => normalizeStatus(a.status) === "rejected"
+      (a) => normalizeStatus(a.status) === "rejected",
     ).length;
     const withdrawn = applications.filter(
-      (a) => normalizeStatus(a.status) === "withdrawn"
+      (a) => normalizeStatus(a.status) === "withdrawn",
     ).length;
     return { all, pending, accepted, rejected, withdrawn };
   }, [applications]);
@@ -182,7 +182,7 @@ const ReviewApplications = () => {
     // Status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter(
-        (a) => normalizeStatus(a.status) === statusFilter
+        (a) => normalizeStatus(a.status) === statusFilter,
       );
     }
 
@@ -193,7 +193,7 @@ const ReviewApplications = () => {
         (a) =>
           (a.companyName || "").toLowerCase().includes(term) ||
           (a.email || "").toLowerCase().includes(term) ||
-          (a.contactPerson || "").toLowerCase().includes(term)
+          (a.contactPerson || "").toLowerCase().includes(term),
       );
     }
 
@@ -323,8 +323,7 @@ const ReviewApplications = () => {
         "bg-slate-800/40 border-slate-600/30 text-gray-400 hover:border-green-400/30 hover:text-green-400",
     },
     red: {
-      active:
-        "bg-red-500/20 border-red-400/50 text-red-300 shadow-red-500/10",
+      active: "bg-red-500/20 border-red-400/50 text-red-300 shadow-red-500/10",
       inactive:
         "bg-slate-800/40 border-slate-600/30 text-gray-400 hover:border-red-400/30 hover:text-red-400",
     },
@@ -343,7 +342,9 @@ const ReviewApplications = () => {
         title="Review Applications"
         subtitle="Review and manage tender applications"
       >
-        <LoadingSpinner variant="section" />
+        <div className="flex items-center justify-center h-64">
+          <LoadingSpinner />
+        </div>
       </DashboardLayout>
     );
   }
@@ -355,9 +356,7 @@ const ReviewApplications = () => {
         title="Review Applications"
         subtitle="Review and manage tender applications"
       >
-        <div
-          className="flex flex-col items-center justify-center py-20 px-4"
-        >
+        <div className="flex flex-col items-center justify-center py-20 px-4">
           <div className="w-20 h-20 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl flex items-center justify-center mb-6 border border-cyan-400/10">
             <Inbox className="w-10 h-10 text-gray-500" />
           </div>
@@ -380,17 +379,13 @@ const ReviewApplications = () => {
     >
       <div className="space-y-5">
         {/* ─── Tender Selector ─── */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4 sm:p-5"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4 sm:p-5">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <div className="flex items-center space-x-2 flex-shrink-0">
               <div className="w-8 h-8 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-lg flex items-center justify-center border border-cyan-400/10">
                 <FileText className="w-4 h-4 text-cyan-400" />
               </div>
-              <span className="text-sm font-medium text-gray-300">
-                Tender:
-              </span>
+              <span className="text-sm font-medium text-gray-300">Tender:</span>
             </div>
 
             <div className="relative flex-1">
@@ -398,7 +393,7 @@ const ReviewApplications = () => {
                 value={selectedTender?._id || selectedTender?.id || ""}
                 onChange={(e) => {
                   const tender = tenders.find(
-                    (t) => (t._id || t.id) === e.target.value
+                    (t) => (t._id || t.id) === e.target.value,
                   );
                   setSelectedTender(tender);
                   setSearchTerm("");
@@ -406,7 +401,7 @@ const ReviewApplications = () => {
                   if (tender) {
                     localStorage.setItem(
                       "selectedTenderId",
-                      tender._id || tender.id
+                      tender._id || tender.id,
                     );
                   }
                 }}
@@ -438,9 +433,7 @@ const ReviewApplications = () => {
 
         {/* ─── Stats Cards ─── */}
         {selectedTender && (
-          <div
-            className="grid grid-cols-2 sm:grid-cols-4 gap-3"
-          >
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               {
                 label: "Total",
@@ -495,9 +488,7 @@ const ReviewApplications = () => {
 
         {/* ─── Search, Filter Chips & Sort ─── */}
         {selectedTender && applications.length > 0 && (
-          <div
-            className="space-y-3"
-          >
+          <div className="space-y-3">
             {/* Search + Sort row */}
             <div className="flex flex-col sm:flex-row gap-3">
               {/* Search */}
@@ -580,12 +571,11 @@ const ReviewApplications = () => {
 
         {/* ─── Applications List ─── */}
         {selectedTender && (
-          <div
-          >
+          <div>
             {/* Loading applications */}
             {showAppsLoading ? (
               <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8">
-                <LoadingSpinner variant="section" text="Loading applications…" />
+                <LoadingSpinner text="Loading applications…" />
               </div>
             ) : applications.length === 0 ? (
               /* No applications */
@@ -649,132 +639,131 @@ const ReviewApplications = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  
-                    {filteredApplications.map((application, index) => (
+                  {filteredApplications.map((application, index) => (
+                    <div
+                      key={application._id || application.id || index}
+                      layout
+                      className="group bg-white/5 backdrop-blur-xl border border-cyan-400/10 rounded-xl overflow-hidden hover:bg-white/[0.07] hover:border-cyan-400/25 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300"
+                    >
+                      {/* Card header with status accent */}
                       <div
-                        key={application._id || application.id || index}
-                        layout
-                        className="group bg-white/5 backdrop-blur-xl border border-cyan-400/10 rounded-xl overflow-hidden hover:bg-white/[0.07] hover:border-cyan-400/25 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300"
-                      >
-                        {/* Card header with status accent */}
-                        <div
-                          className={`h-1 ${
-                            normalizeStatus(application.status) === "pending"
-                              ? "bg-gradient-to-r from-yellow-400 to-amber-500"
-                              : normalizeStatus(application.status) === "accepted"
+                        className={`h-1 ${
+                          normalizeStatus(application.status) === "pending"
+                            ? "bg-gradient-to-r from-yellow-400 to-amber-500"
+                            : normalizeStatus(application.status) === "accepted"
                               ? "bg-gradient-to-r from-green-400 to-emerald-500"
-                              : normalizeStatus(application.status) === "rejected"
-                              ? "bg-gradient-to-r from-red-400 to-pink-500"
-                              : "bg-gradient-to-r from-gray-400 to-gray-500"
-                          }`}
-                        />
+                              : normalizeStatus(application.status) ===
+                                  "rejected"
+                                ? "bg-gradient-to-r from-red-400 to-pink-500"
+                                : "bg-gradient-to-r from-gray-400 to-gray-500"
+                        }`}
+                      />
 
-                        <div className="p-4 sm:p-5">
-                          {/* Company + Status */}
-                          <div className="flex items-start justify-between gap-2 mb-4">
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-10 h-10 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-lg flex items-center justify-center border border-cyan-400/10 flex-shrink-0">
-                                <Building className="w-5 h-5 text-cyan-400" />
-                              </div>
-                              <div className="min-w-0">
-                                <h4 className="text-sm text-white font-semibold truncate">
-                                  {application.companyName || "Unknown Company"}
-                                </h4>
-                                <p className="text-xs text-gray-500 truncate">
-                                  {application.contactPerson || application.email}
-                                </p>
-                              </div>
+                      <div className="p-4 sm:p-5">
+                        {/* Company + Status */}
+                        <div className="flex items-start justify-between gap-2 mb-4">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-lg flex items-center justify-center border border-cyan-400/10 flex-shrink-0">
+                              <Building className="w-5 h-5 text-cyan-400" />
                             </div>
-                            <span
-                              className={`inline-flex items-center space-x-1 px-2 py-0.5 text-[10px] rounded-full border font-semibold flex-shrink-0 ${getStatusColor(
-                                application.status
-                              )}`}
-                            >
-                              {getStatusIcon(application.status)}
-                              <span className="capitalize">
-                                {normalizeStatus(application.status)}
-                              </span>
+                            <div className="min-w-0">
+                              <h4 className="text-sm text-white font-semibold truncate">
+                                {application.companyName || "Unknown Company"}
+                              </h4>
+                              <p className="text-xs text-gray-500 truncate">
+                                {application.contactPerson || application.email}
+                              </p>
+                            </div>
+                          </div>
+                          <span
+                            className={`inline-flex items-center space-x-1 px-2 py-0.5 text-[10px] rounded-full border font-semibold flex-shrink-0 ${getStatusColor(
+                              application.status,
+                            )}`}
+                          >
+                            {getStatusIcon(application.status)}
+                            <span className="capitalize">
+                              {normalizeStatus(application.status)}
+                            </span>
+                          </span>
+                        </div>
+
+                        {/* Bid amount highlight */}
+                        <div className="bg-slate-800/40 rounded-lg p-3 mb-4">
+                          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">
+                            Bid Amount
+                          </p>
+                          <p className="text-lg font-bold text-cyan-400">
+                            R{(application.bidAmount || 0).toLocaleString()}
+                          </p>
+                        </div>
+
+                        {/* Details */}
+                        <div className="space-y-2 mb-4">
+                          <div className="flex items-center space-x-2 text-xs">
+                            <Mail className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+                            <span className="text-gray-400 truncate">
+                              {application.email}
                             </span>
                           </div>
-
-                          {/* Bid amount highlight */}
-                          <div className="bg-slate-800/40 rounded-lg p-3 mb-4">
-                            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">
-                              Bid Amount
-                            </p>
-                            <p className="text-lg font-bold text-cyan-400">
-                              R{(application.bidAmount || 0).toLocaleString()}
-                            </p>
-                          </div>
-
-                          {/* Details */}
-                          <div className="space-y-2 mb-4">
+                          {application.phone && (
                             <div className="flex items-center space-x-2 text-xs">
-                              <Mail className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-                              <span className="text-gray-400 truncate">
-                                {application.email}
-                              </span>
-                            </div>
-                            {application.phone && (
-                              <div className="flex items-center space-x-2 text-xs">
-                                <Phone className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-                                <span className="text-gray-400">
-                                  {application.phone}
-                                </span>
-                              </div>
-                            )}
-                            <div className="flex items-center space-x-2 text-xs">
-                              <Calendar className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+                              <Phone className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
                               <span className="text-gray-400">
-                                {formatRelative(
-                                  application.appliedAt || application.createdAt
-                                )}
+                                {application.phone}
                               </span>
                             </div>
-                          </div>
-
-                          {/* Actions */}
-                          <div className="flex items-center gap-2 pt-3 border-t border-cyan-400/10">
-                            {canViewApp && (
-                              <button
-                                onClick={() => {
-                                  setSelectedApplication(application);
-                                  setShowModal(true);
-                                }}
-                                className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-2 bg-slate-800/60 border border-cyan-400/20 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/40 transition-all duration-200 text-xs font-medium"
-                              >
-                                <Eye className="w-3.5 h-3.5" />
-                                <span>View</span>
-                              </button>
-                            )}
-                            {normalizeStatus(application.status) === "pending" &&
-                              canChangeStatus() && (
-                                <>
-                                  <button
-                                    onClick={() =>
-                                      openStatusModal(application, "Accept")
-                                    }
-                                    className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-2 bg-green-500/10 border border-green-400/20 text-green-400 rounded-lg hover:bg-green-500/20 hover:border-green-400/40 transition-all duration-200 text-xs font-medium"
-                                  >
-                                    <Check className="w-3.5 h-3.5" />
-                                    <span>Accept</span>
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      openStatusModal(application, "Reject")
-                                    }
-                                    className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-2 bg-red-500/10 border border-red-400/20 text-red-400 rounded-lg hover:bg-red-500/20 hover:border-red-400/40 transition-all duration-200 text-xs font-medium"
-                                  >
-                                    <X className="w-3.5 h-3.5" />
-                                    <span>Reject</span>
-                                  </button>
-                                </>
+                          )}
+                          <div className="flex items-center space-x-2 text-xs">
+                            <Calendar className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+                            <span className="text-gray-400">
+                              {formatRelative(
+                                application.appliedAt || application.createdAt,
                               )}
+                            </span>
                           </div>
                         </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 pt-3 border-t border-cyan-400/10">
+                          {canViewApp && (
+                            <button
+                              onClick={() => {
+                                setSelectedApplication(application);
+                                setShowModal(true);
+                              }}
+                              className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-2 bg-slate-800/60 border border-cyan-400/20 text-cyan-400 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/40 transition-all duration-200 text-xs font-medium"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>View</span>
+                            </button>
+                          )}
+                          {normalizeStatus(application.status) === "pending" &&
+                            canChangeStatus() && (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    openStatusModal(application, "Accept")
+                                  }
+                                  className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-2 bg-green-500/10 border border-green-400/20 text-green-400 rounded-lg hover:bg-green-500/20 hover:border-green-400/40 transition-all duration-200 text-xs font-medium"
+                                >
+                                  <Check className="w-3.5 h-3.5" />
+                                  <span>Accept</span>
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    openStatusModal(application, "Reject")
+                                  }
+                                  className="flex-1 inline-flex items-center justify-center space-x-1.5 px-3 py-2 bg-red-500/10 border border-red-400/20 text-red-400 rounded-lg hover:bg-red-500/20 hover:border-red-400/40 transition-all duration-200 text-xs font-medium"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                  <span>Reject</span>
+                                </button>
+                              </>
+                            )}
+                        </div>
                       </div>
-                    ))}
-                  
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -798,7 +787,7 @@ const ReviewApplications = () => {
               setSelectedApplication(null);
             }}
           />,
-          document.body
+          document.body,
         )}
 
       {showStatusModal &&
@@ -816,11 +805,11 @@ const ReviewApplications = () => {
               handleStatusUpdate(
                 selectedApplication._id || selectedApplication.id,
                 statusAction,
-                comment
+                comment,
               )
             }
           />,
-          document.body
+          document.body,
         )}
     </DashboardLayout>
   );

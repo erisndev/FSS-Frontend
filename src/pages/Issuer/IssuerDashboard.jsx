@@ -22,6 +22,7 @@ import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
 
 const IssuerDashboard = () => {
   const { user, permissions } = useAuth();
@@ -233,10 +234,7 @@ const IssuerDashboard = () => {
         subtitle="Manage your tenders and applications"
       >
         <div className="flex items-center justify-center h-64">
-          <div
-            className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin
-"
-          ></div>
+          <LoadingSpinner />
         </div>
       </DashboardLayout>
     );

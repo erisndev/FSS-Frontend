@@ -1,10 +1,24 @@
 import React from "react";
 import LoadingSpinner from "./LoadingSpinner";
-import { X, AlertTriangle, CheckCircle, ThumbsUp, ThumbsDown } from "lucide-react";
+import {
+  X,
+  AlertTriangle,
+  CheckCircle,
+  ThumbsUp,
+  ThumbsDown,
+} from "lucide-react";
 
-const ConfirmActionModal = ({ isOpen, onClose, onConfirm, title, message, actionType = "approve", isLoading = false }) => {
+const ConfirmActionModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  actionType = "approve",
+  isLoading = false,
+}) => {
   const isApprove = actionType === "approve";
-  
+
   return (
     <>
       {isOpen && (
@@ -16,7 +30,7 @@ const ConfirmActionModal = ({ isOpen, onClose, onConfirm, title, message, action
             onClick={(e) => e.stopPropagation()}
             className="bg-gradient-to-b from-slate-900 to-slate-950 border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/40 w-full max-w-md overflow-hidden"
           >
-              {/* Header */}
+            {/* Header */}
             <div className="flex items-start justify-between p-6 border-b border-cyan-400/10">
               <div className="flex items-center space-x-3">
                 {isApprove ? (
@@ -46,7 +60,9 @@ const ConfirmActionModal = ({ isOpen, onClose, onConfirm, title, message, action
 
             {/* Content */}
             <div className="p-6">
-              <div className={`p-4 rounded-lg border ${isApprove ? 'border-green-400/20 bg-gradient-to-r from-green-500/10 to-emerald-500/10' : 'border-red-400/20 bg-gradient-to-r from-red-500/10 to-orange-500/10'}`}>
+              <div
+                className={`p-4 rounded-lg border ${isApprove ? "border-green-400/20 bg-gradient-to-r from-green-500/10 to-emerald-500/10" : "border-red-400/20 bg-gradient-to-r from-red-500/10 to-orange-500/10"}`}
+              >
                 <p className="text-gray-300 text-sm leading-relaxed">
                   {message}
                 </p>
@@ -73,12 +89,16 @@ const ConfirmActionModal = ({ isOpen, onClose, onConfirm, title, message, action
               >
                 {isLoading ? (
                   <>
-                    <LoadingSpinner variant="inline" size="sm" color="white" />
+                    <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
                     <span>Processing...</span>
                   </>
                 ) : (
                   <>
-                    {isApprove ? <ThumbsUp className="w-4 h-4" /> : <ThumbsDown className="w-4 h-4" />}
+                    {isApprove ? (
+                      <ThumbsUp className="w-4 h-4" />
+                    ) : (
+                      <ThumbsDown className="w-4 h-4" />
+                    )}
                     <span>{isApprove ? "Approve" : "Reject"}</span>
                   </>
                 )}

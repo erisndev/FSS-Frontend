@@ -41,7 +41,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
       // First check if user has already verified this tender via status API
       try {
         const statusResponse = await verificationCodeApi.checkStatus(
-          tender._id
+          tender._id,
         );
         console.log("Verification status check:", statusResponse);
 
@@ -65,7 +65,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
       // If not verified, check for existing requests
       const requests = await verificationCodeApi.getMyRequests();
       const foundRequest = requests.find(
-        (req) => req.tenderId === tender._id || req.tender?._id === tender._id
+        (req) => req.tenderId === tender._id || req.tender?._id === tender._id,
       );
 
       if (foundRequest) {
@@ -127,7 +127,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
       setHasRequestedCode(true);
       setRequestStatus("pending");
       toast.success(
-        "Verification code request sent! Please wait for approval."
+        "Verification code request sent! Please wait for approval.",
       );
 
       // Start checking for approval status
@@ -147,7 +147,8 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
       try {
         const requests = await verificationCodeApi.getMyRequests();
         const currentRequest = requests.find(
-          (req) => req.tenderId === tender._id || req.tender?._id === tender._id
+          (req) =>
+            req.tenderId === tender._id || req.tender?._id === tender._id,
         );
 
         if (currentRequest) {
@@ -158,7 +159,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
           if (status === "approved") {
             clearInterval(pollInterval);
             toast.success(
-              "Your request has been approved! Check your email for the verification code."
+              "Your request has been approved! Check your email for the verification code.",
             );
           } else if (status === "rejected") {
             clearInterval(pollInterval);
@@ -189,7 +190,7 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
       await verificationCodeApi.verifyCode(tender._id, codeString);
 
       toast.success(
-        "Verification successful! You can now apply for this tender."
+        "Verification successful! You can now apply for this tender.",
       );
 
       // Mark as verified locally
@@ -248,237 +249,233 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
   if (!isOpen) return null;
 
   return (
-    
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
+      onClick={onClose}
+    >
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
-        onClick={onClose}
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-xl sm:rounded-2xl shadow-2xl max-h-[95vh] sm:max-h-[92vh] overflow-y-auto"
       >
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className="relative w-full max-w-md bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-xl sm:rounded-2xl shadow-2xl max-h-[95vh] sm:max-h-[92vh] overflow-y-auto"
-        >
-          {/* Header */}
-          <div className="flex items-start justify-between p-4 sm:p-6 border-b border-cyan-400/10">
-            <div className="flex items-center space-x-3 min-w-0 flex-1 pr-2">
-              <div
-                className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-cyan-400/30"
-              >
-                <Shield className="w-6 h-6 text-cyan-400" />
+        {/* Header */}
+        <div className="flex items-start justify-between p-4 sm:p-6 border-b border-cyan-400/10">
+          <div className="flex items-center space-x-3 min-w-0 flex-1 pr-2">
+            <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-cyan-400/30">
+              <Shield className="w-6 h-6 text-cyan-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-lg font-bold text-white truncate">
+                Tender Verification
+              </h3>
+              <p className="text-xs text-gray-400 truncate">
+                Secure access verification required
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0 group"
+          >
+            <X className="w-5 h-5 text-gray-400 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+          {/* Tender Info */}
+          <div className="p-4 bg-gradient-to-r from-slate-800/50 to-slate-800/30 border border-cyan-400/10 rounded-xl">
+            <div className="flex items-start space-x-3">
+              <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                <Lock className="w-5 h-5 text-cyan-400" />
               </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="text-lg font-bold text-white truncate">
-                  Tender Verification
-                </h3>
-                <p className="text-xs text-gray-400 truncate">
-                  Secure access verification required
+              <div className="flex-1 min-w-0">
+                <h4 className="text-xs font-semibold text-cyan-400 mb-1">
+                  Applying for:
+                </h4>
+                <p className="text-sm text-white font-semibold break-words">
+                  {tender?.title}
                 </p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="p-1 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0 group"
-            >
-              <X className="w-5 h-5 text-gray-400 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
-            </button>
           </div>
 
-          {/* Content */}
-          <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
-            {/* Tender Info */}
-            <div className="p-4 bg-gradient-to-r from-slate-800/50 to-slate-800/30 border border-cyan-400/10 rounded-xl">
-              <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                  <Lock className="w-5 h-5 text-cyan-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-xs font-semibold text-cyan-400 mb-1">
-                    Applying for:
-                  </h4>
-                  <p className="text-sm text-white font-semibold break-words">
-                    {tender?.title}
+          {/* Status Badge */}
+          {requestStatus && (
+            <>
+              <div className="flex justify-center">{getStatusBadge()}</div>
+
+              {/* Display code if approved and available */}
+              {requestStatus === "approved" && existingRequest?.code && (
+                <div className="mt-4 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl">
+                  <p className="text-xs text-gray-400 mb-3 text-center font-medium">
+                    Your Verification Code
                   </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Status Badge */}
-            {requestStatus && (
-              <>
-                <div className="flex justify-center">{getStatusBadge()}</div>
-
-                {/* Display code if approved and available */}
-                {requestStatus === "approved" && existingRequest?.code && (
-                  <div
-                    className="mt-4 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl"
-                  >
-                    <p className="text-xs text-gray-400 mb-3 text-center font-medium">
-                      Your Verification Code
+                  <div className="text-center">
+                    <p className="text-2xl font-mono font-bold text-green-400 tracking-widest break-all bg-slate-900/50 py-3 px-4 rounded-lg border border-green-400/20">
+                      {existingRequest.code}
                     </p>
-                    <div className="text-center">
-                      <p className="text-2xl font-mono font-bold text-green-400 tracking-widest break-all bg-slate-900/50 py-3 px-4 rounded-lg border border-green-400/20">
-                        {existingRequest.code}
-                      </p>
-                    </div>
                   </div>
-                )}
-              </>
-            )}
+                </div>
+              )}
+            </>
+          )}
 
-            {/* Error Message */}
-            {error && (
-              <div
-                className="p-2 sm:p-3 bg-red-500/20 border border-red-400/30 rounded-lg"
-              >
-                <p className="text-red-400 text-xs sm:text-sm flex items-center space-x-2">
-                  <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="break-words">{error}</span>
+          {/* Error Message */}
+          {error && (
+            <div className="p-2 sm:p-3 bg-red-500/20 border border-red-400/30 rounded-lg">
+              <p className="text-red-400 text-xs sm:text-sm flex items-center space-x-2">
+                <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="break-words">{error}</span>
+              </p>
+            </div>
+          )}
+
+          {/* Already Verified State */}
+          {isAlreadyVerified && requestStatus === "verified" ? (
+            <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4">
+              <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-green-400 mx-auto" />
+              <div>
+                <p className="text-sm sm:text-base text-white font-medium mb-2">
+                  Already Verified
+                </p>
+                <p className="text-xs sm:text-sm text-gray-400 px-2">
+                  You have already verified access to this tender. Proceeding to
+                  application form...
                 </p>
               </div>
-            )}
-
-            {/* Already Verified State */}
-            {isAlreadyVerified && requestStatus === "verified" ? (
-              <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4">
-                <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-green-400 mx-auto" />
-                <div>
-                  <p className="text-sm sm:text-base text-white font-medium mb-2">
-                    Already Verified
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-400 px-2">
-                    You have already verified access to this tender. Proceeding
-                    to application form...
-                  </p>
-                </div>
-              </div>
-            ) : isCheckingStatus ? (
-              <div className="flex justify-center py-6 sm:py-8">
-                <LoadingSpinner variant="section" />
-              </div>
-            ) : (
-              <>
-                {/* Code Input Section - Show only if approved but not yet verified */}
-                {(hasRequestedCode &&
-                  requestStatus === "approved" &&
-                  !isAlreadyVerified) ||
-                (requestStatus === null && !isAlreadyVerified) ? (
-                  <div className="space-y-3 sm:space-y-4">
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2 sm:mb-3 text-center">
-                        Enter 8-character verification code
-                      </label>
-                      <div className="flex justify-center gap-2 flex-wrap">
-                        {code.map((digit, index) => (
-                          <input
-                            key={index}
-                            id={`verify-code-${index}`}
-                            type="text"
-                            maxLength="1"
-                            value={digit}
-                            onChange={(e) =>
-                              handleCodeChange(
-                                index,
-                                e.target.value.toUpperCase()
-                              )
-                            }
-                            onKeyDown={(e) => handleKeyDown(index, e)}
-                            whileFocus={{ scale: 1.1 }}
-                            className="w-10 h-12 text-center text-lg font-bold bg-slate-800/50 border-2 border-cyan-400/20 rounded-xl text-white focus:outline-none focus:border-cyan-400/60 focus:bg-slate-800/70 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 uppercase shadow-lg"
-                            placeholder="-"
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                      {!hasRequestedCode && (
-                        <button
-                          onClick={handleRequestCode}
-                          disabled={isRequesting}
-                          className="flex-1 py-2 sm:py-3 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/30 text-cyan-400 font-medium rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                        >
-                          {isRequesting ? (
-                            <div className="flex items-center justify-center space-x-2">
-                              <LoadingSpinner variant="inline" size="sm" />
-                              <span>Requesting...</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center justify-center space-x-2">
-                              <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
-                              <span>Request Code</span>
-                            </div>
-                          )}
-                        </button>
-                      )}
-
-                      <button
-                        onClick={handleVerifyCode}
-                        disabled={isLoading || code.join("").length !== 8}
-                        className="flex-1 py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
-                      >
-                        {isLoading ? (
-                          <div className="flex items-center justify-center space-x-2">
-                            <LoadingSpinner variant="inline" size="sm" color="white" />
-                            <span>Verifying...</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center space-x-2">
-                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                            <span>Verify Code</span>
-                          </div>
-                        )}
-                      </button>
+            </div>
+          ) : isCheckingStatus ? (
+            <div className="flex justify-center py-6 sm:py-8">
+              <LoadingSpinner />
+            </div>
+          ) : (
+            <>
+              {/* Code Input Section - Show only if approved but not yet verified */}
+              {(hasRequestedCode &&
+                requestStatus === "approved" &&
+                !isAlreadyVerified) ||
+              (requestStatus === null && !isAlreadyVerified) ? (
+                <div className="space-y-3 sm:space-y-4">
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2 sm:mb-3 text-center">
+                      Enter 8-character verification code
+                    </label>
+                    <div className="flex justify-center gap-2 flex-wrap">
+                      {code.map((digit, index) => (
+                        <input
+                          key={index}
+                          id={`verify-code-${index}`}
+                          type="text"
+                          maxLength="1"
+                          value={digit}
+                          onChange={(e) =>
+                            handleCodeChange(
+                              index,
+                              e.target.value.toUpperCase(),
+                            )
+                          }
+                          onKeyDown={(e) => handleKeyDown(index, e)}
+                          whileFocus={{ scale: 1.1 }}
+                          className="w-10 h-12 text-center text-lg font-bold bg-slate-800/50 border-2 border-cyan-400/20 rounded-xl text-white focus:outline-none focus:border-cyan-400/60 focus:bg-slate-800/70 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 uppercase shadow-lg"
+                          placeholder="-"
+                        />
+                      ))}
                     </div>
                   </div>
-                ) : requestStatus === "pending" ? (
-                  <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4">
-                    <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-400 mx-auto" />
-                    <div className="px-2">
-                      <p className="text-sm sm:text-base text-white font-medium mb-2">
-                        Waiting for Approval
-                      </p>
-                      <p className="text-xs sm:text-sm text-gray-400">
-                        Your verification request is being reviewed. You'll
-                        receive a code via email once approved.
-                      </p>
-                    </div>
-                  </div>
-                ) : requestStatus === "rejected" ? (
-                  <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4">
-                    <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto" />
-                    <div className="px-2">
-                      <p className="text-sm sm:text-base text-white font-medium mb-2">
-                        Request Rejected
-                      </p>
-                      <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
-                        Your verification request was not approved. Please
-                        contact support for assistance.
-                      </p>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    {!hasRequestedCode && (
                       <button
                         onClick={handleRequestCode}
                         disabled={isRequesting}
-                        className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/30 text-cyan-400 font-medium rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
+                        className="flex-1 py-2 sm:py-3 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/30 text-cyan-400 font-medium rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                       >
-                        Request Again
+                        {isRequesting ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <LoadingSpinner variant="inline" size="sm" />
+                            <span>Requesting...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center space-x-2">
+                            <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span>Request Code</span>
+                          </div>
+                        )}
                       </button>
-                    </div>
-                  </div>
-                ) : null}
+                    )}
 
-                {/* Help Text */}
-                {!hasRequestedCode &&
-                  requestStatus === null &&
-                  !isAlreadyVerified && (
-                    <p className="text-center text-gray-400 text-xs sm:text-sm px-2">
-                      Don't have a code? Click "Request Code" to get one.
+                    <button
+                      onClick={handleVerifyCode}
+                      disabled={isLoading || code.join("").length !== 8}
+                      className="flex-1 py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <LoadingSpinner
+                            variant="inline"
+                            size="sm"
+                            color="white"
+                          />
+                          <span>Verifying...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center space-x-2">
+                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span>Verify Code</span>
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : requestStatus === "pending" ? (
+                <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4">
+                  <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-400 mx-auto" />
+                  <div className="px-2">
+                    <p className="text-sm sm:text-base text-white font-medium mb-2">
+                      Waiting for Approval
                     </p>
-                  )}
-              </>
-            )}
-          </div>
+                    <p className="text-xs sm:text-sm text-gray-400">
+                      Your verification request is being reviewed. You'll
+                      receive a code via email once approved.
+                    </p>
+                  </div>
+                </div>
+              ) : requestStatus === "rejected" ? (
+                <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4">
+                  <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto" />
+                  <div className="px-2">
+                    <p className="text-sm sm:text-base text-white font-medium mb-2">
+                      Request Rejected
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
+                      Your verification request was not approved. Please contact
+                      support for assistance.
+                    </p>
+                    <button
+                      onClick={handleRequestCode}
+                      disabled={isRequesting}
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/30 text-cyan-400 font-medium rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
+                    >
+                      Request Again
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Help Text */}
+              {!hasRequestedCode &&
+                requestStatus === null &&
+                !isAlreadyVerified && (
+                  <p className="text-center text-gray-400 text-xs sm:text-sm px-2">
+                    Don't have a code? Click "Request Code" to get one.
+                  </p>
+                )}
+            </>
+          )}
         </div>
       </div>
-    
+    </div>
   );
 };
 

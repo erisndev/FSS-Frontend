@@ -133,7 +133,7 @@ const ManageTenders = () => {
         subtitle="View and manage all your tenders"
       >
         <div className="flex items-center justify-center h-64">
-          <LoadingSpinner variant="section" />
+          <LoadingSpinner />
         </div>
       </DashboardLayout>
     );

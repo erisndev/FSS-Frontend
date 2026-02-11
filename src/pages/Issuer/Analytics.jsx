@@ -89,7 +89,7 @@ const Analytics = () => {
             console.error(`Error fetching applications for tender ${id}:`, e);
             return { tender: t, apps: [] };
           }
-        })
+        }),
       );
 
       const allApplications = tenderApps.flatMap(({ tender, apps }) =>
@@ -97,21 +97,21 @@ const Analytics = () => {
           ...a,
           tenderId: tender._id || tender.id,
           tenderTitle: tender.title,
-        }))
+        })),
       );
 
       // 3) Totals
       const totalApplications = allApplications.length;
       const acceptedApplications = allApplications.filter(
-        (a) => (a.status || "").toLowerCase() === "accepted"
+        (a) => (a.status || "").toLowerCase() === "accepted",
       ).length;
       const totalBudget = (tenders || []).reduce(
         (sum, t) => sum + (Number(t.budgetMin) || 0),
-        0
+        0,
       );
       const totalTenders = (tenders || []).length;
       const activeTenders = (tenders || []).filter(
-        (t) => (t.status || "").toLowerCase() === "active"
+        (t) => (t.status || "").toLowerCase() === "active",
       ).length;
 
       const averageApplicationsPerTender = totalTenders
@@ -137,7 +137,7 @@ const Analytics = () => {
         const d = new Date(
           now.getFullYear(),
           now.getMonth() - (monthsBack - 1 - idx),
-          1
+          1,
         );
         const start = new Date(d.getFullYear(), d.getMonth(), 1);
         const end = new Date(d.getFullYear(), d.getMonth() + 1, 1);
@@ -153,17 +153,17 @@ const Analytics = () => {
 
       const monthly = buckets.map((b) => {
         const tendersIn = (tenders || []).filter((t) =>
-          inBucket(t.createdAt, b.start, b.end)
+          inBucket(t.createdAt, b.start, b.end),
         );
         const appsIn = allApplications.filter((a) =>
-          inBucket(a.createdAt, b.start, b.end)
+          inBucket(a.createdAt, b.start, b.end),
         );
         const acceptedIn = appsIn.filter(
-          (a) => (a.status || "").toLowerCase() === "accepted"
+          (a) => (a.status || "").toLowerCase() === "accepted",
         );
         const budgetIn = tendersIn.reduce(
           (sum, t) => sum + (Number(t.budgetMin) || 0),
-          0
+          0,
         );
         return {
           month: b.label,
@@ -196,7 +196,7 @@ const Analytics = () => {
         accepted: pctChange(last.accepted, prev.accepted),
         avgPerTender: pctChange(
           last.tenders ? last.applications / Math.max(1, last.tenders) : 0,
-          prev.tenders ? prev.applications / Math.max(1, prev.tenders) : 0
+          prev.tenders ? prev.applications / Math.max(1, prev.tenders) : 0,
         ),
         budget: pctChange(last.budget, prev.budget),
       });
@@ -247,11 +247,11 @@ const Analytics = () => {
 
   const maxTenders = useMemo(
     () => Math.max(1, ...chartData.map((d) => d.tenders || 0)),
-    [chartData]
+    [chartData],
   );
   const maxApplications = useMemo(
     () => Math.max(1, ...chartData.map((d) => d.applications || 0)),
-    [chartData]
+    [chartData],
   );
 
   const statCards = [
@@ -306,7 +306,7 @@ const Analytics = () => {
         subtitle="Insights and performance metrics"
       >
         <div className="flex items-center justify-center h-64">
-          <LoadingSpinner variant="section" />
+          <LoadingSpinner />
         </div>
       </DashboardLayout>
     );
@@ -345,9 +345,7 @@ const Analytics = () => {
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Tender Performance Chart */}
-          <div
-            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
-          >
+          <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6">
             <h3 className="text-xl font-semibold text-white mb-6">
               Tender Performance
             </h3>
@@ -377,9 +375,7 @@ const Analytics = () => {
           </div>
 
           {/* Application Trends */}
-          <div
-            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
-          >
+          <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6">
             <h3 className="text-xl font-semibold text-white mb-6">
               Application Trends
             </h3>
@@ -412,9 +408,7 @@ const Analytics = () => {
         </div>
 
         {/* Recent Activity */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6">
           <h3 className="text-xl font-semibold text-white mb-6">
             Recent Activity
           </h3>

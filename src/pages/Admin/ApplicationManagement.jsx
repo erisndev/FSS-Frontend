@@ -60,11 +60,11 @@ const ApplicationManagement = () => {
       for (const tender of tendersList) {
         try {
           const tenderApplications = await applicationApi.getTenderApplications(
-            tender._id || tender.id
+            tender._id || tender.id,
           );
           console.log(
             `Fetched applications for tender ${tender._id || tender.id}:`,
-            tenderApplications
+            tenderApplications,
           );
 
           const applicationsWithTenderInfo = tenderApplications.map((app) => ({
@@ -80,7 +80,7 @@ const ApplicationManagement = () => {
             `Error fetching applications for tender ${
               tender._id || tender.id
             }:`,
-            error
+            error,
           );
         }
       }
@@ -94,11 +94,22 @@ const ApplicationManagement = () => {
   };
 
   const handleStatusUpdate = async (applicationId, status, comment = "") => {
-    console.log("ApplicationManagement handleStatusUpdate called with:", { applicationId, status, comment });
+    console.log("ApplicationManagement handleStatusUpdate called with:", {
+      applicationId,
+      status,
+      comment,
+    });
     try {
-      const normalizedStatus = status.toLowerCase().replace('accept', 'accepted').replace('reject', 'rejected');
+      const normalizedStatus = status
+        .toLowerCase()
+        .replace("accept", "accepted")
+        .replace("reject", "rejected");
       console.log("Normalized status:", normalizedStatus);
-      await applicationApi.updateApplicationStatus(applicationId, normalizedStatus, comment);
+      await applicationApi.updateApplicationStatus(
+        applicationId,
+        normalizedStatus,
+        comment,
+      );
       toast.success(`Application ${normalizedStatus} successfully`);
       fetchData();
     } catch (error) {
@@ -152,7 +163,7 @@ const ApplicationManagement = () => {
         subtitle="Manage all system applications"
       >
         <div className="flex items-center justify-center h-64">
-          <LoadingSpinner variant="section" />
+          <LoadingSpinner />
         </div>
       </DashboardLayout>
     );
@@ -165,9 +176,7 @@ const ApplicationManagement = () => {
     >
       <div className="space-y-6">
         {/* Header Actions */}
-        <div
-          className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0"
-        >
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 flex-1">
             {/* Search */}
             <div className="relative flex-1 max-w-md">
@@ -219,9 +228,7 @@ const ApplicationManagement = () => {
         </div>
 
         {/* Applications Table */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl overflow-hidden"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-800/50 border-b border-cyan-400/10">
@@ -281,7 +288,7 @@ const ApplicationManagement = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`px-3 py-1 text-xs rounded-full border ${getStatusColor(
-                          application.status
+                          application.status,
                         )}`}
                       >
                         {application.status}

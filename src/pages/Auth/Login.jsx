@@ -31,8 +31,8 @@ const Login = () => {
       user.role === "admin"
         ? "/admin"
         : user.role === "issuer"
-        ? "/issuer"
-        : "/bidder";
+          ? "/issuer"
+          : "/bidder";
 
     return <Navigate to={dashboardPath} replace />;
   }
@@ -54,7 +54,7 @@ const Login = () => {
           {
             duration: 4000,
             icon: "ℹ️",
-          }
+          },
         );
 
         // Redirect to team login
@@ -114,20 +114,16 @@ const Login = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <LoadingSpinner variant="section" />
+        <LoadingSpinner fullScreen />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-3 sm:p-4">
-      <div
-        className="max-w-md w-full space-y-6 sm:space-y-8"
-      >
+      <div className="max-w-md w-full space-y-6 sm:space-y-8">
         {/* Logo and Title */}
-        <div
-          className="text-center"
-        >
+        <div className="text-center">
           <div className="flex justify-center">
             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4">
               <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
@@ -136,15 +132,14 @@ const Login = () => {
           <h2 className="text-2xl sm:text-3xl font-bold text-white">
             Welcome Back
           </h2>
+
           <p className="text-cyan-400/70 mt-1 sm:mt-2 text-sm sm:text-base">
             Sign in to TenderFlow System
           </p>
         </div>
 
         {/* Login Form */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-2xl p-5 sm:p-8 shadow-2xl"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl sm:rounded-2xl p-5 sm:p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* {error && (
               <div
@@ -221,7 +216,7 @@ const Login = () => {
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <LoadingSpinner variant="inline" size="sm" color="white" />
+                  <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
                   <span>Signing In...</span>
                 </div>
               ) : (
@@ -242,9 +237,7 @@ const Login = () => {
             </div>
 
             <Link to="/team-login">
-              <div
-                className="mt-4 p-4 bg-gradient-to-r from-cyan-500/10 to-purple-600/10 border border-cyan-400/30 rounded-lg hover:border-cyan-400/50 transition-all duration-200 cursor-pointer"
-              >
+              <div className="mt-4 p-4 bg-gradient-to-r from-cyan-500/10 to-purple-600/10 border border-cyan-400/30 rounded-lg hover:border-cyan-400/50 transition-all duration-200 cursor-pointer">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">

@@ -26,7 +26,9 @@ const ForgotPassword = () => {
       console.log("Password reset OTP sent to:", normalizedEmail);
       localStorage.setItem("otpTimestamp", Date.now().toString());
       toast.success("OTP sent to your email");
-      navigate("/verify-otp", { state: { email: normalizedEmail, isRegistration: false } });
+      navigate("/verify-otp", {
+        state: { email: normalizedEmail, isRegistration: false },
+      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -36,13 +38,9 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div
-        className="max-w-md w-full space-y-8"
-      >
+      <div className="max-w-md w-full space-y-8">
         {/* Logo and Title */}
-        <div
-          className="text-center"
-        >
+        <div className="text-center">
           <div className="flex justify-center">
             <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-2xl flex items-center justify-center mb-4">
               <Shield className="w-8 h-8 text-white" />
@@ -55,9 +53,7 @@ const ForgotPassword = () => {
         </div>
 
         {/* Form */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8 shadow-2xl"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8 shadow-2xl">
           {isEmailSent ? (
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -76,9 +72,7 @@ const ForgotPassword = () => {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div
-                  className="bg-red-500/20 border border-red-400/50 rounded-lg p-3 text-red-300 text-sm"
-                >
+                <div className="bg-red-500/20 border border-red-400/50 rounded-lg p-3 text-red-300 text-sm">
                   {error}
                 </div>
               )}
@@ -110,7 +104,7 @@ const ForgotPassword = () => {
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
-                    <LoadingSpinner variant="inline" size="sm" color="white" />
+                    <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
                     <span>Sending OTP...</span>
                   </div>
                 ) : (

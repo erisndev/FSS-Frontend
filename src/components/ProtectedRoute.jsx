@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children, roles = [] }) => {
   if (showLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <LoadingSpinner variant="section" />
+        <LoadingSpinner fullScreen />
       </div>
     );
   }

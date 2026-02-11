@@ -56,86 +56,94 @@ const ConfirmDeleteModal = ({
   };
 
   return (
-    
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
+      onClick={() => {
+        if (!processing) onClose();
+      }}
+    >
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
-        onClick={() => {
-          if (!processing) onClose();
-        }}
+        className={`bg-gradient-to-b from-slate-900 to-slate-950 backdrop-blur-xl border ${getBorderColor()} rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl`}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className={`bg-gradient-to-b from-slate-900 to-slate-950 backdrop-blur-xl border ${getBorderColor()} rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header with Icon */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${actionType === 'withdraw' ? 'from-yellow-500/20 to-orange-500/20' : 'from-red-500/20 to-red-600/20'} flex items-center justify-center`}>
-                <AlertTriangle className={`w-6 h-6 ${getIconColor()}`} />
-              </div>
-              <div>
-                <h3 className="text-lg sm:text-xl font-bold text-white">{title}</h3>
-                <p className="text-xs text-gray-400">This action is permanent</p>
-              </div>
+        {/* Header with Icon */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div
+              className={`w-12 h-12 rounded-xl bg-gradient-to-br ${actionType === "withdraw" ? "from-yellow-500/20 to-orange-500/20" : "from-red-500/20 to-red-600/20"} flex items-center justify-center`}
+            >
+              <AlertTriangle className={`w-6 h-6 ${getIconColor()}`} />
             </div>
-            <button
-              onClick={onClose}
-              disabled={processing}
-              className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold text-white">
+                {title}
+              </h3>
+              <p className="text-xs text-gray-400">This action is permanent</p>
+            </div>
           </div>
+          <button
+            onClick={onClose}
+            disabled={processing}
+            className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-          {/* Message */}
-          <div className={`p-4 rounded-lg border ${getBorderColor()} bg-gradient-to-r ${actionType === 'withdraw' ? 'from-yellow-500/10 to-orange-500/10' : 'from-red-500/10 to-red-600/10'} mb-6`}>
-            <p className="text-sm sm:text-base text-gray-300 leading-relaxed break-words">
-              {message || getDefaultMessage()}
-            </p>
-          </div>
+        {/* Message */}
+        <div
+          className={`p-4 rounded-lg border ${getBorderColor()} bg-gradient-to-r ${actionType === "withdraw" ? "from-yellow-500/10 to-orange-500/10" : "from-red-500/10 to-red-600/10"} mb-6`}
+        >
+          <p className="text-sm sm:text-base text-gray-300 leading-relaxed break-words">
+            {message || getDefaultMessage()}
+          </p>
+        </div>
 
-          {/* Actions */}
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
-            <button
-              onClick={onClose}
-              disabled={processing}
-              className={`px-4 py-2.5 text-sm sm:text-base bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg transition-all duration-300 font-medium ${
-                processing ? "opacity-60 cursor-not-allowed" : "hover:bg-slate-800/70 hover:border-gray-400/40"
-              }`}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  setProcessing(true);
-                  await onConfirm();
-                  onClose();
-                } finally {
-                  setProcessing(false);
-                }
-              }}
-              disabled={processing}
-              className={`px-4 py-2.5 text-sm sm:text-base text-white rounded-lg transition-all duration-300 font-semibold bg-gradient-to-r ${getActionColor()} shadow-lg ${
-                processing ? "opacity-80 cursor-wait" : "hover:shadow-xl"
-              }`}
-            >
-              {processing ? (
-                <span className="flex items-center justify-center space-x-2">
-                  <LoadingSpinner variant="inline" size="sm" color="white" />
-                  <span>{actionType === "withdraw" ? "Withdrawing..." : "Deleting..."}</span>
+        {/* Actions */}
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+          <button
+            onClick={onClose}
+            disabled={processing}
+            className={`px-4 py-2.5 text-sm sm:text-base bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg transition-all duration-300 font-medium ${
+              processing
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-slate-800/70 hover:border-gray-400/40"
+            }`}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                setProcessing(true);
+                await onConfirm();
+                onClose();
+              } finally {
+                setProcessing(false);
+              }
+            }}
+            disabled={processing}
+            className={`px-4 py-2.5 text-sm sm:text-base text-white rounded-lg transition-all duration-300 font-semibold bg-gradient-to-r ${getActionColor()} shadow-lg ${
+              processing ? "opacity-80 cursor-wait" : "hover:shadow-xl"
+            }`}
+          >
+            {processing ? (
+              <span className="flex items-center justify-center space-x-2">
+                <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                <span>
+                  {actionType === "withdraw" ? "Withdrawing..." : "Deleting..."}
                 </span>
-              ) : (
-                <span className="flex items-center space-x-2">
-                  <Trash2 className="w-4 h-4" />
-                  <span>{actionText}</span>
-                </span>
-              )}
-            </button>
-          </div>
+              </span>
+            ) : (
+              <span className="flex items-center space-x-2">
+                <Trash2 className="w-4 h-4" />
+                <span>{actionText}</span>
+              </span>
+            )}
+          </button>
         </div>
       </div>
-    
+    </div>
   );
 };
 

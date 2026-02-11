@@ -227,20 +227,22 @@ const LandingPage = () => {
         {/* Ambient glow orbs */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-20 left-1/4 w-72 h-72 bg-cyan-500/10 rounded-full blur-[100px] animate-pulse" />
-          <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
+          <div
+            className="absolute bottom-10 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px] animate-pulse"
+            style={{ animationDelay: "1s" }}
+          />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/5 rounded-full blur-[120px]" />
         </div>
 
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center">
-            <div
-            >
+            <div>
               {/* Badge */}
-              <div
-                className="inline-flex items-center space-x-2 px-4 py-1.5 bg-cyan-500/10 border border-cyan-400/20 rounded-full mb-8"
-              >
+              <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-cyan-500/10 border border-cyan-400/20 rounded-full mb-8">
                 <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-                <span className="text-cyan-400 text-sm font-medium">Trusted by 10,000+ organizations</span>
+                <span className="text-cyan-400 text-sm font-medium">
+                  Trusted by 10,000+ organizations
+                </span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight tracking-tight">
@@ -277,9 +279,7 @@ const LandingPage = () => {
       {/* Features Section */}
       <section id="features" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
               Powerful Features for{" "}
               <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
@@ -316,9 +316,7 @@ const LandingPage = () => {
       {/* Benefits Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-800/30">
         <div className="max-w-7xl mx-auto">
-          <div
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
               Why Choose{" "}
               <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
@@ -329,10 +327,7 @@ const LandingPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit, index) => (
-              <div
-                key={benefit.title}
-                className="text-center"
-              >
+              <div key={benefit.title} className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <benefit.icon className="w-8 h-8 text-white" />
                 </div>
@@ -350,8 +345,7 @@ const LandingPage = () => {
       <section id="about" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div
-            >
+            <div>
               <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
                 About{" "}
                 <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
@@ -380,9 +374,7 @@ const LandingPage = () => {
                 ))}
               </div>
             </div>
-            <div
-              className="relative"
-            >
+            <div className="relative">
               <div className="bg-gradient-to-r from-cyan-500/20 to-purple-600/20 rounded-2xl p-8 backdrop-blur-xl border border-cyan-400/20">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="text-center">
@@ -419,9 +411,7 @@ const LandingPage = () => {
       {/* Testimonials Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-800/30">
         <div className="max-w-7xl mx-auto">
-          <div
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
               What Our{" "}
               <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
@@ -465,9 +455,7 @@ const LandingPage = () => {
       {/* Contact Section with Form */}
       <section id="contact" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
               Get in{" "}
               <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
@@ -482,9 +470,7 @@ const LandingPage = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Information */}
-            <div
-              className="space-y-8"
-            >
+            <div className="space-y-8">
               <div>
                 <h3 className="text-2xl font-semibold text-white mb-6">
                   Contact Information
@@ -548,9 +534,7 @@ const LandingPage = () => {
             </div>
 
             {/* Contact Form */}
-            <div
-              className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8"
-            >
+            <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8">
               <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -661,7 +645,7 @@ const LandingPage = () => {
                   >
                     {isSubmitting ? (
                       <>
-                        <LoadingSpinner variant="inline" size="sm" color="white" />
+                        <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
                         Sending...
                       </>
                     ) : (
@@ -681,8 +665,7 @@ const LandingPage = () => {
       {/* CTA Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-800/30">
         <div className="max-w-4xl mx-auto text-center">
-          <div
-          >
+          <div>
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
               Ready to Transform Your{" "}
               <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">

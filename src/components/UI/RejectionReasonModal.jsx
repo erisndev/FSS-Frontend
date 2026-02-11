@@ -36,7 +36,7 @@ const RejectionReasonModal = ({
             onClick={(e) => e.stopPropagation()}
             className="bg-gradient-to-b from-slate-900 to-slate-950 border border-red-400/20 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
           >
-              {/* Header */}
+            {/* Header */}
             <div className="flex items-start justify-between p-6 border-b border-red-400/10">
               <div className="flex items-center space-x-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-xl flex items-center justify-center">
@@ -66,7 +66,9 @@ const RejectionReasonModal = ({
                 <div className="flex items-start space-x-2">
                   <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-300 text-sm leading-relaxed">
-                    Please provide a reason for rejecting this request. This will help the applicant understand why their request was not approved.
+                    Please provide a reason for rejecting this request. This
+                    will help the applicant understand why their request was not
+                    approved.
                   </p>
                 </div>
               </div>
@@ -74,7 +76,9 @@ const RejectionReasonModal = ({
               <div>
                 <label className="flex items-center space-x-2 text-sm font-semibold text-gray-200 mb-3">
                   <MessageSquare className="w-4 h-4 text-cyan-400" />
-                  <span>Reason for Rejection <span className="text-red-400">*</span></span>
+                  <span>
+                    Reason for Rejection <span className="text-red-400">*</span>
+                  </span>
                 </label>
                 <textarea
                   value={reason}
@@ -92,9 +96,7 @@ const RejectionReasonModal = ({
                     {reason.length}/500 characters
                   </p>
                   {error && (
-                    <p
-                      className="text-sm text-red-400 flex items-center space-x-1"
-                    >
+                    <p className="text-sm text-red-400 flex items-center space-x-1">
                       <AlertCircle className="w-4 h-4" />
                       <span>{error}</span>
                     </p>
@@ -119,7 +121,7 @@ const RejectionReasonModal = ({
               >
                 {isLoading ? (
                   <>
-                    <LoadingSpinner variant="inline" size="sm" color="white" />
+                    <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
                     <span>Rejecting...</span>
                   </>
                 ) : (

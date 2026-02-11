@@ -105,7 +105,9 @@ const TenderManagement = () => {
   const filteredTenders = tenders.filter((tender) => {
     const matchesSearch =
       (tender.title?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (tender.companyName?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+      (tender.companyName?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      );
     const matchesStatus = statusFilter === "" || tender.status === statusFilter;
     const matchesCategory =
       categoryFilter === "" || tender.category === categoryFilter;
@@ -119,7 +121,7 @@ const TenderManagement = () => {
         subtitle="Manage all system tenders"
       >
         <div className="flex items-center justify-center h-64">
-          <LoadingSpinner variant="section" />
+          <LoadingSpinner />
         </div>
       </DashboardLayout>
     );
@@ -132,9 +134,7 @@ const TenderManagement = () => {
     >
       <div className="space-y-6">
         {/* Header Actions */}
-        <div
-          className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0"
-        >
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 flex-1">
             {/* Search */}
             <div className="relative flex-1 max-w-md">
@@ -183,9 +183,7 @@ const TenderManagement = () => {
         </div>
 
         {/* Tenders Table */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl overflow-hidden"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-800/50 border-b border-cyan-400/10">
@@ -242,7 +240,7 @@ const TenderManagement = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`px-3 py-1 text-xs rounded-full border ${getStatusColor(
-                          tender.status
+                          tender.status,
                         )}`}
                       >
                         {tender.status}

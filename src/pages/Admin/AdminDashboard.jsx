@@ -72,11 +72,11 @@ const AdminDashboard = () => {
         activeUsers: users.filter((user) => user.isActive).length,
         totalTenders: tendersArray.length,
         activeTenders: tendersArray.filter(
-          (tender) => tender.status === "active"
+          (tender) => tender.status === "active",
         ).length,
         totalApplications: applicationsArray.length,
         pendingApplications: applicationsArray.filter(
-          (app) => app.status === "PENDING" || app.status === "pending"
+          (app) => app.status === "PENDING" || app.status === "pending",
         ).length,
       };
 
@@ -172,7 +172,7 @@ const AdminDashboard = () => {
         subtitle="System overview and management"
       >
         <div className="flex items-center justify-center h-64">
-          <LoadingSpinner variant="section" />
+          <LoadingSpinner />
         </div>
       </DashboardLayout>
     );
@@ -216,9 +216,7 @@ const AdminDashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Users */}
-          <div
-            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
-          >
+          <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-white">Recent Users</h3>
               <button
@@ -250,7 +248,7 @@ const AdminDashboard = () => {
                     <div className="flex items-center space-x-2">
                       <span
                         className={`px-2 py-1 text-xs rounded-full ${getRoleColor(
-                          user.role
+                          user.role,
                         )}`}
                       >
                         {user.role}
@@ -268,9 +266,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Recent Tenders */}
-          <div
-            className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
-          >
+          <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-white">
                 Recent Tenders
@@ -311,7 +307,7 @@ const AdminDashboard = () => {
                       <div className="flex flex-col items-end space-y-2">
                         <span
                           className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                            tender.status
+                            tender.status,
                           )}`}
                         >
                           {tender.status || "UNKNOWN"}
@@ -335,9 +331,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* System Health */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6">
           <h3 className="text-xl font-semibold text-white mb-6">
             System Health
           </h3>
@@ -374,9 +368,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-6">
           <h3 className="text-xl font-semibold text-white mb-6">
             Quick Actions
           </h3>

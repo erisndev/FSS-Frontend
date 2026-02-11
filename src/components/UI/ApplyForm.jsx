@@ -25,9 +25,7 @@ const ApplyForm = ({
       <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
         {/* Error Display */}
         {error && (
-          <div
-            className="p-4 bg-red-500/20 border border-red-400/30 text-red-300 rounded-lg"
-          >
+          <div className="p-4 bg-red-500/20 border border-red-400/30 text-red-300 rounded-lg">
             <div className="flex items-center space-x-2">
               <AlertCircle className="w-5 h-5" />
               <span>{error}</span>
@@ -36,9 +34,7 @@ const ApplyForm = ({
         )}
 
         {/* Company Information Section */}
-        <div
-          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
-        >
+        <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4">
           <h4 className="text-base font-semibold text-cyan-400 mb-3">
             Company Information
           </h4>
@@ -108,9 +104,7 @@ const ApplyForm = ({
         </div>
 
         {/* Contact Information Section */}
-        <div
-          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
-        >
+        <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4">
           <h4 className="text-base font-semibold text-cyan-400 mb-3">
             Contact Information
           </h4>
@@ -163,9 +157,7 @@ const ApplyForm = ({
         </div>
 
         {/* Bid Details Section */}
-        <div
-          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
-        >
+        <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4">
           <h4 className="text-base font-semibold text-cyan-400 mb-3">
             Bid Details
           </h4>
@@ -209,9 +201,7 @@ const ApplyForm = ({
         </div>
 
         {/* Cover Letter Section */}
-        <div
-          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
-        >
+        <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4">
           <h4 className="text-base font-semibold text-cyan-400 mb-3">
             Cover Letter
           </h4>
@@ -227,9 +217,7 @@ const ApplyForm = ({
         </div>
 
         {/* Documents Section */}
-        <div
-          className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4"
-        >
+        <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-4">
           <h4 className="text-base font-semibold text-cyan-400 mb-1">
             Compliance Documents
           </h4>
@@ -285,7 +273,9 @@ const ApplyForm = ({
                         className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
                       >
                         <Upload className="w-5 h-5 mr-2" />
-                        <span className="text-sm">Choose File or Drop Here</span>
+                        <span className="text-sm">
+                          Choose File or Drop Here
+                        </span>
                       </label>
                     </div>
                   )}
@@ -313,7 +303,7 @@ const ApplyForm = ({
                   </div>
                   <button
                     type="button"
-                    onClick={() => onRemoveFile('supportingDocuments')}
+                    onClick={() => onRemoveFile("supportingDocuments")}
                     className="p-2 hover:bg-red-500/20 rounded-lg transition-all duration-200"
                   >
                     <X className="w-4 h-4 text-red-400" />
@@ -324,13 +314,13 @@ const ApplyForm = ({
                   <input
                     type="file"
                     id="supportingDocuments"
-                    onChange={(e) => onFileUpload(e, 'supportingDocuments')}
+                    onChange={(e) => onFileUpload(e, "supportingDocuments")}
                     className="hidden"
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
                   />
                   <label
                     htmlFor="supportingDocuments"
-                    onDrop={(e) => onFileDrop(e, 'supportingDocuments')}
+                    onDrop={(e) => onFileDrop(e, "supportingDocuments")}
                     onDragOver={handleDragOver}
                     className="flex items-center justify-center px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-gray-400 hover:text-white hover:border-cyan-400/40 cursor-pointer transition-all duration-200"
                   >
@@ -363,7 +353,7 @@ const ApplyForm = ({
         >
           {loading ? (
             <div className="flex items-center space-x-1.5">
-              <LoadingSpinner variant="inline" size="sm" color="white" />
+              <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
               <span>Submitting...</span>
             </div>
           ) : (

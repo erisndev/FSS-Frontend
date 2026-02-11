@@ -27,7 +27,7 @@ import { useAuth } from "../../contexts/AuthContext";
 const BidderDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+
   const [stats, setStats] = useState({
     totalApplications: 0,
     pendingApplications: 0,
@@ -62,13 +62,13 @@ const BidderDashboard = () => {
       const stats = {
         totalApplications: applications.length,
         pendingApplications: applications.filter(
-          (app) => app.status === "pending"
+          (app) => app.status === "pending",
         ).length,
         acceptedApplications: applications.filter(
-          (app) => app.status === "accepted"
+          (app) => app.status === "accepted",
         ).length,
         rejectedApplications: applications.filter(
-          (app) => app.status === "rejected"
+          (app) => app.status === "rejected",
         ).length,
       };
       setStats(stats);
@@ -193,7 +193,7 @@ const BidderDashboard = () => {
         subtitle="Welcome back! Here's an overview of your tender activities."
       >
         <div className="flex items-center justify-center h-64">
-          <LoadingSpinner variant="section" />
+          <LoadingSpinner />
         </div>
       </DashboardLayout>
     );
@@ -215,7 +215,9 @@ const BidderDashboard = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.02] to-purple-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
               <div className="relative flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3">{stat.title}</p>
+                  <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3">
+                    {stat.title}
+                  </p>
                   <p className="text-3xl font-bold text-white tracking-tight">
                     {stat.value.toLocaleString()}
                   </p>
@@ -232,14 +234,12 @@ const BidderDashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Tenders */}
-          <div
-            className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5"
-          >
+          <div className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-semibold text-white">
                 Recent Tenders
               </h3>
-              <button 
+              <button
                 onClick={handleViewAllTenders}
                 className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200"
               >
@@ -265,8 +265,8 @@ const BidderDashboard = () => {
                         tender.status?.toLowerCase() === "active"
                           ? "bg-gradient-to-r from-green-400 to-emerald-500"
                           : tender.status?.toLowerCase() === "closed"
-                          ? "bg-gradient-to-r from-red-400 to-pink-500"
-                          : "bg-gradient-to-r from-gray-400 to-gray-500"
+                            ? "bg-gradient-to-r from-red-400 to-pink-500"
+                            : "bg-gradient-to-r from-gray-400 to-gray-500"
                       }`}
                     />
                     <div className="p-4">
@@ -287,7 +287,7 @@ const BidderDashboard = () => {
                           )}
                           <span
                             className={`px-1.5 py-0.5 text-[10px] rounded-full border font-medium ${getTenderStatusColor(
-                              tender.status
+                              tender.status,
                             )}`}
                           >
                             {tender.status}
@@ -298,7 +298,9 @@ const BidderDashboard = () => {
                       <div className="flex items-center space-x-3 mb-3">
                         <span className="text-cyan-400 text-sm font-semibold">
                           R{(tender.budgetMin || 0).toLocaleString()}
-                          {tender.budgetMax ? ` – R${tender.budgetMax.toLocaleString()}` : ""}
+                          {tender.budgetMax
+                            ? ` – R${tender.budgetMax.toLocaleString()}`
+                            : ""}
                         </span>
                         <span className="text-gray-500 text-xs flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
@@ -331,14 +333,12 @@ const BidderDashboard = () => {
           </div>
 
           {/* Recent Applications */}
-          <div
-            className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5"
-          >
+          <div className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-semibold text-white">
                 My Applications
               </h3>
-              <button 
+              <button
                 onClick={handleViewAllApplications}
                 className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-200"
               >
@@ -363,11 +363,13 @@ const BidderDashboard = () => {
                       className={`h-0.5 ${
                         (application.status || "").toLowerCase() === "pending"
                           ? "bg-gradient-to-r from-yellow-400 to-amber-500"
-                          : (application.status || "").toLowerCase() === "accepted"
-                          ? "bg-gradient-to-r from-green-400 to-emerald-500"
-                          : (application.status || "").toLowerCase() === "rejected"
-                          ? "bg-gradient-to-r from-red-400 to-pink-500"
-                          : "bg-gradient-to-r from-gray-400 to-gray-500"
+                          : (application.status || "").toLowerCase() ===
+                              "accepted"
+                            ? "bg-gradient-to-r from-green-400 to-emerald-500"
+                            : (application.status || "").toLowerCase() ===
+                                "rejected"
+                              ? "bg-gradient-to-r from-red-400 to-pink-500"
+                              : "bg-gradient-to-r from-gray-400 to-gray-500"
                       }`}
                     />
                     <div className="p-4">
@@ -382,7 +384,7 @@ const BidderDashboard = () => {
                         </div>
                         <span
                           className={`px-1.5 py-0.5 text-[10px] rounded-full font-semibold flex-shrink-0 ${getStatusColor(
-                            application.status
+                            application.status,
                           )}`}
                         >
                           {application.status}
@@ -420,28 +422,26 @@ const BidderDashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div
-          className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5"
-        >
+        <div className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5">
           <h3 className="text-lg font-semibold text-white mb-5">
             Quick Actions
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button 
+            <button
               onClick={() => handleQuickAction("browse")}
               className="flex items-center space-x-3 p-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 rounded-lg hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
             >
               <Search className="w-5 h-5 text-cyan-400" />
               <span className="text-white font-medium">Browse Tenders</span>
             </button>
-            <button 
+            <button
               onClick={() => handleQuickAction("applications")}
               className="flex items-center space-x-3 p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300"
             >
               <FileText className="w-5 h-5 text-purple-400" />
               <span className="text-white font-medium">My Applications</span>
             </button>
-            <button 
+            <button
               onClick={() => handleQuickAction("analytics")}
               className="flex items-center space-x-3 p-4 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-400/30 rounded-lg hover:from-emerald-500/30 hover:to-teal-500/30 transition-all duration-300"
             >

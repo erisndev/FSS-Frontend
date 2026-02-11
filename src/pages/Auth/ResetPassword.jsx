@@ -24,7 +24,7 @@ const ResetPassword = () => {
     "ResetPassword component loaded with email:",
     email,
     "and otp:",
-    otp
+    otp,
   );
 
   const handleSubmit = async (e) => {
@@ -72,9 +72,7 @@ const ResetPassword = () => {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-        <div
-          className="max-w-md w-full text-center"
-        >
+        <div className="max-w-md w-full text-center">
           <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8 shadow-2xl">
             <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-400" />
@@ -86,7 +84,7 @@ const ResetPassword = () => {
               Your password has been successfully reset. You will be redirected
               to the login page.
             </p>
-            <LoadingSpinner variant="section" />
+            <LoadingSpinner />
           </div>
         </div>
       </div>
@@ -95,13 +93,9 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div
-        className="max-w-md w-full space-y-8"
-      >
+      <div className="max-w-md w-full space-y-8">
         {/* Logo and Title */}
-        <div
-          className="text-center"
-        >
+        <div className="text-center">
           <div className="flex justify-center">
             <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-2xl flex items-center justify-center mb-4">
               <Shield className="w-8 h-8 text-white" />
@@ -114,14 +108,10 @@ const ResetPassword = () => {
         </div>
 
         {/* Reset Form */}
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8 shadow-2xl"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div
-                className="bg-red-500/20 border border-red-400/50 rounded-lg p-3 text-red-300 text-sm"
-              >
+              <div className="bg-red-500/20 border border-red-400/50 rounded-lg p-3 text-red-300 text-sm">
                 {error}
               </div>
             )}
@@ -199,7 +189,7 @@ const ResetPassword = () => {
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <LoadingSpinner variant="inline" size="sm" color="white" />
+                  <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
                   <span>Resetting Password...</span>
                 </div>
               ) : (

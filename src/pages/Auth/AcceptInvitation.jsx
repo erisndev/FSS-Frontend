@@ -15,7 +15,8 @@ import {
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const AcceptInvitation = () => {
   const { token } = useParams();
@@ -44,18 +45,24 @@ const AcceptInvitation = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${API_BASE_URL}/team-members/invitations/${token}/validate`
+        `${API_BASE_URL}/team-members/invitations/${token}/validate`,
       );
       setInvitationData(response.data);
       setError("");
     } catch (err) {
       console.error("Error validating invitation:", err);
       if (err.response?.status === 404) {
-        setError("Invalid invitation link. Please check your email or contact your team leader.");
+        setError(
+          "Invalid invitation link. Please check your email or contact your team leader.",
+        );
       } else if (err.response?.data?.message?.includes("expired")) {
-        setError("This invitation has expired. Please contact your team leader for a new invitation.");
+        setError(
+          "This invitation has expired. Please contact your team leader for a new invitation.",
+        );
       } else {
-        setError(err.response?.data?.message || "Failed to validate invitation");
+        setError(
+          err.response?.data?.message || "Failed to validate invitation",
+        );
       }
     } finally {
       setLoading(false);
@@ -81,7 +88,8 @@ const AcceptInvitation = () => {
   const getPasswordStrengthLabel = () => {
     if (passwordStrength === 0) return { label: "", color: "" };
     if (passwordStrength <= 2) return { label: "Weak", color: "text-red-400" };
-    if (passwordStrength <= 3) return { label: "Fair", color: "text-yellow-400" };
+    if (passwordStrength <= 3)
+      return { label: "Fair", color: "text-yellow-400" };
     if (passwordStrength <= 4) return { label: "Good", color: "text-blue-400" };
     return { label: "Strong", color: "text-green-400" };
   };
@@ -106,7 +114,7 @@ const AcceptInvitation = () => {
     try {
       const response = await axios.post(
         `${API_BASE_URL}/team-members/invitations/${token}/accept`,
-        { password: formData.password }
+        { password: formData.password },
       );
 
       setOrganizationEmail(response.data.organizationEmail);
@@ -121,8 +129,13 @@ const AcceptInvitation = () => {
       }, 5000);
     } catch (err) {
       console.error("Error accepting invitation:", err);
-      if (err.response?.status === 400 && err.response?.data?.message?.includes("expired")) {
-        setError("This invitation has expired. Please contact your team leader for a new invitation.");
+      if (
+        err.response?.status === 400 &&
+        err.response?.data?.message?.includes("expired")
+      ) {
+        setError(
+          "This invitation has expired. Please contact your team leader for a new invitation.",
+        );
       } else {
         setError(err.response?.data?.message || "Failed to accept invitation");
       }
@@ -135,7 +148,7 @@ const AcceptInvitation = () => {
   if (showLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <LoadingSpinner variant="section" />
+        <LoadingSpinner />
       </div>
     );
   }
@@ -143,11 +156,11 @@ const AcceptInvitation = () => {
   if (error && !invitationData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-        <div
-          className="max-w-md w-full bg-white/5 backdrop-blur-xl border border-red-400/20 rounded-2xl p-8 text-center"
-        >
+        <div className="max-w-md w-full bg-white/5 backdrop-blur-xl border border-red-400/20 rounded-2xl p-8 text-center">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-4">Invalid Invitation</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Invalid Invitation
+          </h2>
           <p className="text-gray-300 mb-6">{error}</p>
           <Link
             to="/login"
@@ -163,9 +176,7 @@ const AcceptInvitation = () => {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-        <div
-          className="max-w-2xl w-full bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8"
-        >
+        <div className="max-w-2xl w-full bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8">
           <div className="text-center mb-8">
             <CheckCircle className="w-20 h-20 text-green-400 mx-auto mb-4" />
             <h2 className="text-3xl font-bold text-white mb-2">
@@ -187,7 +198,8 @@ const AcceptInvitation = () => {
                   1
                 </span>
                 <span>
-                  Go to the <strong className="text-white">Team Login</strong> page
+                  Go to the <strong className="text-white">Team Login</strong>{" "}
+                  page
                 </span>
               </li>
               <li className="flex items-start">
@@ -238,9 +250,7 @@ const AcceptInvitation = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div
-        className="max-w-md w-full space-y-6"
-      >
+      <div className="max-w-md w-full space-y-6">
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-4">
@@ -260,9 +270,7 @@ const AcceptInvitation = () => {
         <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div
-                className="bg-red-500/20 border border-red-400/50 rounded-lg p-3 text-red-300 text-sm"
-              >
+              <div className="bg-red-500/20 border border-red-400/50 rounded-lg p-3 text-red-300 text-sm">
                 {error}
               </div>
             )}
@@ -298,8 +306,12 @@ const AcceptInvitation = () => {
               {formData.password && (
                 <div className="mt-2">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-400">Password Strength:</span>
-                    <span className={`text-xs font-medium ${strengthInfo.color}`}>
+                    <span className="text-xs text-gray-400">
+                      Password Strength:
+                    </span>
+                    <span
+                      className={`text-xs font-medium ${strengthInfo.color}`}
+                    >
                       {strengthInfo.label}
                     </span>
                   </div>
@@ -309,10 +321,10 @@ const AcceptInvitation = () => {
                         passwordStrength <= 2
                           ? "bg-red-400"
                           : passwordStrength <= 3
-                          ? "bg-yellow-400"
-                          : passwordStrength <= 4
-                          ? "bg-blue-400"
-                          : "bg-green-400"
+                            ? "bg-yellow-400"
+                            : passwordStrength <= 4
+                              ? "bg-blue-400"
+                              : "bg-green-400"
                       }`}
                       style={{ width: `${(passwordStrength / 5) * 100}%` }}
                     />
@@ -332,7 +344,10 @@ const AcceptInvitation = () => {
                   type={showConfirmPassword ? "text" : "password"}
                   value={formData.confirmPassword}
                   onChange={(e) =>
-                    setFormData({ ...formData, confirmPassword: e.target.value })
+                    setFormData({
+                      ...formData,
+                      confirmPassword: e.target.value,
+                    })
                   }
                   required
                   className="w-full pl-10 pr-12 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
@@ -360,7 +375,7 @@ const AcceptInvitation = () => {
             >
               {submitting ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <LoadingSpinner variant="inline" size="sm" color="white" />
+                  <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
                   <span>Accepting Invitation...</span>
                 </div>
               ) : (
@@ -375,10 +390,12 @@ const AcceptInvitation = () => {
           <div className="flex items-start space-x-3">
             <Users className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-gray-300">
-              <p className="font-medium text-white mb-1">After setting your password:</p>
+              <p className="font-medium text-white mb-1">
+                After setting your password:
+              </p>
               <p>
-                You'll be able to login using your organization's shared email address
-                and select your name from the team member list.
+                You'll be able to login using your organization's shared email
+                address and select your name from the team member list.
               </p>
             </div>
           </div>
