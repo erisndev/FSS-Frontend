@@ -29,7 +29,7 @@ const VerificationRequests = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [processingId, setProcessingId] = useState(null);
-  
+
   // Modal states
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
@@ -64,7 +64,7 @@ const VerificationRequests = () => {
 
   const confirmApprove = async () => {
     if (!selectedRequest) return;
-    
+
     try {
       setProcessingId(selectedRequest._id);
       await verificationCodeApi.approveRequest(selectedRequest._id);
@@ -75,10 +75,10 @@ const VerificationRequests = () => {
         prev.map((req) =>
           req._id === selectedRequest._id
             ? { ...req, status: "approved", approvedAt: new Date() }
-            : req
-        )
+            : req,
+        ),
       );
-      
+
       setShowApproveModal(false);
       setSelectedRequest(null);
     } catch (error) {
@@ -91,7 +91,7 @@ const VerificationRequests = () => {
 
   const confirmReject = async (reason) => {
     if (!selectedRequest) return;
-    
+
     try {
       setProcessingId(selectedRequest._id);
       await verificationCodeApi.rejectRequest(selectedRequest._id, reason);
@@ -102,10 +102,10 @@ const VerificationRequests = () => {
         prev.map((req) =>
           req._id === selectedRequest._id
             ? { ...req, status: "rejected", rejectedAt: new Date() }
-            : req
-        )
+            : req,
+        ),
       );
-      
+
       setShowRejectModal(false);
       setSelectedRequest(null);
     } catch (error) {
@@ -163,12 +163,20 @@ const VerificationRequests = () => {
   const filteredRequests = requests.filter((request) => {
     const matchesSearch =
       searchTerm === "" ||
-      request.bidder?.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.bidder?.company
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       request.bidder?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.bidder?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.requestedBy?.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.requestedBy?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.requestedBy?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.requestedBy?.company
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      request.requestedBy?.name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      request.requestedBy?.email
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       request.tender?.title?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
@@ -181,13 +189,13 @@ const VerificationRequests = () => {
   const stats = {
     total: requests.length,
     pending: requests.filter(
-      (r) => (r.status || "pending").toLowerCase() === "pending"
+      (r) => (r.status || "pending").toLowerCase() === "pending",
     ).length,
     approved: requests.filter(
-      (r) => (r.status || "").toLowerCase() === "approved"
+      (r) => (r.status || "").toLowerCase() === "approved",
     ).length,
     rejected: requests.filter(
-      (r) => (r.status || "").toLowerCase() === "rejected"
+      (r) => (r.status || "").toLowerCase() === "rejected",
     ).length,
   };
 
@@ -198,9 +206,7 @@ const VerificationRequests = () => {
     >
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Total Requests</p>
@@ -214,9 +220,7 @@ const VerificationRequests = () => {
           </div>
         </div>
 
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Pending</p>
@@ -230,9 +234,7 @@ const VerificationRequests = () => {
           </div>
         </div>
 
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Approved</p>
@@ -246,9 +248,7 @@ const VerificationRequests = () => {
           </div>
         </div>
 
-        <div
-          className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Rejected</p>
@@ -294,7 +294,9 @@ const VerificationRequests = () => {
 
       {/* Requests Table */}
       {loading ? (
-        <LoadingSpinner />
+        <div className="flex items-center justify-center h-64">
+          <LoadingSpinner />
+        </div>
       ) : filteredRequests.length === 0 ? (
         <EmptyState
           icon={Shield}

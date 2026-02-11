@@ -370,7 +370,9 @@ const MyVerificationRequests = () => {
 
       {/* Requests List - Responsive */}
       {loading ? (
-        <LoadingSpinner />
+        <div className="flex items-center justify-center h-64">
+          <LoadingSpinner />
+        </div>
       ) : filteredRequests.length === 0 ? (
         <EmptyState
           icon={Shield}

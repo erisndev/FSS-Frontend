@@ -608,21 +608,14 @@ const ApplicationModal = ({
                 </p>
               </div>
               {application.tender.description && (
-                <div>
-                  <p
-                    className="text-gray-300 whitespace-pre-line break-words max-w-full"
-                    style={{
-                      overflowWrap: "anywhere",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    Description
-                  </p>
-                  <p className="text-gray-300">
+                <div className="break-words overflow-hidden">
+                  <p className="text-gray-300 text-sm mb-1">Description</p>
+                  <p className="text-gray-300 whitespace-pre-wrap break-words">
                     {application.tender.description}
                   </p>
                 </div>
               )}
+
               {application.tender.category && (
                 <div>
                   <p className="text-gray-400 text-sm">Category</p>

@@ -574,8 +574,8 @@ const ReviewApplications = () => {
           <div>
             {/* Loading applications */}
             {showAppsLoading ? (
-              <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-xl p-8">
-                <LoadingSpinner text="Loading applications…" />
+              <div className="flex items-center justify-center h-64">
+                <LoadingSpinner />
               </div>
             ) : applications.length === 0 ? (
               /* No applications */

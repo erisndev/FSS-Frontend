@@ -1,9 +1,17 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Bell, BellOff, Check, Trash2, CheckCircle2, Clock } from "lucide-react";
+import {
+  Bell,
+  BellOff,
+  Check,
+  Trash2,
+  CheckCircle2,
+  Clock,
+} from "lucide-react";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import { notificationApi } from "../../services/api";
 import toast from "react-hot-toast";
 import { emitNotificationsChanged } from "../../utils/notificationsBus";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
 
 const formatTime = (date) => {
   if (!date) return "";
@@ -31,7 +39,7 @@ const AdminNotifications = () => {
 
   const unreadCount = useMemo(
     () => notifications.filter((n) => !n.isRead).length,
-    [notifications]
+    [notifications],
   );
 
   useEffect(() => {
@@ -44,13 +52,15 @@ const AdminNotifications = () => {
         const normalized = (list || []).map((n) => ({
           id: n._id || n.id,
           title:
-            n.title || (n.type ? String(n.type).replace(/[_:]/g, " ") : "Notification"),
+            n.title ||
+            (n.type ? String(n.type).replace(/[_:]/g, " ") : "Notification"),
           message: n.message || n.body || n.description || "",
           createdAt: n.createdAt || n.time || new Date().toISOString(),
           isRead: n.isRead === true,
         }));
         normalized.sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
         if (mounted) setNotifications(normalized);
       } catch (e) {
@@ -69,7 +79,9 @@ const AdminNotifications = () => {
   const handleMarkAsRead = async (n) => {
     try {
       await notificationApi.markAsRead(n.id);
-      setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, isRead: true } : x)));
+      setNotifications((prev) =>
+        prev.map((x) => (x.id === n.id ? { ...x, isRead: true } : x)),
+      );
       emitNotificationsChanged({ action: "markAsRead", id: n.id });
       toast.success("Marked as read");
     } catch (e) {
@@ -108,7 +120,10 @@ const AdminNotifications = () => {
   }, [notifications, filter]);
 
   return (
-    <DashboardLayout title="Notifications" subtitle="System-wide updates and alerts">
+    <DashboardLayout
+      title="Notifications"
+      subtitle="System-wide updates and alerts"
+    >
       <div className="space-y-6">
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -156,7 +171,9 @@ const AdminNotifications = () => {
 
         {/* Content */}
         {loading ? (
-          <div className="p-6 text-center text-gray-400">Loading notifications...</div>
+          <div className="flex items-center justify-center h-64">
+            <LoadingSpinner />
+          </div>
         ) : error ? (
           <div className="p-6 text-center text-red-400">{error}</div>
         ) : visible.length === 0 ? (
@@ -167,7 +184,9 @@ const AdminNotifications = () => {
               <Bell className="w-12 h-12 text-gray-400 mb-3" />
             )}
             <div className="text-white font-semibold mb-1">
-              {notifications.length === 0 ? "No notifications yet" : "No unread notifications"}
+              {notifications.length === 0
+                ? "No notifications yet"
+                : "No unread notifications"}
             </div>
             <div className="text-gray-400 text-sm">
               {notifications.length === 0
@@ -193,7 +212,9 @@ const AdminNotifications = () => {
                       <div className="text-white font-medium truncate">
                         {n.title}
                       </div>
-                      {!n.isRead && <span className="w-2 h-2 bg-cyan-400 rounded-full" />}
+                      {!n.isRead && (
+                        <span className="w-2 h-2 bg-cyan-400 rounded-full" />
+                      )}
                     </div>
                     {n.message && (
                       <div className="text-gray-300 text-sm leading-relaxed break-words">
@@ -201,7 +222,8 @@ const AdminNotifications = () => {
                       </div>
                     )}
                     <div className="flex items-center gap-2 text-xs text-gray-400 mt-2">
-                      <Clock className="w-3.5 h-3.5" /> {formatTime(n.createdAt)}
+                      <Clock className="w-3.5 h-3.5" />{" "}
+                      {formatTime(n.createdAt)}
                     </div>
                   </div>
                   {!n.isRead && (

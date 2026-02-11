@@ -193,8 +193,8 @@ const BrowseTenders = () => {
     }
 
     if (restored) {
-      setApplyForm({ 
-        ...restored, 
+      setApplyForm({
+        ...restored,
         bidFileDocuments: null,
         compiledDocuments: null,
         financialDocuments: null,
@@ -274,7 +274,10 @@ const BrowseTenders = () => {
             }
           : null;
 
-      console.log("[APPLY] tenderId:", selectedTender?._id || selectedTender?.id);
+      console.log(
+        "[APPLY] tenderId:",
+        selectedTender?._id || selectedTender?.id,
+      );
       console.log("[APPLY] selectedTender:", {
         _id: selectedTender?._id,
         id: selectedTender?.id,
@@ -287,7 +290,7 @@ const BrowseTenders = () => {
         ...applyForm,
         // Summarize ALL compliance docs
         ...Object.fromEntries(
-          complianceKeys.map((k) => [k, summarizeFile(applyForm?.[k])])
+          complianceKeys.map((k) => [k, summarizeFile(applyForm?.[k])]),
         ),
         // Optional
         supportingDocuments: summarizeFile(applyForm.supportingDocuments),
@@ -318,7 +321,7 @@ const BrowseTenders = () => {
         ...payload,
         // Summarize ALL compliance docs
         ...Object.fromEntries(
-          complianceKeys.map((k) => [k, summarizeFile(payload?.[k])])
+          complianceKeys.map((k) => [k, summarizeFile(payload?.[k])]),
         ),
         // Optional
         supportingDocuments: summarizeFile(payload.supportingDocuments),
@@ -368,7 +371,7 @@ const BrowseTenders = () => {
     } catch (err) {
       console.error("Error applying to tender:", err);
       setApplyError(
-        err?.response?.data?.message || "Failed to submit application"
+        err?.response?.data?.message || "Failed to submit application",
       );
       toast.error("Failed to submit application");
     } finally {
@@ -415,7 +418,9 @@ const BrowseTenders = () => {
 
         {/* Tenders Grid */}
         {loading ? (
-          <LoadingSpinner />
+          <div className="flex items-center justify-center h-64">
+            <LoadingSpinner />
+          </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {tenders.map((tender, index) => (

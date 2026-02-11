@@ -65,7 +65,9 @@ const MyApplications = () => {
         title="My Applications"
         subtitle="Track your tender applications"
       >
-        <LoadingSpinner />
+        <div className="flex items-center justify-center h-64">
+          <LoadingSpinner />
+        </div>
       </DashboardLayout>
     );
   }

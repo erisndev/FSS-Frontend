@@ -120,7 +120,7 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
         (a, b) => (b.time?.getTime?.() || 0) - (a.time?.getTime?.() || 0),
       );
       const onlyUnread = items.filter((x) => !x.isRead);
-      const limited = onlyUnread.slice(0, 10);
+      const limited = onlyUnread.slice(0, 20);
       setNotifications(limited);
     } catch (err) {
       console.error("Error loading notifications:", err);
@@ -249,105 +249,100 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
       </button>
 
       {/* Dropdown */}
-      
-        {notifOpen && (
+
+      {notifOpen && (
+        <div
+          ref={notifMenuRef}
+          className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto lg:mt-2 w-80 sm:w-96 z-[9999]"
+          style={{ pointerEvents: "auto" }}
+        >
           <div
-            ref={notifMenuRef}
-            className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto lg:mt-2 w-80 sm:w-96 z-[9999]"
-            style={{ pointerEvents: "auto" }}
+            className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="px-4 py-3 border-b border-cyan-400/10 flex items-center justify-between">
-                <span className="text-white font-semibold">Notifications</span>
-                <button
-                  onClick={() => setNotifOpen(false)}
-                  className="text-gray-400 hover:text-white"
-                  aria-label="Close notifications"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="max-h-80 overflow-y-auto">
-                {notifLoading ? (
-                  <div className="p-4 text-center text-gray-400">
-                    Loading...
-                  </div>
-                ) : notifError ? (
-                  <div className="p-4 text-center text-red-400">
-                    {notifError}
-                  </div>
-                ) : notifications.length === 0 ? (
-                  <div className="p-4 text-center text-gray-400">
-                    No notifications
-                  </div>
-                ) : (
-                  notifications.map((n) => (
-                    <div
-                      key={`${n.id}`}
-                      className="flex items-start space-x-3 p-4 hover:bg-white/5 transition-colors"
-                    >
-                      <div className="w-9 h-9 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                        {n.icon ? (
-                          <n.icon className="w-5 h-5 text-cyan-400" />
-                        ) : (
-                          <FileText className="w-5 h-5 text-cyan-400" />
-                        )}
+            <div className="px-4 py-3 border-b border-cyan-400/10 flex items-center justify-between">
+              <span className="text-white font-semibold">Notifications</span>
+              <button
+                onClick={() => setNotifOpen(false)}
+                className="text-gray-400 hover:text-white"
+                aria-label="Close notifications"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="max-h-80 overflow-y-auto">
+              {notifLoading ? (
+                <div className="p-4 text-center text-gray-400">Loading...</div>
+              ) : notifError ? (
+                <div className="p-4 text-center text-red-400">{notifError}</div>
+              ) : notifications.length === 0 ? (
+                <div className="p-4 text-center text-gray-400">
+                  No notifications
+                </div>
+              ) : (
+                notifications.map((n) => (
+                  <div
+                    key={`${n.id}`}
+                    className="flex items-start space-x-3 p-4 hover:bg-white/5 transition-colors"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                      {n.icon ? (
+                        <n.icon className="w-5 h-5 text-cyan-400" />
+                      ) : (
+                        <FileText className="w-5 h-5 text-cyan-400" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-white text-sm font-medium truncate">
+                        {n.title}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-white text-sm font-medium truncate">
-                          {n.title}
+                      <div className="text-gray-400 text-xs truncate">
+                        {n.message}
+                      </div>
+                      <div className="flex items-center justify-between mt-1">
+                        <div className="text-gray-500 text-[11px]">
+                          {timeAgo(n.time)}
                         </div>
-                        <div className="text-gray-400 text-xs truncate">
-                          {n.message}
-                        </div>
-                        <div className="flex items-center justify-between mt-1">
-                          <div className="text-gray-500 text-[11px]">
-                            {timeAgo(n.time)}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => handleViewNotification(n)}
-                              className="text-cyan-400 hover:text-cyan-300 text-[11px]"
-                            >
-                              View
-                            </button>
-                            <button
-                              onClick={() => handleMarkAsRead(n)}
-                              className="text-gray-300 hover:text-white text-[11px]"
-                            >
-                              Mark as read
-                            </button>
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleViewNotification(n)}
+                            className="text-cyan-400 hover:text-cyan-300 text-[11px]"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleMarkAsRead(n)}
+                            className="text-gray-300 hover:text-white text-[11px]"
+                          >
+                            Mark as read
+                          </button>
                         </div>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
-              <div className="px-4 py-2 border-t border-cyan-400/10 flex items-center justify-between">
-                <button
-                  onClick={() => {
-                    setNotifOpen(false);
-                    navigate(notificationsPath);
-                  }}
-                  className="text-cyan-400 hover:text-cyan-300 text-sm"
-                >
-                  View all
-                </button>
-                <button
-                  onClick={() => setNotifOpen(false)}
-                  className="text-gray-300 hover:text-white text-sm"
-                >
-                  Close
-                </button>
-              </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="px-4 py-2 border-t border-cyan-400/10 flex items-center justify-between">
+              <button
+                onClick={() => {
+                  setNotifOpen(false);
+                  navigate(notificationsPath);
+                }}
+                className="text-cyan-400 hover:text-cyan-300 text-sm"
+              >
+                View all
+              </button>
+              <button
+                onClick={() => setNotifOpen(false)}
+                className="text-gray-300 hover:text-white text-sm"
+              >
+                Close
+              </button>
             </div>
           </div>
-        )}
-      
+        </div>
+      )}
     </div>
   );
 
@@ -367,59 +362,58 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
       </button>
 
       {/* Dropdown */}
-      
-        {userMenuOpen && (
+
+      {userMenuOpen && (
+        <div
+          ref={userMenuRef}
+          className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto lg:mt-2 w-72 z-[9999]"
+          style={{ pointerEvents: "auto" }}
+        >
           <div
-            ref={userMenuRef}
-            className="fixed lg:absolute right-2 lg:right-0 top-16 lg:top-auto lg:mt-2 w-72 z-[9999]"
-            style={{ pointerEvents: "auto" }}
+            className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="bg-slate-900/95 backdrop-blur-xl border border-cyan-400/20 rounded-xl shadow-xl overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* User Info Section */}
-              <div className="px-4 py-4 border-b border-cyan-400/10">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
-                    {getUserInitials(user?.name)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-semibold truncate">
-                      {user?.name}
-                    </p>
-                    <p className="text-cyan-400/70 text-sm capitalize">
-                      {user?.role}
-                    </p>
-                  </div>
+            {/* User Info Section */}
+            <div className="px-4 py-4 border-b border-cyan-400/10">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
+                  {getUserInitials(user?.name)}
                 </div>
-                <div className="mt-3 pt-3 border-t border-cyan-400/10">
-                  <p className="text-gray-400 text-xs">Email</p>
-                  <p className="text-white text-sm truncate">{user?.email}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-semibold truncate">
+                    {user?.name}
+                  </p>
+                  <p className="text-cyan-400/70 text-sm capitalize">
+                    {user?.role}
+                  </p>
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="p-2">
-                <button
-                  onClick={handleProfile}
-                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-cyan-400/10 transition-colors text-left"
-                >
-                  <User className="w-5 h-5 text-cyan-400" />
-                  <span className="text-white font-medium">Profile</span>
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-red-500/10 transition-colors text-left"
-                >
-                  <LogOut className="w-5 h-5 text-red-400" />
-                  <span className="text-white font-medium">Logout</span>
-                </button>
+              <div className="mt-3 pt-3 border-t border-cyan-400/10">
+                <p className="text-gray-400 text-xs">Email</p>
+                <p className="text-white text-sm truncate">{user?.email}</p>
               </div>
             </div>
+
+            {/* Action Buttons */}
+            <div className="p-2">
+              <button
+                onClick={handleProfile}
+                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-cyan-400/10 transition-colors text-left"
+              >
+                <User className="w-5 h-5 text-cyan-400" />
+                <span className="text-white font-medium">Profile</span>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-red-500/10 transition-colors text-left"
+              >
+                <LogOut className="w-5 h-5 text-red-400" />
+                <span className="text-white font-medium">Logout</span>
+              </button>
+            </div>
           </div>
-        )}
-      
+        </div>
+      )}
     </div>
   );
 
@@ -446,9 +440,7 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
               <div className="w-10 h-10 flex-shrink-0"></div>
 
               {/* User Info - Compact on mobile */}
-              <div
-                className="flex items-center space-x-2"
-              >
+              <div className="flex items-center space-x-2">
                 {/* Notifications - Mobile */}
                 <NotificationBell />
 
@@ -459,17 +451,9 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
             {/* Title row */}
             <div className="text-center">
-              <h1
-                className="text-xl font-bold text-white"
-              >
-                {title}
-              </h1>
+              <h1 className="text-xl font-bold text-white">{title}</h1>
               {subtitle && (
-                <p
-                  className="text-cyan-400/70 mt-1 text-sm"
-                >
-                  {subtitle}
-                </p>
+                <p className="text-cyan-400/70 mt-1 text-sm">{subtitle}</p>
               )}
             </div>
           </div>
@@ -477,26 +461,15 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
           /* Desktop Layout */
           <div className="flex items-center justify-between">
             <div>
-              <h1
-                className="text-2xl font-bold text-white"
-              >
-                {title}
-              </h1>
-              {subtitle && (
-                <p
-                  className="text-cyan-400/70 mt-1"
-                >
-                  {subtitle}
-                </p>
-              )}
+              <h1 className="text-2xl font-bold text-white">{title}</h1>
+              {subtitle && <p className="text-cyan-400/70 mt-1">{subtitle}</p>}
             </div>
             <div className="flex items-center space-x-4">
               {/* Notifications - Desktop */}
               <NotificationBell />
 
               {/* User Menu - Desktop */}
-              <div
-              >
+              <div>
                 <UserMenu />
               </div>
             </div>
@@ -505,67 +478,66 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
       </header>
 
       {/* Logout Confirmation Modal */}
-      
-        {showLogoutModal && (
+
+      {showLogoutModal && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
+          onClick={() => setShowLogoutModal(false)}
+        >
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
-            onClick={() => setShowLogoutModal(false)}
+            className="bg-gradient-to-b from-slate-900 to-slate-950 border border-red-400/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="bg-gradient-to-b from-slate-900 to-slate-950 border border-red-400/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center">
-                    <LogOut className="w-6 h-6 text-red-400" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white">
-                      Confirm Logout
-                    </h2>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      End your current session
-                    </p>
-                  </div>
+            {/* Header */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center">
+                  <LogOut className="w-6 h-6 text-red-400" />
                 </div>
-                <button
-                  onClick={() => setShowLogoutModal(false)}
-                  className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    Confirm Logout
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    End your current session
+                  </p>
+                </div>
               </div>
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-              {/* Message */}
-              <div className="p-4 rounded-lg border border-red-400/20 bg-gradient-to-r from-red-500/10 to-orange-500/10 mb-6">
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  Are you sure you want to logout? You'll need to sign in again
-                  to access your account.
-                </p>
-              </div>
+            {/* Message */}
+            <div className="p-4 rounded-lg border border-red-400/20 bg-gradient-to-r from-red-500/10 to-orange-500/10 mb-6">
+              <p className="text-gray-300 text-sm leading-relaxed">
+                Are you sure you want to logout? You'll need to sign in again to
+                access your account.
+              </p>
+            </div>
 
-              {/* Actions */}
-              <div className="flex flex-col-reverse sm:flex-row gap-3">
-                <button
-                  onClick={() => setShowLogoutModal(false)}
-                  className="flex-1 px-4 py-2.5 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg hover:bg-slate-800/70 hover:border-gray-400/40 transition-all duration-300 font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmLogout}
-                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </button>
-              </div>
+            {/* Actions */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 px-4 py-2.5 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg hover:bg-slate-800/70 hover:border-gray-400/40 transition-all duration-300 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
             </div>
           </div>
-        )}
-      
+        </div>
+      )}
     </>
   );
 };
