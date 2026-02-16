@@ -711,7 +711,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       touched.title && errors.title
                         ? "border-red-400/50"
                         : "border-cyan-400/20"
-                    } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                    } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                   />
                   {touched.title && errors.title && (
                     <p className="mt-1 text-sm text-red-400 flex items-center space-x-1">
@@ -719,7 +719,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       <span>{errors.title}</span>
                     </p>
                   )}
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-gray-400">
                     {formData.title.length}/100 characters
                   </p>
                 </div>
@@ -771,7 +771,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       touched.description && errors.description
                         ? "border-red-400/50"
                         : "border-cyan-400/20"
-                    } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200 resize-none`}
+                    } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200 resize-none`}
                   />
                   {touched.description && errors.description && (
                     <p className="mt-1 text-sm text-red-400 flex items-center space-x-1">
@@ -779,7 +779,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       <span>{errors.description}</span>
                     </p>
                   )}
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-gray-400">
                     {formData.description.length}/2000 characters
                   </p>
                 </div>
@@ -796,10 +796,10 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       value={formData.tags}
                       onChange={handleInputChange}
                       placeholder="e.g., construction, urgent, government (comma separated)"
-                      className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-gray-400">
                     Separate tags with commas to help bidders find your tender
                   </p>
                 </div>
@@ -862,7 +862,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           touched.budgetMin && errors.budgetMin
                             ? "border-red-400/50"
                             : "border-cyan-400/20"
-                        } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                        } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                       />
                     </div>
                     {touched.budgetMin && errors.budgetMin && (
@@ -890,7 +890,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           touched.budgetMax && errors.budgetMax
                             ? "border-red-400/50"
                             : "border-cyan-400/20"
-                        } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                        } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                       />
                     </div>
                     {touched.budgetMax && errors.budgetMax && (
@@ -930,7 +930,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         touched.deadline && errors.deadline
                           ? "border-red-400/50"
                           : "border-cyan-400/20"
-                      } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                      } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                     />
                   </div>
                   {touched.deadline && errors.deadline && (
@@ -1016,7 +1016,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         touched.companyName && errors.companyName
                           ? "border-red-400/50"
                           : "border-cyan-400/20"
-                      } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                      } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                     />
                   </div>
                   {touched.companyName && errors.companyName && (
@@ -1039,10 +1039,10 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                       onChange={handleInputChange}
                       rows={3}
                       placeholder="Street, suburb, city, province, postal code"
-                      className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200 resize-none"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200 resize-none"
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-gray-400">
                     This will be shown to bidders as part of the tender details.
                   </p>
                 </div>
@@ -1071,7 +1071,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           value={formData.technicalContactPerson}
                           onChange={handleInputChange}
                           placeholder="Full name"
-                          className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
+                          className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -1095,7 +1095,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                               errors.technicalContactEmail
                                 ? "border-red-400/50"
                                 : "border-cyan-400/20"
-                            } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                            } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                           />
                         </div>
                         {touched.technicalContactEmail &&
@@ -1125,7 +1125,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                               errors.technicalContactPhone
                                 ? "border-red-400/50"
                                 : "border-cyan-400/20"
-                            } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                            } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                           />
                         </div>
                         {touched.technicalContactPhone &&
@@ -1157,7 +1157,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                           value={formData.generalContactPerson}
                           onChange={handleInputChange}
                           placeholder="Full name"
-                          className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
+                          className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -1181,7 +1181,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                               errors.generalContactEmail
                                 ? "border-red-400/50"
                                 : "border-cyan-400/20"
-                            } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                            } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                           />
                         </div>
                         {touched.generalContactEmail &&
@@ -1211,7 +1211,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                               errors.generalContactPhone
                                 ? "border-red-400/50"
                                 : "border-cyan-400/20"
-                            } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
+                            } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200`}
                           />
                         </div>
                         {touched.generalContactPhone &&
@@ -1241,9 +1241,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                     onChange={handleInputChange}
                     rows={5}
                     placeholder="List specific requirements, qualifications, certifications, or any other specifications bidders must meet..."
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-200 resize-none"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-200 resize-none"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-gray-400">
                     Be specific about mandatory requirements vs. preferred
                     qualifications
                   </p>
@@ -1271,7 +1271,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                                   <p className="text-white text-sm font-medium">
                                     {value.name}
                                   </p>
-                                  <p className="text-gray-500 text-xs">
+                                  <p className="text-gray-400 text-xs">
                                     {formatFileSize(value.size)}
                                   </p>
                                 </div>
@@ -1323,31 +1323,31 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div className="space-y-2">
                       <p className="text-gray-300">
-                        <span className="text-gray-500">Title:</span>{" "}
+                        <span className="text-gray-400">Title:</span>{" "}
                         <span className="text-white font-medium">
                           {formData.title || "Not set"}
                         </span>
                       </p>
                       <p className="text-gray-300">
-                        <span className="text-gray-500">Company:</span>{" "}
+                        <span className="text-gray-400">Company:</span>{" "}
                         <span className="text-white font-medium">
                           {formData.companyName || "Not set"}
                         </span>
                       </p>
                       <p className="text-gray-300">
-                        <span className="text-gray-500">Address:</span>{" "}
+                        <span className="text-gray-400">Address:</span>{" "}
                         <span className="text-white font-medium">
                           {formData.companyAddress || "Not set"}
                         </span>
                       </p>
                       <p className="text-gray-300">
-                        <span className="text-gray-500">Category:</span>{" "}
+                        <span className="text-gray-400">Category:</span>{" "}
                         <span className="text-white font-medium">
                           {formData.category || "Not set"}
                         </span>
                       </p>
                       <p className="text-gray-300">
-                        <span className="text-gray-500">Status:</span>{" "}
+                        <span className="text-gray-400">Status:</span>{" "}
                         <span
                           className={`font-medium ${
                             formData.status === "active"
@@ -1364,14 +1364,14 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                     </div>
                     <div className="space-y-2">
                       <p className="text-gray-300">
-                        <span className="text-gray-500">Budget:</span>{" "}
+                        <span className="text-gray-400">Budget:</span>{" "}
                         <span className="text-cyan-400 font-medium">
                           R{Number(formData.budgetMin || 0).toLocaleString()} -
                           R{Number(formData.budgetMax || 0).toLocaleString()}
                         </span>
                       </p>
                       <p className="text-gray-300">
-                        <span className="text-gray-500">Deadline:</span>{" "}
+                        <span className="text-gray-400">Deadline:</span>{" "}
                         <span className="text-white font-medium">
                           {formData.deadline
                             ? new Date(formData.deadline).toLocaleDateString()
@@ -1379,7 +1379,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
                         </span>
                       </p>
                       <p className="text-gray-300">
-                        <span className="text-gray-500">Documents:</span>{" "}
+                        <span className="text-gray-400">Documents:</span>{" "}
                         <span className="text-white font-medium">
                           {formData.documents.length} file(s)
                         </span>

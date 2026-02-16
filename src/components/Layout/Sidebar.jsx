@@ -87,7 +87,7 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
         issuerMenu.push(
           { name: "Notifications", path: "/issuer/notifications", icon: Bell },
-          { name: "Profile", path: "/issuer/profile", icon: User }
+          { name: "Profile", path: "/issuer/profile", icon: User },
         );
 
         return issuerMenu;
@@ -127,7 +127,7 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
       case "admin":
         return "from-emerald-500 to-teal-500";
       default:
-        return "from-gray-500 to-gray-600";
+        return "from-gray-400 to-gray-600";
     }
   };
 
@@ -195,26 +195,26 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
                 className={`relative flex items-center justify-between p-3 rounded-lg transition-all duration-200 group touch-manipulation min-h-[44px] ${
                   isActive
                     ? "bg-gradient-to-r from-cyan-500/15 to-purple-500/15 text-cyan-400"
-                    : "text-gray-400 hover:text-white hover:bg-white/5 active:bg-white/10"
+                    : "text-gray-300 hover:text-white hover:bg-white/5 active:bg-white/10"
                 }`}
               >
                 {/* Active indicator bar */}
                 {isActive && (
-                  <div
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-r-full"
-                  />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-r-full" />
                 )}
                 <div className="flex items-center space-x-3 pl-1">
                   <item.icon
                     className={`w-[18px] h-[18px] flex-shrink-0 transition-colors duration-200 ${
                       isActive
                         ? "text-cyan-400"
-                        : "text-gray-500 group-hover:text-gray-200"
+                        : "text-gray-400  group-hover:text-gray-200"
                     }`}
                   />
-                  <span className={`text-sm truncate transition-colors duration-200 ${
-                    isActive ? "font-semibold" : "font-medium"
-                  }`}>
+                  <span
+                    className={`text-sm truncate transition-colors duration-200 ${
+                      isActive ? "font-bold" : "font-semibold"
+                    }`}
+                  >
                     {item.name}
                   </span>
                 </div>
@@ -247,93 +247,90 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
       </div>
 
       {/* Mobile Sidebar */}
-      
-        {isMobileMenuOpen && isMobile && (
-          <>
-            <div
+
+      {isMobileMenuOpen && isMobile && (
+        <>
+          <div
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          />
+          <div className="fixed left-0 top-0 h-full w-full sm:w-80 sm:max-w-[85vw] bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border-r border-cyan-400/20 shadow-2xl z-50 lg:hidden">
+            <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
-            />
-            <div
-              className="fixed left-0 top-0 h-full w-full sm:w-80 sm:max-w-[85vw] bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border-r border-cyan-400/20 shadow-2xl z-50 lg:hidden"
+              aria-label="Close sidebar"
+              className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-cyan-400/20 text-cyan-400 z-10"
             >
+              <X className="w-5 h-5" />
+            </button>
+            <SidebarContent isMobileVersion={true} />
+          </div>
+        </>
+      )}
+
+      {/* Logout Modal */}
+
+      {showLogoutModal && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
+          onClick={() => setShowLogoutModal(false)}
+        >
+          <div
+            className="bg-gradient-to-b from-slate-900 to-slate-950 border border-red-400/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center">
+                  <LogOut className="w-6 h-6 text-red-400" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    Confirm Logout
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    End your current session
+                  </p>
+                </div>
+              </div>
               <button
-                onClick={() => setIsMobileMenuOpen(false)}
-                aria-label="Close sidebar"
-                className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-cyan-400/20 text-cyan-400 z-10"
+                onClick={() => setShowLogoutModal(false)}
+                className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
-              <SidebarContent isMobileVersion={true} />
             </div>
-          </>
-        )}
-      
 
-      {/* Logout Modal */}
-      
-        {showLogoutModal && (
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
-            onClick={() => setShowLogoutModal(false)}
-          >
-            <div
-              className="bg-gradient-to-b from-slate-900 to-slate-950 border border-red-400/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center">
-                    <LogOut className="w-6 h-6 text-red-400" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white">
-                      Confirm Logout
-                    </h2>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      End your current session
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowLogoutModal(false)}
-                  className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+            {/* Message */}
+            <div className="p-4 rounded-lg border border-red-400/20 bg-gradient-to-r from-red-500/10 to-orange-500/10 mb-6">
+              <p className="text-gray-300 text-sm leading-relaxed">
+                Are you sure you want to logout? You'll need to sign in again to
+                access your account.
+              </p>
+            </div>
 
-              {/* Message */}
-              <div className="p-4 rounded-lg border border-red-400/20 bg-gradient-to-r from-red-500/10 to-orange-500/10 mb-6">
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  Are you sure you want to logout? You'll need to sign in again to access your account.
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="flex flex-col-reverse sm:flex-row gap-3">
-                <button
-                  onClick={() => setShowLogoutModal(false)}
-                  className="flex-1 px-4 py-2.5 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg hover:bg-slate-800/70 hover:border-gray-400/40 transition-all duration-300 font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    logout();
-                    setShowLogoutModal(false);
-                  }}
-                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </button>
-              </div>
+            {/* Actions */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 px-4 py-2.5 bg-slate-800/50 border border-gray-400/20 text-gray-300 rounded-lg hover:bg-slate-800/70 hover:border-gray-400/40 transition-all duration-300 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  logout();
+                  setShowLogoutModal(false);
+                }}
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
             </div>
           </div>
-        )}
-      
+        </div>
+      )}
     </>
   );
 };

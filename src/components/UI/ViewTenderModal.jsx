@@ -55,15 +55,14 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
   };
 
   return (
-    
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
+      onClick={onClose}
+    >
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
-        onClick={onClose}
+        className="bg-gradient-to-b from-slate-900 to-slate-950 border border-white/[0.08] rounded-2xl p-4 sm:p-6 md:p-8 max-w-4xl w-full max-h-[95vh] sm:max-h-[92vh] overflow-y-auto custom-scrollbar shadow-2xl shadow-black/40"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className="bg-gradient-to-b from-slate-900 to-slate-950 border border-white/[0.08] rounded-2xl p-4 sm:p-6 md:p-8 max-w-4xl w-full max-h-[95vh] sm:max-h-[92vh] overflow-y-auto custom-scrollbar shadow-2xl shadow-black/40"
-          onClick={(e) => e.stopPropagation()}
-        >
         {/* Header */}
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
@@ -79,7 +78,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
               )}
               <span
                 className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs rounded-full border ${getStatusColor(
-                  tender.status
+                  tender.status,
                 )} border-opacity-30`}
               >
                 {tender.status}
@@ -96,9 +95,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
 
         {/* Description */}
         {tender.description && (
-          <div
-            className="mb-4 sm:mb-6 md:mb-8"
-          >
+          <div className="mb-4 sm:mb-6 md:mb-8">
             <h4 className="text-base sm:text-lg font-semibold text-cyan-400 mb-2 sm:mb-3">
               Description
             </h4>
@@ -111,9 +108,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
         )}
 
         {/* Core Information */}
-        <div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8"
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
           {/* Basic Details */}
           <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6">
             <h4 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
@@ -135,9 +130,9 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                 <span className="text-xs sm:text-sm text-cyan-400 font-semibold text-right">
                   {tender.budgetMin || tender.budgetMax
                     ? `R${Number(
-                        tender.budgetMin || 0
+                        tender.budgetMin || 0,
                       ).toLocaleString()} - R${Number(
-                        tender.budgetMax || 0
+                        tender.budgetMax || 0,
                       ).toLocaleString()}`
                     : `R${Number(tender.budget || 0).toLocaleString()}`}
                 </span>
@@ -210,9 +205,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
         </div>
 
         {/* Contact & Metadata */}
-        <div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8"
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
           {/* Contact Information */}
           <div className="bg-slate-800/30 border border-cyan-400/10 rounded-lg p-3 sm:p-4 md:p-6">
             <h4 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4">
@@ -306,9 +299,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
 
         {/* Requirements */}
         {tender.requirements && (
-          <div
-            className="mb-4 sm:mb-6 md:mb-8"
-          >
+          <div className="mb-4 sm:mb-6 md:mb-8">
             <h4 className="text-base sm:text-lg font-semibold text-cyan-400 mb-2 sm:mb-3">
               Requirements
             </h4>
@@ -335,9 +326,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
 
         {/* Tags */}
         {tender.tags?.length > 0 && (
-          <div
-            className="mb-4 sm:mb-6 md:mb-8"
-          >
+          <div className="mb-4 sm:mb-6 md:mb-8">
             <h4 className="text-base sm:text-lg font-semibold text-cyan-400 mb-2 sm:mb-3">
               Tags
             </h4>
@@ -355,15 +344,13 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
         )}
 
         {/* Documents */}
-        {(tender.documents?.length > 0 || 
-          tender.documents?.bidFileDocuments || 
-          tender.documents?.compiledDocuments || 
-          tender.documents?.financialDocuments || 
-          tender.documents?.technicalProposal || 
+        {(tender.documents?.length > 0 ||
+          tender.documents?.bidFileDocuments ||
+          tender.documents?.compiledDocuments ||
+          tender.documents?.financialDocuments ||
+          tender.documents?.technicalProposal ||
           tender.documents?.proofOfExperience) && (
-          <div
-            className="mb-2 sm:mb-4"
-          >
+          <div className="mb-2 sm:mb-4">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
                 <FileText className="w-5 h-5 text-cyan-400" />
@@ -379,40 +366,45 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
             </div>
             <div className="space-y-4">
               {/* Check if documents is an array with labels */}
-              {Array.isArray(tender.documents) && tender.documents.length > 0 && tender.documents[0]?.label ? (
+              {Array.isArray(tender.documents) &&
+              tender.documents.length > 0 &&
+              tender.documents[0]?.label ? (
                 // New format: Array with label property
                 <>
                   {/* Always show the issuer-issued document labels */}
                   {ISSUER_ISSUED_DOCUMENTS.map((def, index) => {
                     const requiredLabel = def.label;
-                    const doc = tender.documents.find(d => d.label === requiredLabel);
+                    const doc = tender.documents.find(
+                      (d) => d.label === requiredLabel,
+                    );
                     const getFileExtension = (filename) => {
-                      if (!filename) return 'file';
-                      const ext = filename.split('.').pop().toLowerCase();
+                      if (!filename) return "file";
+                      const ext = filename.split(".").pop().toLowerCase();
                       return ext;
                     };
                     const getFileTypeColor = (filename) => {
                       const ext = getFileExtension(filename);
-                      if (['pdf'].includes(ext)) return 'from-red-500/20 to-red-600/20 border-red-400/30';
-                      if (['doc', 'docx'].includes(ext)) return 'from-blue-500/20 to-blue-600/20 border-blue-400/30';
-                      if (['xls', 'xlsx'].includes(ext)) return 'from-green-500/20 to-green-600/20 border-green-400/30';
-                      if (['jpg', 'jpeg', 'png'].includes(ext)) return 'from-purple-500/20 to-purple-600/20 border-purple-400/30';
-                      return 'from-cyan-500/20 to-cyan-600/20 border-cyan-400/30';
+                      if (["pdf"].includes(ext))
+                        return "from-red-500/20 to-red-600/20 border-red-400/30";
+                      if (["doc", "docx"].includes(ext))
+                        return "from-blue-500/20 to-blue-600/20 border-blue-400/30";
+                      if (["xls", "xlsx"].includes(ext))
+                        return "from-green-500/20 to-green-600/20 border-green-400/30";
+                      if (["jpg", "jpeg", "png"].includes(ext))
+                        return "from-purple-500/20 to-purple-600/20 border-purple-400/30";
+                      return "from-cyan-500/20 to-cyan-600/20 border-cyan-400/30";
                     };
                     const getFileTypeIcon = (filename) => {
                       const ext = getFileExtension(filename);
-                      if (['pdf'].includes(ext)) return '📄';
-                      if (['doc', 'docx'].includes(ext)) return '📝';
-                      if (['xls', 'xlsx'].includes(ext)) return '📊';
-                      if (['jpg', 'jpeg', 'png'].includes(ext)) return '🖼️';
-                      return '📎';
+                      if (["pdf"].includes(ext)) return "📄";
+                      if (["doc", "docx"].includes(ext)) return "📝";
+                      if (["xls", "xlsx"].includes(ext)) return "📊";
+                      if (["jpg", "jpeg", "png"].includes(ext)) return "🖼️";
+                      return "📎";
                     };
-                    
+
                     return (
-                      <div 
-                        key={requiredLabel}
-                        className="group"
-                      >
+                      <div key={requiredLabel} className="group">
                         <div className="flex items-center space-x-2 mb-2">
                           <div className="w-1 h-4 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></div>
                           <label className="text-xs sm:text-sm font-semibold text-gray-200">
@@ -425,11 +417,17 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                           )}
                         </div>
                         {doc ? (
-                          <div className={`relative flex items-center justify-between gap-3 p-4 bg-gradient-to-r ${getFileTypeColor(doc.name || doc.originalName)} border rounded-xl hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 group-hover:scale-[1.02]`}>
+                          <div
+                            className={`relative flex items-center justify-between gap-3 p-4 bg-gradient-to-r ${getFileTypeColor(doc.name || doc.originalName)} border rounded-xl hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 group-hover:scale-[1.02]`}
+                          >
                             <div className="flex items-center space-x-3 min-w-0 flex-1">
                               <div className="relative">
                                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border border-cyan-400/20 shadow-lg">
-                                  <span className="text-2xl">{getFileTypeIcon(doc.name || doc.originalName)}</span>
+                                  <span className="text-2xl">
+                                    {getFileTypeIcon(
+                                      doc.name || doc.originalName,
+                                    )}
+                                  </span>
                                 </div>
                                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-slate-900">
                                   <CheckCircle className="w-3 h-3 text-white" />
@@ -437,7 +435,7 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-semibold text-white truncate mb-0.5">
-                                  {doc.name || doc.originalName || 'Document'}
+                                  {doc.name || doc.originalName || "Document"}
                                 </p>
                                 <div className="flex items-center space-x-2">
                                   {doc.size && (
@@ -445,9 +443,13 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                                       {formatFileSize(doc.size)}
                                     </span>
                                   )}
-                                  <span className="text-xs text-gray-500">•</span>
+                                  <span className="text-xs text-gray-400">
+                                    •
+                                  </span>
                                   <span className="text-xs text-cyan-400 uppercase font-bold">
-                                    {getFileExtension(doc.name || doc.originalName)}
+                                    {getFileExtension(
+                                      doc.name || doc.originalName,
+                                    )}
                                   </span>
                                 </div>
                               </div>
@@ -461,7 +463,9 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                                 className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-400/40 text-cyan-300 rounded-lg hover:from-cyan-500/40 hover:to-purple-500/40 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 text-sm font-semibold flex-shrink-0 group/btn"
                               >
                                 <Download className="w-4 h-4 group-hover/btn:animate-bounce" />
-                                <span className="hidden sm:inline">Download</span>
+                                <span className="hidden sm:inline">
+                                  Download
+                                </span>
                               </a>
                             )}
                           </div>
@@ -472,8 +476,12 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                                 <XCircle className="w-6 h-6 text-red-400" />
                               </div>
                               <div>
-                                <p className="text-sm font-semibold text-red-400">Not Uploaded</p>
-                                <p className="text-xs text-gray-500">This document is required</p>
+                                <p className="text-sm font-semibold text-red-400">
+                                  Not Uploaded
+                                </p>
+                                <p className="text-xs text-gray-400">
+                                  This document is required
+                                </p>
                               </div>
                             </div>
                           </div>
@@ -482,7 +490,9 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                     );
                   })}
                 </>
-              ) : tender.documents && typeof tender.documents === 'object' && !Array.isArray(tender.documents) ? (
+              ) : tender.documents &&
+                typeof tender.documents === "object" &&
+                !Array.isArray(tender.documents) ? (
                 <>
                   {ISSUER_ISSUED_DOCUMENTS.map((def) => {
                     const docValue = tender.documents?.[def.key];
@@ -492,7 +502,8 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                       typeof docValue === "string"
                         ? docValue.split("/").pop()
                         : docValue.name || def.label;
-                    const size = typeof docValue === "object" ? docValue.size : undefined;
+                    const size =
+                      typeof docValue === "object" ? docValue.size : undefined;
                     const url =
                       typeof docValue === "string" ? docValue : docValue.url;
 
@@ -535,7 +546,8 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
                 </>
               ) : (
                 /* Fallback for old array format */
-                Array.isArray(tender.documents) && tender.documents.map((doc, idx) => {
+                Array.isArray(tender.documents) &&
+                tender.documents.map((doc, idx) => {
                   const name =
                     doc?.name ||
                     doc?.originalName ||
@@ -603,7 +615,6 @@ const ViewTenderModal = ({ isOpen, onClose, tender }) => {
         `}</style>
       </div>
     </div>
-    
   );
 };
 

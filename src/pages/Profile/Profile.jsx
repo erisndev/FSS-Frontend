@@ -166,7 +166,7 @@ const Profile = () => {
       case "bidder":
         return "from-blue-500 to-cyan-500";
       default:
-        return "from-gray-500 to-gray-600";
+        return "from-gray-400 to-gray-600";
     }
   };
 
@@ -568,7 +568,7 @@ const Profile = () => {
                       placeholder="Enter your email"
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-400 mt-1">
                     Email cannot be changed
                   </p>
                 </div>

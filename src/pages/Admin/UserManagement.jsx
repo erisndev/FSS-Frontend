@@ -426,7 +426,7 @@ const UserManagement = () => {
                           <p className="text-white font-medium">{user.name}</p>
                           <p className="text-gray-400 text-sm">{user.email}</p>
                           {user.company && (
-                            <p className="text-gray-500 text-xs">
+                            <p className="text-gray-400 text-xs">
                               {user.company}
                             </p>
                           )}

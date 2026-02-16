@@ -253,7 +253,7 @@ const IssuerDashboard = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.02] to-purple-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
               <div className="relative flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3">
+                  <p className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-3">
                     {stat.title}
                   </p>
                   <p className="text-3xl font-bold text-white tracking-tight">
@@ -370,7 +370,7 @@ const IssuerDashboard = () => {
               {recentApplications.length === 0 ? (
                 <div className="text-center py-8">
                   <Users className="w-10 h-10 text-gray-600 mx-auto mb-2" />
-                  <p className="text-gray-500 text-sm">No applications yet</p>
+                  <p className="text-gray-400 text-sm">No applications yet</p>
                 </div>
               ) : (
                 recentApplications.map((application) => (
@@ -387,7 +387,7 @@ const IssuerDashboard = () => {
                             ? "bg-gradient-to-r from-green-400 to-emerald-500"
                             : application.status === "rejected"
                               ? "bg-gradient-to-r from-red-400 to-pink-500"
-                              : "bg-gradient-to-r from-gray-400 to-gray-500"
+                              : "bg-gradient-to-r from-gray-400 to-gray-400"
                       }`}
                     />
                     <div className="p-4">
@@ -400,7 +400,7 @@ const IssuerDashboard = () => {
                             <h4 className="text-white font-medium text-sm truncate">
                               {application.companyName || "Unknown Company"}
                             </h4>
-                            <p className="text-gray-500 text-xs truncate">
+                            <p className="text-gray-400 text-xs truncate">
                               {application.tenderTitle ||
                                 application.tender?.title ||
                                 "—"}
@@ -420,7 +420,7 @@ const IssuerDashboard = () => {
                         <span className="text-cyan-400 text-sm font-semibold">
                           R{(application.bidAmount || 0).toLocaleString()}
                         </span>
-                        <span className="text-gray-500 text-xs flex items-center gap-1">
+                        <span className="text-gray-400 text-xs flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           {formatDate(
                             application.appliedAt || application.createdAt,

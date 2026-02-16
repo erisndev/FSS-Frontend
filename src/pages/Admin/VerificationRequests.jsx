@@ -142,7 +142,7 @@ const VerificationRequests = () => {
         );
       default:
         return (
-          <span className="flex items-center space-x-1 px-2 py-1 bg-gray-500/20 text-gray-400 text-xs rounded-full">
+          <span className="flex items-center space-x-1 px-2 py-1 bg-gray-400/20 text-gray-400 text-xs rounded-full">
             <AlertCircle className="w-3 h-3" />
             <span>{status}</span>
           </span>
@@ -394,7 +394,7 @@ const VerificationRequests = () => {
                           </button>
                         </div>
                       ) : (
-                        <span className="text-gray-500 text-sm">
+                        <span className="text-gray-400 text-sm">
                           {(request.status || "").toLowerCase() === "approved"
                             ? "Approved"
                             : "Rejected"}

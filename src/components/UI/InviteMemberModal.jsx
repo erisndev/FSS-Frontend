@@ -18,15 +18,17 @@ const InviteMemberModal = ({ organizationId, presets, onClose, onSuccess }) => {
     try {
       const invitationData = {
         ...formData,
-        email: formData.email.toLowerCase().trim()
+        email: formData.email.toLowerCase().trim(),
       };
       await teamMemberApi.sendInvitation(organizationId, invitationData);
-      toast.success("Invitation sent successfully! The member will receive an email.");
+      toast.success(
+        "Invitation sent successfully! The member will receive an email.",
+      );
       onSuccess();
     } catch (error) {
       console.error("Error sending invitation:", error);
       toast.error(
-        error?.response?.data?.message || "Failed to send invitation"
+        error?.response?.data?.message || "Failed to send invitation",
       );
     } finally {
       setLoading(false);
@@ -35,10 +37,10 @@ const InviteMemberModal = ({ organizationId, presets, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div
-        className="bg-slate-900 border border-cyan-400/20 rounded-xl p-6 max-w-md w-full"
-      >
-        <h2 className="text-2xl font-bold text-white mb-2">Invite Team Member</h2>
+      <div className="bg-slate-900 border border-cyan-400/20 rounded-xl p-6 max-w-md w-full">
+        <h2 className="text-2xl font-bold text-white mb-2">
+          Invite Team Member
+        </h2>
         <p className="text-gray-400 text-sm mb-6">
           Send an invitation email to add a new member to your team
         </p>
@@ -80,7 +82,7 @@ const InviteMemberModal = ({ organizationId, presets, onClose, onSuccess }) => {
                 placeholder="Enter member's email"
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-400 mt-1">
               An invitation link will be sent to this email
             </p>
           </div>
@@ -98,16 +100,24 @@ const InviteMemberModal = ({ organizationId, presets, onClose, onSuccess }) => {
                 }
                 className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white focus:outline-none focus:border-cyan-400/50"
               >
-                <option value="FULL_ACCESS">Full Access - Can do everything except manage team</option>
-                <option value="LIMITED_ACCESS">Limited Access - Can create and edit tenders</option>
-                <option value="VIEWER">Viewer Only - Can only view tenders and applications</option>
+                <option value="FULL_ACCESS">
+                  Full Access - Can do everything except manage team
+                </option>
+                <option value="LIMITED_ACCESS">
+                  Limited Access - Can create and edit tenders
+                </option>
+                <option value="VIEWER">
+                  Viewer Only - Can only view tenders and applications
+                </option>
               </select>
             </div>
           </div>
 
           <div className="bg-cyan-500/10 border border-cyan-400/20 rounded-lg p-3">
             <p className="text-xs text-gray-300">
-              <strong className="text-cyan-400">Note:</strong> The invited member will receive an email with a link to set their password and join your team. The invitation will expire in 7 days.
+              <strong className="text-cyan-400">Note:</strong> The invited
+              member will receive an email with a link to set their password and
+              join your team. The invitation will expire in 7 days.
             </p>
           </div>
 

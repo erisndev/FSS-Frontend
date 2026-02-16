@@ -1,4 +1,5 @@
 import React from "react";
+import { Appear } from "./Motion";
 import {
   CheckCircle,
   XCircle,
@@ -83,7 +84,7 @@ const NotificationCard = ({ notification, index, onView, onMarkAsRead, onDelete 
   };
 
   return (
-    <div
+    <Appear
       className={`bg-white/5 backdrop-blur-xl border rounded-xl p-6 hover:bg-white/10 transition-all duration-300 ${
         notification.isRead 
           ? "border-gray-400/20 hover:border-gray-400/40" 
@@ -187,7 +188,7 @@ const NotificationCard = ({ notification, index, onView, onMarkAsRead, onDelete 
           </button>
         </div>
       </div>
-    </div>
+    </Appear>
   );
 };
 

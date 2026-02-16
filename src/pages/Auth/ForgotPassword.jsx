@@ -64,7 +64,7 @@ const ForgotPassword = () => {
                 We've sent a password reset link to{" "}
                 <strong className="text-cyan-400">{email}</strong>
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-400">
                 Please check your email and follow the instructions to reset
                 your password.
               </p>
@@ -92,7 +92,7 @@ const ForgotPassword = () => {
                     placeholder="Enter your email address"
                   />
                 </div>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-gray-400 mt-2">
                   We'll send a 6-digit OTP to your email address.
                 </p>
               </div>

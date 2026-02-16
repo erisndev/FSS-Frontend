@@ -29,7 +29,7 @@ const PendingInvitationCard = ({ invitation, onResend, onCancel }) => {
               </span>
             </div>
             <p className="text-gray-400 text-sm">{invitation.email}</p>
-            <p className="text-gray-500 text-xs mt-1">
+            <p className="text-gray-400 text-xs mt-1">
               Sent: {new Date(invitation.createdAt).toLocaleDateString()} •
               Expires: {new Date(invitation.expiresAt).toLocaleDateString()}
             </p>

@@ -63,15 +63,16 @@ const ActivityLogItem = ({ activity }) => {
       case "organization":
         return "bg-blue-500/20 text-blue-300 border-blue-500/30";
       default:
-        return "bg-gray-500/20 text-gray-300 border-gray-500/30";
+        return "bg-gray-400/20 text-gray-300 border-gray-400/30";
     }
   };
 
   // Format action text
   const formatAction = (action) => {
-    return action
-      ?.replace(/_/g, " ")
-      .replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown Action";
+    return (
+      action?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) ||
+      "Unknown Action"
+    );
   };
 
   // Format timestamp
@@ -90,12 +91,11 @@ const ActivityLogItem = ({ activity }) => {
     return date.toLocaleDateString();
   };
 
-  const hasDetails = activity.details && Object.keys(activity.details).length > 0;
+  const hasDetails =
+    activity.details && Object.keys(activity.details).length > 0;
 
   return (
-    <div
-      className="bg-slate-800/50 border border-cyan-400/20 rounded-lg p-3 sm:p-4 hover:border-cyan-400/40 transition-all duration-200"
-    >
+    <div className="bg-slate-800/50 border border-cyan-400/20 rounded-lg p-3 sm:p-4 hover:border-cyan-400/40 transition-all duration-200">
       <div className="flex items-start gap-2 sm:gap-3">
         {/* Icon */}
         <div
@@ -120,7 +120,7 @@ const ActivityLogItem = ({ activity }) => {
                   </span>
                 </div>
                 <span className="text-gray-600">•</span>
-                <div className="flex items-center gap-1.5 text-gray-500 text-xs">
+                <div className="flex items-center gap-1.5 text-gray-400 text-xs">
                   <Clock className="w-3 h-3 flex-shrink-0" />
                   <span>{formatTimestamp(activity.timestamp)}</span>
                 </div>
@@ -156,33 +156,33 @@ const ActivityLogItem = ({ activity }) => {
           )}
 
           {/* Expanded Details */}
-          
-            {isExpanded && hasDetails && (
-              <div
-                className="mt-3 overflow-hidden"
-              >
-                <div className="p-3 bg-slate-900/50 rounded-lg border border-cyan-400/10">
-                  <p className="text-gray-400 text-xs font-medium mb-2">
-                    Activity Details
-                  </p>
-                  <div className="space-y-2">
-                    {Object.entries(activity.details).map(([key, value]) => (
-                      <div key={key} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                        <span className="text-cyan-400 text-xs font-medium min-w-[100px] capitalize">
-                          {key.replace(/([A-Z])/g, " $1").trim()}:
-                        </span>
-                        <span className="text-gray-300 text-xs break-words flex-1">
-                          {typeof value === "object"
-                            ? JSON.stringify(value, null, 2)
-                            : String(value)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+
+          {isExpanded && hasDetails && (
+            <div className="mt-3 overflow-hidden">
+              <div className="p-3 bg-slate-900/50 rounded-lg border border-cyan-400/10">
+                <p className="text-gray-400 text-xs font-medium mb-2">
+                  Activity Details
+                </p>
+                <div className="space-y-2">
+                  {Object.entries(activity.details).map(([key, value]) => (
+                    <div
+                      key={key}
+                      className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2"
+                    >
+                      <span className="text-cyan-400 text-xs font-medium min-w-[100px] capitalize">
+                        {key.replace(/([A-Z])/g, " $1").trim()}:
+                      </span>
+                      <span className="text-gray-300 text-xs break-words flex-1">
+                        {typeof value === "object"
+                          ? JSON.stringify(value, null, 2)
+                          : String(value)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
-          
+            </div>
+          )}
         </div>
       </div>
     </div>

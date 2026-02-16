@@ -151,7 +151,7 @@ const SystemSettings = () => {
             <span className="text-gray-300">Maintenance Mode</span>
             <AlertTriangle className="w-4 h-4 text-yellow-400" />
           </label>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-gray-400 text-sm mt-1">
             Temporarily disable site access for maintenance
           </p>
         </div>
@@ -168,7 +168,7 @@ const SystemSettings = () => {
             />
             <span className="text-gray-300">Allow New Registrations</span>
           </label>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-gray-400 text-sm mt-1">
             Enable or disable new user registrations
           </p>
         </div>
@@ -298,7 +298,7 @@ const SystemSettings = () => {
           />
           <span className="text-gray-300">Email Notifications</span>
         </label>
-        <p className="text-gray-500 text-sm mt-1">
+        <p className="text-gray-400 text-sm mt-1">
           Send notifications via email
         </p>
       </div>
@@ -315,7 +315,7 @@ const SystemSettings = () => {
           />
           <span className="text-gray-300">SMS Notifications</span>
         </label>
-        <p className="text-gray-500 text-sm mt-1">
+        <p className="text-gray-400 text-sm mt-1">
           Send notifications via SMS (requires SMS provider)
         </p>
       </div>
@@ -332,7 +332,7 @@ const SystemSettings = () => {
           />
           <span className="text-gray-300">Push Notifications</span>
         </label>
-        <p className="text-gray-500 text-sm mt-1">
+        <p className="text-gray-400 text-sm mt-1">
           Send browser push notifications
         </p>
       </div>
@@ -369,7 +369,7 @@ const SystemSettings = () => {
           />
           <span className="text-gray-300">Require Email Verification</span>
         </label>
-        <p className="text-gray-500 text-sm mt-1">
+        <p className="text-gray-400 text-sm mt-1">
           Users must verify their email before accessing the system
         </p>
       </div>
@@ -439,7 +439,7 @@ const SystemSettings = () => {
           placeholder="pdf,doc,docx,xls,xlsx,jpg,jpeg,png"
           className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300"
         />
-        <p className="text-gray-500 text-sm mt-1">
+        <p className="text-gray-400 text-sm mt-1">
           Comma-separated list of allowed file extensions
         </p>
       </div>

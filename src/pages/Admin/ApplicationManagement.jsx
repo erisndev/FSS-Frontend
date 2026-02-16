@@ -277,7 +277,7 @@ const ApplicationManagement = () => {
                         <p className="text-gray-400 text-sm">
                           {application.tenderCategory}
                         </p>
-                        <p className="text-gray-500 text-xs">
+                        <p className="text-gray-400 text-xs">
                           by {application.issuerName}
                         </p>
                       </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { Appear } from "./Motion";
 import {
   Calendar,
   Clock,
@@ -37,13 +38,13 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
         return {
           text: "Cancelled",
           color: "text-gray-400 bg-gray-400/15 border-gray-400/25",
-          bar: "from-gray-400 to-gray-500",
+          bar: "from-gray-400 to-gray-400",
         };
       default:
         return {
           text: status || "—",
           color: "text-gray-400 bg-gray-400/15 border-gray-400/25",
-          bar: "from-gray-400 to-gray-500",
+          bar: "from-gray-400 to-gray-400",
         };
     }
   };
@@ -72,7 +73,7 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
   const statusConfig = getStatusConfig(tender.status);
 
   return (
-    <div className="group relative bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden hover:bg-white/[0.07] hover:border-cyan-400/20 hover:shadow-xl hover:shadow-cyan-500/5 transition-all duration-300 flex flex-col">
+    <Appear className="group relative bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden hover:bg-white/[0.07] hover:border-cyan-400/20 hover:shadow-xl hover:shadow-cyan-500/5 transition-all duration-300 flex flex-col">
       {/* Status accent bar */}
       <div className={`h-[3px] bg-gradient-to-r ${statusConfig.bar}`} />
 
@@ -131,7 +132,7 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
           <span
             className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
               daysLeft <= 0
-                ? "bg-gray-500/15 text-gray-400"
+                ? "bg-gray-400/15 text-gray-400"
                 : daysLeft <= 7
                   ? "bg-red-500/15 text-red-400"
                   : "bg-emerald-500/15 text-emerald-400"
@@ -161,7 +162,7 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
 
           <div className="flex-1">
             {isClosedOrArchived() ? (
-              <div className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-gray-500/10 text-gray-300 border border-gray-500/10">
+              <div className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-gray-400/10 text-gray-300 border border-gray-400/10">
                 {(tender.status || "").toLowerCase() === "archived" ? (
                   <Archive className="w-3.5 h-3.5" />
                 ) : (
@@ -189,7 +190,7 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
           </div>
         </div>
       </div>
-    </div>
+    </Appear>
   );
 };
 

@@ -92,7 +92,7 @@ const RejectionReasonModal = ({
                   className="w-full px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 resize-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 />
                 <div className="flex items-center justify-between mt-2">
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-400">
                     {reason.length}/500 characters
                   </p>
                   {error && (

@@ -244,7 +244,7 @@ const ApplyForm = ({
                           <p className="text-white text-sm font-medium">
                             {value.name}
                           </p>
-                          <p className="text-gray-500 text-xs">
+                          <p className="text-gray-400 text-xs">
                             {formatFileSize(value.size)}
                           </p>
                         </div>
@@ -296,7 +296,7 @@ const ApplyForm = ({
                       <p className="text-white text-sm font-medium">
                         {formData.supportingDocuments.name}
                       </p>
-                      <p className="text-gray-500 text-xs">
+                      <p className="text-gray-400 text-xs">
                         {formatFileSize(formData.supportingDocuments.size)}
                       </p>
                     </div>

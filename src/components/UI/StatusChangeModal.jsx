@@ -119,7 +119,7 @@ const StatusChangeModal = ({ application, action, onClose, onSubmit }) => {
               className="w-full px-4 py-3 text-sm bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-200 resize-none disabled:opacity-50"
               placeholder="Add a comment about this decision..."
             />
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-400 mt-2">
               {localComment.length}/500 characters
             </p>
           </div>

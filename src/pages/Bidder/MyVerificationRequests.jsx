@@ -150,7 +150,7 @@ const MyVerificationRequests = () => {
         );
       default:
         return (
-          <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-500/20 text-gray-400 text-xs sm:text-sm rounded-full border border-gray-400/30">
+          <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-400/20 text-gray-400 text-xs sm:text-sm rounded-full border border-gray-400/30">
             <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
             <span>{status}</span>
           </span>
@@ -271,7 +271,7 @@ const MyVerificationRequests = () => {
             </div>
           </div>
           {stats.pending > 0 && (
-            <p className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2">
+            <p className="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2">
               Auto-refresh...
             </p>
           )}
@@ -496,7 +496,7 @@ const MyVerificationRequests = () => {
                         {/* Additional Details - Responsive Grid */}
                         <div className="mt-3 sm:mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
                           <div>
-                            <p className="text-gray-500 mb-0.5 sm:mb-1">
+                            <p className="text-gray-400 mb-0.5 sm:mb-1">
                               Request ID
                             </p>
                             <p className="text-gray-300 font-mono truncate">
@@ -505,7 +505,7 @@ const MyVerificationRequests = () => {
                           </div>
                           {request.approvedAt && (
                             <div>
-                              <p className="text-gray-500 mb-0.5 sm:mb-1">
+                              <p className="text-gray-400 mb-0.5 sm:mb-1">
                                 Approved
                               </p>
                               <p className="text-gray-300 truncate">
@@ -520,7 +520,7 @@ const MyVerificationRequests = () => {
                           )}
                           {request.rejectedAt && (
                             <div>
-                              <p className="text-gray-500 mb-0.5 sm:mb-1">
+                              <p className="text-gray-400 mb-0.5 sm:mb-1">
                                 Rejected
                               </p>
                               <p className="text-gray-300 truncate">
@@ -535,7 +535,7 @@ const MyVerificationRequests = () => {
                           )}
                           {request.expiresAt && (
                             <div>
-                              <p className="text-gray-500 mb-0.5 sm:mb-1">
+                              <p className="text-gray-400 mb-0.5 sm:mb-1">
                                 Expires
                               </p>
                               <p className="text-gray-300 truncate">
@@ -592,13 +592,13 @@ const MyVerificationRequests = () => {
                   <div className="pt-3 sm:pt-4 space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                       <div>
-                        <p className="text-gray-500 mb-0.5 sm:mb-1">Company</p>
+                        <p className="text-gray-400 mb-0.5 sm:mb-1">Company</p>
                         <p className="text-gray-300 truncate">
                           {request.tender?.companyName || "N/A"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-500 mb-0.5 sm:mb-1">
+                        <p className="text-gray-400 mb-0.5 sm:mb-1">
                           Budget Range
                         </p>
                         <p className="text-cyan-400 truncate">
@@ -607,7 +607,7 @@ const MyVerificationRequests = () => {
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-500 mb-0.5 sm:mb-1">Deadline</p>
+                        <p className="text-gray-400 mb-0.5 sm:mb-1">Deadline</p>
                         <p className="text-gray-300">
                           {request.tender?.deadline
                             ? formatDateMobile(request.tender.deadline)
@@ -615,7 +615,7 @@ const MyVerificationRequests = () => {
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-500 mb-0.5 sm:mb-1">Status</p>
+                        <p className="text-gray-400 mb-0.5 sm:mb-1">Status</p>
                         <p className="text-gray-300">
                           {request.tender?.status || "N/A"}
                         </p>
@@ -623,7 +623,7 @@ const MyVerificationRequests = () => {
                     </div>
                     {request.tender?.description && (
                       <div>
-                        <p className="text-gray-500 mb-0.5 sm:mb-1 text-xs sm:text-sm">
+                        <p className="text-gray-400 mb-0.5 sm:mb-1 text-xs sm:text-sm">
                           Description
                         </p>
                         <p className="text-gray-300 line-clamp-3 text-xs sm:text-sm">

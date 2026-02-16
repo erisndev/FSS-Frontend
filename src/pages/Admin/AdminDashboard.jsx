@@ -294,7 +294,7 @@ const AdminDashboard = () => {
                         <p className="text-gray-400 text-sm mb-2">
                           {tender.category || "No Category"}
                         </p>
-                        <div className="flex items-center space-x-4 text-xs text-gray-500">
+                        <div className="flex items-center space-x-4 text-xs text-gray-400">
                           <span>By {tender.companyName || "N/A"}</span>
                           <span>
                             R{tender.budgetMin?.toLocaleString() || "0"}

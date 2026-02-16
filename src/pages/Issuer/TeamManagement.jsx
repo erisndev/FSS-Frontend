@@ -428,11 +428,11 @@ const TeamMembersTab = ({
 
         {allMembers.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
-            <Users className="w-12 h-12 sm:w-16 sm:h-16 text-gray-500 mx-auto mb-3 sm:mb-4" />
+            <Users className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
             <p className="text-gray-400 text-base sm:text-lg mb-1 sm:mb-2">
               No team members yet
             </p>
-            <p className="text-gray-500 text-xs sm:text-sm">
+            <p className="text-gray-400 text-xs sm:text-sm">
               Click "Invite Member" to invite your first team member
             </p>
           </div>
@@ -524,11 +524,11 @@ const ActivityLogTab = ({
       <div className="space-y-2 max-h-[60vh] sm:max-h-96 overflow-y-auto">
         {filteredActivities.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
-            <Activity className="w-12 h-12 sm:w-16 sm:h-16 text-gray-500 mx-auto mb-3 sm:mb-4" />
+            <Activity className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
             <p className="text-gray-400 text-base sm:text-lg mb-1 sm:mb-2">
               No activities yet
             </p>
-            <p className="text-gray-500 text-xs sm:text-sm">
+            <p className="text-gray-400 text-xs sm:text-sm">
               Team activities will appear here
             </p>
           </div>

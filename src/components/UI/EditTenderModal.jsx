@@ -267,7 +267,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                     value={formData.title || ""}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300 text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300 text-sm"
                     placeholder="Enter tender title"
                   />
                 </div>
@@ -303,7 +303,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                   onChange={handleInputChange}
                   required
                   rows={4}
-                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300 resize-none text-sm"
+                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 focus:bg-slate-800/70 transition-all duration-300 resize-none text-sm"
                   placeholder="Provide detailed description…"
                 />
               </div>
@@ -322,7 +322,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
                     placeholder="10000"
                   />
                 </div>
@@ -338,7 +338,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
                     placeholder="50000"
                   />
                 </div>
@@ -398,7 +398,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                   name="tags"
                   value={formData.tags}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
+                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
                   placeholder="e.g. construction, urgent, government"
                 />
               </div>
@@ -413,7 +413,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                   value={formData.requirements}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 resize-none text-sm"
+                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 resize-none text-sm"
                   placeholder="List tender requirements"
                 />
               </div>
@@ -430,7 +430,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                     value={formData.companyName}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
                     placeholder="Enter company name"
                   />
                 </div>
@@ -443,7 +443,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                     value={formData.companyAddress}
                     onChange={handleInputChange}
                     rows={2}
-                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 resize-none text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 resize-none text-sm"
                     placeholder="Street, suburb, city, province"
                   />
                 </div>
@@ -461,7 +461,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                       name="technicalContactPerson"
                       value={formData.technicalContactPerson}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
                       placeholder="Full name"
                     />
                     <input
@@ -469,7 +469,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                       name="technicalContactEmail"
                       value={formData.technicalContactEmail}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
                       placeholder="technical@example.com"
                     />
                     <input
@@ -477,7 +477,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                       name="technicalContactPhone"
                       value={formData.technicalContactPhone}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
                       placeholder="+27 ..."
                     />
                   </div>
@@ -492,7 +492,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                       name="generalContactPerson"
                       value={formData.generalContactPerson}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
                       placeholder="Full name"
                     />
                     <input
@@ -500,7 +500,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                       name="generalContactEmail"
                       value={formData.generalContactEmail}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
                       placeholder="bids@example.com"
                     />
                     <input
@@ -508,7 +508,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                       name="generalContactPhone"
                       value={formData.generalContactPhone}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
+                      className="w-full px-3 py-2 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400/50 transition-all duration-300 text-sm"
                       placeholder="+27 ..."
                     />
                   </div>
@@ -628,7 +628,7 @@ const EditTenderModal = ({ isOpen, onClose, tenderId, onSuccess }) => {
                                 <p className="text-xs font-semibold text-red-400">
                                   Not Uploaded
                                 </p>
-                                <p className="text-[10px] text-gray-500">
+                                <p className="text-[10px] text-gray-400">
                                   Required
                                 </p>
                               </div>

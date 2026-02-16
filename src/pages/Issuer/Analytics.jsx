@@ -430,7 +430,7 @@ const Analytics = () => {
                     <p className="text-white font-medium">{item.action}</p>
                     <p className="text-gray-400 text-sm">{item.tender}</p>
                   </div>
-                  <span className="text-gray-500 text-sm">
+                  <span className="text-gray-400 text-sm">
                     {timeAgo(item.time)}
                   </span>
                 </div>

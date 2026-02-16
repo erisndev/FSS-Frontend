@@ -300,7 +300,7 @@ const Header = ({ title, subtitle, isMobileMenuOpen, setIsMobileMenuOpen }) => {
                         {n.message}
                       </div>
                       <div className="flex items-center justify-between mt-1">
-                        <div className="text-gray-500 text-[11px]">
+                        <div className="text-gray-400 text-[11px]">
                           {timeAgo(n.time)}
                         </div>
                         <div className="flex items-center gap-2">

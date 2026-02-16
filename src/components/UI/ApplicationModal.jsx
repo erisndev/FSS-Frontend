@@ -17,6 +17,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { format } from "date-fns";
+import { Appear } from "./Motion";
 import StatusChangeModal from "./StatusChangeModal";
 import { canPerformApplicationAction } from "../../utils/permissions";
 import { BIDDER_REQUIRED_DOCUMENTS } from "../../constants/documents";
@@ -97,7 +98,8 @@ const ApplicationModal = ({
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999]"
       onClick={onClose}
     >
-      <div
+      <Appear
+        variant="pop"
         className="bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 max-w-4xl w-full max-h-[95vh] sm:max-h-[92vh] overflow-y-auto custom-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
@@ -412,7 +414,7 @@ const ApplicationModal = ({
                                         {formatFileSize(doc.size)}
                                       </span>
                                     )}
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-gray-400">
                                       •
                                     </span>
                                     <span className="text-xs text-cyan-400 uppercase font-bold">
@@ -445,7 +447,7 @@ const ApplicationModal = ({
                                   <p className="text-sm font-semibold text-red-400">
                                     Not Uploaded
                                   </p>
-                                  <p className="text-xs text-gray-500">
+                                  <p className="text-xs text-gray-400">
                                     This document was not provided
                                   </p>
                                 </div>
@@ -499,7 +501,7 @@ const ApplicationModal = ({
                                         {formatFileSize(doc.size)}
                                       </span>
                                     )}
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-gray-400">
                                       •
                                     </span>
                                     <span className="text-xs text-cyan-400 uppercase font-bold">
@@ -558,7 +560,7 @@ const ApplicationModal = ({
                               )}
                               {doc.label && (
                                 <>
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-xs text-gray-400">
                                     •
                                   </span>
                                   <span className="text-xs text-purple-400">
@@ -684,7 +686,7 @@ const ApplicationModal = ({
             background: linear-gradient(to bottom, #0891b2, #9333ea);
           }
         `}</style>
-      </div>
+      </Appear>
     </div>
   );
 };

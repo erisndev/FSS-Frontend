@@ -3,11 +3,9 @@ import { Users, Crown, Edit, Trash2, Mail, Calendar } from "lucide-react";
 
 const TeamMemberCard = ({ member, onEdit, onRemove }) => {
   const isTeamLeader = member.role === "team_leader";
-  
+
   return (
-    <div
-      className="bg-slate-800/50 border border-cyan-400/20 rounded-lg p-3 sm:p-4 hover:border-cyan-400/40 transition-all duration-200"
-    >
+    <div className="bg-slate-800/50 border border-cyan-400/20 rounded-lg p-3 sm:p-4 hover:border-cyan-400/40 transition-all duration-200">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
         {/* Avatar */}
@@ -55,15 +53,19 @@ const TeamMemberCard = ({ member, onEdit, onRemove }) => {
               </span>
             )}
           </div>
-          
+
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-gray-400 text-sm">
               <Mail className="w-3.5 h-3.5 flex-shrink-0" />
-              <span className="truncate">{member.user?.email || "No email"}</span>
+              <span className="truncate">
+                {member.user?.email || "No email"}
+              </span>
             </div>
-            <div className="flex items-center gap-2 text-gray-500 text-xs">
+            <div className="flex items-center gap-2 text-gray-400 text-xs">
               <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-              <span>Joined {new Date(member.joinedAt).toLocaleDateString()}</span>
+              <span>
+                Joined {new Date(member.joinedAt).toLocaleDateString()}
+              </span>
             </div>
           </div>
         </div>
@@ -97,31 +99,34 @@ const TeamMemberCard = ({ member, onEdit, onRemove }) => {
           <Mail className="w-3.5 h-3.5 flex-shrink-0" />
           <span className="truncate">{member.user?.email || "No email"}</span>
         </div>
-        <div className="flex items-center gap-2 text-gray-500 text-xs">
+        <div className="flex items-center gap-2 text-gray-400 text-xs">
           <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
           <span>Joined {new Date(member.joinedAt).toLocaleDateString()}</span>
         </div>
       </div>
 
       {/* Permissions */}
-      {member.permissions && Object.values(member.permissions).some(v => v) && (
-        <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-cyan-400/10">
-          <p className="text-gray-400 text-xs font-medium mb-2">Permissions</p>
-          <div className="flex flex-wrap gap-1.5 sm:gap-2">
-            {Object.entries(member.permissions).map(
-              ([key, value]) =>
-                value && (
-                  <span
-                    key={key}
-                    className="px-2 py-1 bg-cyan-500/20 text-cyan-300 text-xs rounded-md"
-                  >
-                    {key.replace(/([A-Z])/g, " $1").trim()}
-                  </span>
-                )
-            )}
+      {member.permissions &&
+        Object.values(member.permissions).some((v) => v) && (
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-cyan-400/10">
+            <p className="text-gray-400 text-xs font-medium mb-2">
+              Permissions
+            </p>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+              {Object.entries(member.permissions).map(
+                ([key, value]) =>
+                  value && (
+                    <span
+                      key={key}
+                      className="px-2 py-1 bg-cyan-500/20 text-cyan-300 text-xs rounded-md"
+                    >
+                      {key.replace(/([A-Z])/g, " $1").trim()}
+                    </span>
+                  ),
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };

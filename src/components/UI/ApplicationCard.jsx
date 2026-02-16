@@ -1,4 +1,5 @@
 import React from "react";
+import { Appear } from "./Motion";
 import {
   Clock,
   FileText,
@@ -14,15 +15,35 @@ const ApplicationCard = ({ application, index, onView, onWithdraw }) => {
   const getStatusConfig = (status) => {
     switch ((status || "").toUpperCase()) {
       case "PENDING":
-        return { text: "Pending", color: "text-amber-400 bg-amber-400/15 border-amber-400/20", bar: "from-amber-400 to-yellow-500" };
+        return {
+          text: "Pending",
+          color: "text-amber-400 bg-amber-400/15 border-amber-400/20",
+          bar: "from-amber-400 to-yellow-500",
+        };
       case "ACCEPTED":
-        return { text: "Accepted", color: "text-emerald-400 bg-emerald-400/15 border-emerald-400/20", bar: "from-emerald-400 to-green-500" };
+        return {
+          text: "Accepted",
+          color: "text-emerald-400 bg-emerald-400/15 border-emerald-400/20",
+          bar: "from-emerald-400 to-green-500",
+        };
       case "REJECTED":
-        return { text: "Rejected", color: "text-red-400 bg-red-400/15 border-red-400/20", bar: "from-red-400 to-pink-500" };
+        return {
+          text: "Rejected",
+          color: "text-red-400 bg-red-400/15 border-red-400/20",
+          bar: "from-red-400 to-pink-500",
+        };
       case "WITHDRAWN":
-        return { text: "Withdrawn", color: "text-gray-400 bg-gray-400/15 border-gray-400/20", bar: "from-gray-400 to-gray-500" };
+        return {
+          text: "Withdrawn",
+          color: "text-gray-400 bg-gray-400/15 border-gray-400/20",
+          bar: "from-gray-400 to-gray-400",
+        };
       default:
-        return { text: status || "—", color: "text-gray-400 bg-gray-400/15 border-gray-400/20", bar: "from-gray-400 to-gray-500" };
+        return {
+          text: status || "—",
+          color: "text-gray-400 bg-gray-400/15 border-gray-400/20",
+          bar: "from-gray-400 to-gray-400",
+        };
     }
   };
 
@@ -36,9 +57,7 @@ const ApplicationCard = ({ application, index, onView, onWithdraw }) => {
   const statusConfig = getStatusConfig(application.status);
 
   return (
-    <div
-      className="group relative bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden hover:bg-white/[0.07] hover:border-cyan-400/20 hover:shadow-xl hover:shadow-cyan-500/5 transition-all duration-300 flex flex-col"
-    >
+    <Appear className="group relative bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden hover:bg-white/[0.07] hover:border-cyan-400/20 hover:shadow-xl hover:shadow-cyan-500/5 transition-all duration-300 flex flex-col">
       {/* Status accent bar */}
       <div className={`h-[3px] bg-gradient-to-r ${statusConfig.bar}`} />
 
@@ -49,11 +68,13 @@ const ApplicationCard = ({ application, index, onView, onWithdraw }) => {
             <h3 className="text-[15px] font-semibold text-white mb-1 line-clamp-2 leading-snug">
               {application.tender?.title || "Unknown Tender"}
             </h3>
-            <p className="text-gray-500 text-xs">
+            <p className="text-gray-400 text-xs">
               Applied {formatDate(application.createdAt)}
             </p>
           </div>
-          <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border flex-shrink-0 ${statusConfig.color}`}>
+          <span
+            className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border flex-shrink-0 ${statusConfig.color}`}
+          >
             {statusConfig.text}
           </span>
         </div>
@@ -62,15 +83,21 @@ const ApplicationCard = ({ application, index, onView, onWithdraw }) => {
         <div className="bg-slate-800/40 border border-white/[0.04] rounded-xl p-3 mb-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">Bid Amount</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">
+                Bid Amount
+              </p>
               <p className="text-base font-bold text-cyan-400">
                 R{(application.bidAmount || 0).toLocaleString()}
               </p>
             </div>
             {application.timeframe && (
               <div className="text-right">
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">Timeframe</p>
-                <p className="text-sm font-medium text-white">{application.timeframe}</p>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-0.5">
+                  Timeframe
+                </p>
+                <p className="text-sm font-medium text-white">
+                  {application.timeframe}
+                </p>
               </div>
             )}
           </div>
@@ -86,12 +113,20 @@ const ApplicationCard = ({ application, index, onView, onWithdraw }) => {
             <Clock className="w-3.5 h-3.5 flex-shrink-0" />
             <span>Updated {formatDate(application.updatedAt)}</span>
           </div>
-          {(application.files?.length > 0 || application.complianceDocuments?.length > 0) && (
+          {(application.files?.length > 0 ||
+            application.complianceDocuments?.length > 0) && (
             <div className="flex items-center gap-2 text-gray-400">
               <FileText className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
               <span>
-                {(application.files?.length || application.complianceDocuments?.length || 0)} document
-                {(application.files?.length || application.complianceDocuments?.length || 0) !== 1 ? "s" : ""}
+                {application.files?.length ||
+                  application.complianceDocuments?.length ||
+                  0}{" "}
+                document
+                {(application.files?.length ||
+                  application.complianceDocuments?.length ||
+                  0) !== 1
+                  ? "s"
+                  : ""}
               </span>
             </div>
           )}
@@ -136,7 +171,7 @@ const ApplicationCard = ({ application, index, onView, onWithdraw }) => {
           )}
         </div>
       </div>
-    </div>
+    </Appear>
   );
 };
 

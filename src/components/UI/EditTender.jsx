@@ -767,7 +767,7 @@ const EditTender = () => {
                                 <p className="text-sm font-semibold text-red-400">
                                   Not Uploaded
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-400">
                                   This document is required
                                 </p>
                               </div>

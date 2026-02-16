@@ -215,7 +215,7 @@ const BidderDashboard = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.02] to-purple-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
               <div className="relative flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3">
+                  <p className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-3">
                     {stat.title}
                   </p>
                   <p className="text-3xl font-bold text-white tracking-tight">
@@ -251,7 +251,7 @@ const BidderDashboard = () => {
               {recentTenders.length === 0 ? (
                 <div className="text-center py-8">
                   <FileText className="w-10 h-10 text-gray-600 mx-auto mb-2" />
-                  <p className="text-gray-500 text-sm">No tenders available</p>
+                  <p className="text-gray-400 text-sm">No tenders available</p>
                 </div>
               ) : (
                 recentTenders.map((tender) => (
@@ -266,7 +266,7 @@ const BidderDashboard = () => {
                           ? "bg-gradient-to-r from-green-400 to-emerald-500"
                           : tender.status?.toLowerCase() === "closed"
                             ? "bg-gradient-to-r from-red-400 to-pink-500"
-                            : "bg-gradient-to-r from-gray-400 to-gray-500"
+                            : "bg-gradient-to-r from-gray-400 to-gray-400"
                       }`}
                     />
                     <div className="p-4">
@@ -275,7 +275,7 @@ const BidderDashboard = () => {
                           <h4 className="text-white font-medium text-sm truncate">
                             {tender.title}
                           </h4>
-                          <p className="text-gray-500 text-xs mt-0.5">
+                          <p className="text-gray-400 text-xs mt-0.5">
                             {tender.category}
                           </p>
                         </div>
@@ -302,7 +302,7 @@ const BidderDashboard = () => {
                             ? ` – R${tender.budgetMax.toLocaleString()}`
                             : ""}
                         </span>
-                        <span className="text-gray-500 text-xs flex items-center gap-1">
+                        <span className="text-gray-400 text-xs flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           {formatDate(tender.deadline)}
                         </span>
@@ -350,7 +350,7 @@ const BidderDashboard = () => {
               {recentApplications.length === 0 ? (
                 <div className="text-center py-8">
                   <FileText className="w-10 h-10 text-gray-600 mx-auto mb-2" />
-                  <p className="text-gray-500 text-sm">No applications yet</p>
+                  <p className="text-gray-400 text-sm">No applications yet</p>
                 </div>
               ) : (
                 recentApplications.map((application) => (
@@ -369,7 +369,7 @@ const BidderDashboard = () => {
                             : (application.status || "").toLowerCase() ===
                                 "rejected"
                               ? "bg-gradient-to-r from-red-400 to-pink-500"
-                              : "bg-gradient-to-r from-gray-400 to-gray-500"
+                              : "bg-gradient-to-r from-gray-400 to-gray-400"
                       }`}
                     />
                     <div className="p-4">
@@ -378,7 +378,7 @@ const BidderDashboard = () => {
                           <h4 className="text-white font-medium text-sm truncate">
                             {application.tender?.title || "Untitled Tender"}
                           </h4>
-                          <p className="text-gray-500 text-xs mt-0.5">
+                          <p className="text-gray-400 text-xs mt-0.5">
                             Applied {formatDate(application.createdAt)}
                           </p>
                         </div>
@@ -396,7 +396,7 @@ const BidderDashboard = () => {
                           R{(application.bidAmount || 0).toLocaleString()}
                         </span>
                         {application.companyName && (
-                          <span className="text-gray-500 text-xs flex items-center gap-1">
+                          <span className="text-gray-400 text-xs flex items-center gap-1">
                             <Building className="w-3 h-3" />
                             {application.companyName}
                           </span>
