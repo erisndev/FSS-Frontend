@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import ViewTenderModal from "../../components/UI/ViewTenderModal";
 import TenderFilters from "../../components/UI/TenderFilters";
 import TenderCard from "../../components/UI/TenderCard";
-import ApplyModal from "../../components/UI/ApplyModal";
 import VerificationModal from "../../components/UI/VerificationModal";
 import EmptyState from "../../components/UI/EmptyState";
 import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import useMinLoadingTime from "../../utils/useMinLoadingTime";
 import { tenderApi, applicationApi } from "../../services/api";
 import toast from "react-hot-toast";
-import { BIDDER_REQUIRED_DOCUMENTS } from "../../constants/documents";
-
 const BrowseTenders = () => {
+  const navigate = useNavigate();
   const [tenders, setTenders] = useState([]);
   const [loading, setLoading] = useState(true);
   const showLoading = useMinLoadingTime(loading);
@@ -28,31 +27,7 @@ const BrowseTenders = () => {
 
   const [selectedTender, setSelectedTender] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [showApplyModal, setShowApplyModal] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
-
-  const [applyForm, setApplyForm] = useState({
-    companyName: "", // bidder's name or company name
-    registrationNumber: "", // optional
-    bbeeLevel: "", // optional
-    cidbGrading: "", // optional
-    contactPerson: "", // required
-    email: "", // required
-    phone: "", // required
-    bidAmount: "", // required, was proposedAmount
-    timeframe: "", // optional
-    message: "", // required, was coverLetter
-    bidFileDocuments: null,
-    compiledDocuments: null,
-    financialDocuments: null,
-    technicalProposal: null,
-    proofOfExperience: null,
-    supportingDocuments: null,
-  });
-
-  const [applyLoading, setApplyLoading] = useState(false);
-  const [applyError, setApplyError] = useState("");
   const [appliedTenderIds, setAppliedTenderIds] = useState(new Set());
 
   const categories = [
@@ -169,248 +144,22 @@ const BrowseTenders = () => {
     }
 
     setSelectedTender(tender);
-    setIsVerified(false);
 
     // Show verification modal first
     setShowVerificationModal(true);
   };
 
   const handleVerificationSuccess = () => {
-    setIsVerified(true);
     setShowVerificationModal(false);
 
-    // Now open the apply modal
     const tenderId = selectedTender?._id || selectedTender?.id;
-
-    // Try to restore draft
-    const draftKey = `applyDraft:${tenderId}`;
-    let restored = null;
-    try {
-      const saved = localStorage.getItem(draftKey);
-      if (saved) restored = JSON.parse(saved);
-    } catch (e) {
-      console.error("Failed to parse saved apply draft", e);
-    }
-
-    if (restored) {
-      setApplyForm({
-        ...restored,
-        bidFileDocuments: null,
-        compiledDocuments: null,
-        financialDocuments: null,
-        technicalProposal: null,
-        proofOfExperience: null,
-        supportingDocuments: null,
-      });
-      toast.success("Draft restored from your last session.");
-    } else {
-      setApplyForm({
-        companyName: "",
-        registrationNumber: "",
-        bbeeLevel: "",
-        cidbGrading: "",
-        contactPerson: "",
-        email: "",
-        phone: "",
-        bidAmount: "",
-        timeframe: "",
-        message: "",
-        bidFileDocuments: null,
-        compiledDocuments: null,
-        financialDocuments: null,
-        technicalProposal: null,
-        proofOfExperience: null,
-        supportingDocuments: null,
-      });
-    }
-
-    setApplyError("");
-    setShowApplyModal(true);
-  };
-
-  const handleApplyInputChange = (e) => {
-    const { name, value } = e.target;
-    setApplyForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleApplyFileUpload = (e, documentType) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
-      toast.error(`${file.name} is too large. Maximum size is 10MB`);
+    if (!tenderId) {
+      toast.error("Invalid tender.");
       return;
     }
 
-    setApplyForm((prev) => ({
-      ...prev,
-      [documentType]: file,
-    }));
-    toast.success(`${file.name} uploaded successfully`);
+    navigate(`/bidder/tenders/apply/${tenderId}`, { state: { tender: selectedTender } });
   };
-
-  const handleRemoveApplyDocument = (documentType) => {
-    setApplyForm((prev) => ({
-      ...prev,
-      [documentType]: null,
-    }));
-    toast.success("File removed");
-  };
-
-  const handleSubmitApplication = async (e) => {
-    e.preventDefault();
-    if (!selectedTender) return;
-
-    try {
-      setApplyLoading(true);
-      setApplyError("");
-      const summarizeFile = (f) =>
-        f
-          ? {
-              name: f.name,
-              type: f.type,
-              size: f.size,
-            }
-          : null;
-
-      console.log(
-        "[APPLY] tenderId:",
-        selectedTender?._id || selectedTender?.id,
-      );
-      console.log("[APPLY] selectedTender:", {
-        _id: selectedTender?._id,
-        id: selectedTender?.id,
-        title: selectedTender?.title,
-        status: selectedTender?.status,
-      });
-      const complianceKeys = BIDDER_REQUIRED_DOCUMENTS.map((d) => d.key);
-
-      console.log("[APPLY] raw applyForm:", {
-        ...applyForm,
-        // Summarize ALL compliance docs
-        ...Object.fromEntries(
-          complianceKeys.map((k) => [k, summarizeFile(applyForm?.[k])]),
-        ),
-        // Optional
-        supportingDocuments: summarizeFile(applyForm.supportingDocuments),
-      });
-
-      const payload = {
-        companyName: applyForm.companyName,
-        registrationNumber: applyForm.registrationNumber || undefined,
-        bbeeLevel: applyForm.bbeeLevel || undefined,
-        cidbGrading: applyForm.cidbGrading || undefined,
-        contactPerson: applyForm.contactPerson,
-        email: applyForm.email,
-        phone: applyForm.phone,
-        bidAmount: Number(applyForm.bidAmount) || 0,
-        timeframe: applyForm.timeframe || undefined,
-        message: applyForm.message,
-
-        // Compliance docs
-        ...Object.fromEntries(complianceKeys.map((k) => [k, applyForm?.[k]])),
-
-        // Optional extra docs
-        supportingDocuments: applyForm.supportingDocuments,
-      };
-
-      const tenderId = selectedTender._id || selectedTender.id;
-
-      console.log("[APPLY] payload (pre-submit):", {
-        ...payload,
-        // Summarize ALL compliance docs
-        ...Object.fromEntries(
-          complianceKeys.map((k) => [k, summarizeFile(payload?.[k])]),
-        ),
-        // Optional
-        supportingDocuments: summarizeFile(payload.supportingDocuments),
-      });
-
-      // Extra guard on submission
-      const status = (selectedTender.status || "").toLowerCase();
-      if (status === "closed" || status === "archived") {
-        throw new Error("This tender is not accepting applications.");
-      }
-
-      await applicationApi.applyToTender(tenderId, payload);
-
-      toast.success("Application submitted successfully!");
-      setShowApplyModal(false);
-
-      // Clear saved draft and mark as applied
-      try {
-        const draftKey = `applyDraft:${tenderId}`;
-        localStorage.removeItem(draftKey);
-      } catch {}
-      setAppliedTenderIds((prev) => {
-        const next = new Set(prev);
-        next.add(tenderId);
-        return next;
-      });
-
-      // Reset form
-      setApplyForm({
-        companyName: "",
-        registrationNumber: "",
-        bbeeLevel: "",
-        cidbGrading: "",
-        contactPerson: "",
-        email: "",
-        phone: "",
-        bidAmount: "",
-        timeframe: "",
-        message: "",
-        bidFileDocuments: null,
-        compiledDocuments: null,
-        financialDocuments: null,
-        technicalProposal: null,
-        proofOfExperience: null,
-        supportingDocuments: null,
-      });
-    } catch (err) {
-      console.error("Error applying to tender:", err);
-
-      // Backend enforces verification
-      if (
-        err?.response?.status === 403 &&
-        err?.response?.data?.requiresVerification
-      ) {
-        toast.error("Please verify your code before applying.");
-        setShowApplyModal(false);
-        setShowVerificationModal(true);
-        return;
-      }
-
-      setApplyError(
-        err?.response?.data?.message || "Failed to submit application",
-      );
-      toast.error("Failed to submit application");
-    } finally {
-      setApplyLoading(false);
-    }
-  };
-
-  const formatFileSize = (bytes) => {
-    if (!bytes) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return (bytes / Math.pow(k, i)).toFixed(2) + " " + sizes[i];
-  };
-
-  // Persist apply form draft per tender while modal is open (exclude files)
-  useEffect(() => {
-    if (!showApplyModal || !selectedTender) return;
-    const tenderId = selectedTender._id || selectedTender.id;
-    const draftKey = `applyDraft:${tenderId}`;
-    const { files, ...rest } = applyForm || {};
-    try {
-      localStorage.setItem(draftKey, JSON.stringify(rest));
-    } catch (e) {
-      console.error("Failed to save apply draft", e);
-    }
-  }, [applyForm, showApplyModal, selectedTender]);
 
   return (
     <DashboardLayout
@@ -471,19 +220,6 @@ const BrowseTenders = () => {
         onVerified={handleVerificationSuccess}
       />
 
-      <ApplyModal
-        isOpen={showApplyModal}
-        onClose={() => setShowApplyModal(false)}
-        tender={selectedTender}
-        formData={applyForm}
-        onInputChange={handleApplyInputChange}
-        onFileUpload={handleApplyFileUpload}
-        onRemoveFile={handleRemoveApplyDocument}
-        onSubmit={handleSubmitApplication}
-        loading={applyLoading}
-        error={applyError}
-        formatFileSize={formatFileSize}
-      />
     </DashboardLayout>
   );
 };

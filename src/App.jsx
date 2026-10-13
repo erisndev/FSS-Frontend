@@ -19,6 +19,7 @@ import AcceptInvitation from "./pages/Auth/AcceptInvitation";
 // Bidder Pages
 import BidderDashboard from "./pages/Bidder/BidderDashboard";
 import BrowseTenders from "./pages/Bidder/BrowseTenders";
+import ApplyTenderPage from "./pages/Bidder/ApplyTenderPage";
 import MyApplications from "./pages/Bidder/MyApplications";
 import MyVerificationRequests from "./pages/Bidder/MyVerificationRequests";
 import Notifications from "./pages/Bidder/Notifications";
@@ -76,6 +77,14 @@ function App() {
               element={
                 <ProtectedRoute roles={["bidder"]}>
                   <BrowseTenders />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/bidder/tenders/apply/:id"
+              element={
+                <ProtectedRoute roles={["bidder"]}>
+                  <ApplyTenderPage />
                 </ProtectedRoute>
               }
             />
