@@ -267,7 +267,6 @@ const Register = () => {
                 >
                   <option value="bidder">Bidder</option>
                   <option value="issuer">Issuer</option>
-                  <option value="admin">Admin</option>
                 </select>
               </div>
             </div>
