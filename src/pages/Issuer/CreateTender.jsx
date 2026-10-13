@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   X,
   FileText,
@@ -24,13 +25,23 @@ import {
   Award,
   Building2,
 } from "lucide-react";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
 import { tenderApi } from "../../services/api";
 import toast from "react-hot-toast";
 import { ISSUER_ISSUED_DOCUMENTS } from "../../constants/documents";
+import DashboardLayout from "../../components/Layout/DashboardLayout";
+import { useAuth } from "../../contexts/AuthContext";
 
-const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
-  const contentRef = React.useRef(null);
+const CreateTender = () => {
+  const { user, permissions } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const returnPath =
+    location.state?.from === "/issuer" ? "/issuer" : "/issuer/tenders";
+  const canCreate =
+    user?.role === "admin" ||
+    !user?.organizationId ||
+    (user?.permissions || permissions)?.canCreateTenders;
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -122,36 +133,34 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
 
   // Auto-save draft to localStorage
   useEffect(() => {
-    if (isOpen && formData.title) {
+    if (formData.title) {
       const draftData = { ...formData };
       delete draftData.documents; // Don't save files in localStorage
       localStorage.setItem("tenderDraft", JSON.stringify(draftData));
     }
-  }, [formData, isOpen]);
+  }, [formData]);
 
   // Load draft on mount
   useEffect(() => {
-    if (isOpen) {
-      const savedDraft = localStorage.getItem("tenderDraft");
-      if (savedDraft) {
-        try {
-          const parsed = JSON.parse(savedDraft);
-          setFormData((prev) => ({
-            ...prev,
-            ...parsed,
-            // Ensure documents is always an array to avoid `.length` crashes in Step 4 summary
-            documents: Array.isArray(parsed?.documents) ? parsed.documents : [],
-          }));
-          toast.success("Draft restored from previous session", {
-            icon: "📝",
-            duration: 3000,
-          });
-        } catch (error) {
-          console.error("Error loading draft:", error);
-        }
+    const savedDraft = localStorage.getItem("tenderDraft");
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        setFormData((prev) => ({
+          ...prev,
+          ...parsed,
+          // Ensure documents is always an array to avoid `.length` crashes in Step 4 summary
+          documents: Array.isArray(parsed?.documents) ? parsed.documents : [],
+        }));
+        toast.success("Draft restored from previous session", {
+          icon: "📝",
+          duration: 3000,
+        });
+      } catch (error) {
+        console.error("Error loading draft:", error);
       }
     }
-  }, [isOpen]);
+  }, []);
 
   // Clean stray artifacts: ensure file has no rogue text nodes around this line
   const validateField = (name, value) => {
@@ -256,10 +265,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     if (validateStep(currentStep)) {
       setCompletedSteps([...completedSteps, currentStep]);
       setCurrentStep(currentStep + 1);
-      // Scroll to top of form
-      if (contentRef.current) {
-        contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
-      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       toast.error("Please fix the errors before proceeding", {
         icon: "⚠️",
@@ -269,10 +275,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleBack = () => {
     setCurrentStep(currentStep - 1);
-    // Scroll to top of form
-    if (contentRef.current) {
-      contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleStepClick = (step) => {
@@ -378,8 +381,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
         icon: "💾",
       });
       localStorage.removeItem("tenderDraft");
-      onSuccess?.();
-      onClose();
+      navigate(returnPath);
     } catch (error) {
       toast.error("Failed to save draft");
     } finally {
@@ -470,8 +472,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
       setTouched({});
       setCompletedSteps([]);
 
-      onSuccess?.();
-      onClose();
+      navigate(returnPath);
     } catch (error) {
       console.error("Error creating tender:", error);
       toast.error(error.response?.data?.message || "Failed to create tender", {
@@ -502,7 +503,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
       }
     }
 
-    onClose();
+    navigate(returnPath);
   };
 
   const getStepProgress = () => {
@@ -532,19 +533,16 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
     return Math.round((filledFields / requiredFields.length) * 100);
   };
 
-  // Guard render
-  if (!isOpen) return null;
+  if (!canCreate) {
+    return <Navigate to="/issuer/tenders" replace />;
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        onClick={handleClose}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-      />
-
-      {/* Modal */}
-      <div className="relative w-full max-w-5xl max-h-[92vh] bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <DashboardLayout
+      title="Create Tender"
+      subtitle="Complete all steps to publish your tender"
+    >
+      <div className="w-full max-w-5xl mx-auto bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-400/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         {/* Header with gradient */}
         <div className="relative bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 p-3 border-b border-cyan-400/10">
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 animate-pulse" />
@@ -674,7 +672,6 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
 
         {/* Content - Scrollable */}
         <div
-          ref={contentRef}
           className="flex-1 overflow-y-auto p-6 custom-scrollbar"
         >
           <form onSubmit={handleSubmit}>
@@ -1398,7 +1395,7 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           </form>
         </div>
 
-        {/* Footer - Fixed at bottom */}
+        {/* Footer */}
         <div className="flex items-center justify-between p-3 border-t border-cyan-400/10 bg-gradient-to-r from-slate-900 to-slate-950">
           <div className="flex items-center space-x-2">
             {currentStep > 1 && (
@@ -1474,8 +1471,6 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
             )}
           </div>
         </div>
-      </div>
-
       {/* Custom scrollbar styles */}
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
@@ -1493,8 +1488,9 @@ const CreateTenderModal = ({ isOpen, onClose, onSuccess }) => {
           background: linear-gradient(to bottom, #0891b2, #9333ea);
         }
       `}</style>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
-export default CreateTenderModal;
+export default CreateTender;

@@ -235,16 +235,8 @@ const LandingPage = () => {
         </div>
 
         <div className="relative max-w-7xl mx-auto">
-          <div className="text-center">
+          <div className="text-center pt-20">
             <div>
-              {/* Badge */}
-              <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-cyan-500/10 border border-cyan-400/20 rounded-full mb-8">
-                <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-                <span className="text-cyan-400 text-sm font-medium">
-                  Trusted by 10,000+ organizations
-                </span>
-              </div>
-
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight tracking-tight">
                 The Future of{" "}
                 <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 bg-clip-text text-transparent">

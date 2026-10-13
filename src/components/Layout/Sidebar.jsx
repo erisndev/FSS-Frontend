@@ -242,7 +242,7 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
       {isMobile && <MobileMenuButton />}
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block fixed left-0 top-0 h-full w-64 bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border-r border-cyan-400/20 shadow-2xl z-50">
+      <div className="hidden lg:block fixed left-0 top-0 h-full w-64 bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border-r border-cyan-400/20 shadow-2xl z-[9999]">
         <SidebarContent />
       </div>
 
@@ -254,7 +254,7 @@ const Sidebar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
             onClick={() => setIsMobileMenuOpen(false)}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
           />
-          <div className="fixed left-0 top-0 h-full w-full sm:w-80 sm:max-w-[85vw] bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border-r border-cyan-400/20 shadow-2xl z-50 lg:hidden">
+          <div className="fixed left-0 top-0 h-full w-full sm:w-80 sm:max-w-[85vw] bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-xl border-r border-cyan-400/20 shadow-2xl z-[9999] lg:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(false)}
               aria-label="Close sidebar"

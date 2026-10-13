@@ -26,6 +26,7 @@ import Notifications from "./pages/Bidder/Notifications";
 // Issuer Pages
 import IssuerDashboard from "./pages/Issuer/IssuerDashboard";
 import ManageTenders from "./pages/Issuer/ManageTenders";
+import CreateTender from "./pages/Issuer/CreateTender";
 import ReviewApplications from "./pages/Issuer/ReviewApplications";
 import Analytics from "./pages/Issuer/Analytics";
 import EditTender from "./components/UI/EditTender";
@@ -133,6 +134,14 @@ function App() {
               element={
                 <ProtectedRoute roles={["issuer"]}>
                   <ManageTenders />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/issuer/tenders/create"
+              element={
+                <ProtectedRoute roles={["issuer"]}>
+                  <CreateTender />
                 </ProtectedRoute>
               }
             />

@@ -370,6 +370,18 @@ const BrowseTenders = () => {
       });
     } catch (err) {
       console.error("Error applying to tender:", err);
+
+      // Backend enforces verification
+      if (
+        err?.response?.status === 403 &&
+        err?.response?.data?.requiresVerification
+      ) {
+        toast.error("Please verify your code before applying.");
+        setShowApplyModal(false);
+        setShowVerificationModal(true);
+        return;
+      }
+
       setApplyError(
         err?.response?.data?.message || "Failed to submit application",
       );
@@ -422,7 +434,7 @@ const BrowseTenders = () => {
             <LoadingSpinner />
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {tenders.map((tender, index) => (
               <TenderCard
                 key={tender._id || tender.id || index}

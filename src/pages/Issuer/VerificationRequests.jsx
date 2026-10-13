@@ -226,8 +226,8 @@ const VerificationRequests = () => {
 
   return (
     <DashboardLayout
-      title="Application Requests"
-      subtitle="Manage verification code requests for your tenders"
+      title="Verification Requests"
+      subtitle="Verification codes are now auto-approved. This page is kept for auditing only."
     >
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -311,7 +311,7 @@ const VerificationRequests = () => {
               className="px-4 py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white focus:outline-none focus:border-cyan-400/50"
             >
               <option value="all">All Status</option>
-              <option value="pending">Pending</option>
+              <option value="pending">Pending (legacy)</option>
               <option value="approved">Approved</option>
               <option value="rejected">Rejected</option>
             </select>
@@ -416,37 +416,9 @@ const VerificationRequests = () => {
                       {getStatusBadge(request.status)}
                     </td>
                     <td className="px-6 py-4">
-                      {(request.status || "pending").toLowerCase() ===
-                        "pending" && canManage ? (
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleApproveClick(request)}
-                            disabled={processingId === request._id}
-                            className="p-2 bg-green-500/20 border border-green-400/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                            title="Approve Request"
-                          >
-                            <Check className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleRejectClick(request)}
-                            disabled={processingId === request._id}
-                            className="p-2 bg-red-500/20 border border-red-400/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                            title="Reject Request"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 text-sm">
-                          {(request.status || "pending").toLowerCase() ===
-                            "pending" && !canManage
-                            ? "No permission"
-                            : (request.status || "").toLowerCase() ===
-                                "approved"
-                              ? "Approved"
-                              : "Rejected"}
-                        </span>
-                      )}
+                      <span className="text-gray-400 text-sm">
+                        Actions disabled
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -458,7 +430,7 @@ const VerificationRequests = () => {
 
       {/* Modals */}
       <ConfirmActionModal
-        isOpen={showApproveModal}
+        isOpen={false}
         onClose={() => {
           setShowApproveModal(false);
           setSelectedRequest(null);
@@ -477,7 +449,7 @@ const VerificationRequests = () => {
       />
 
       <RejectionReasonModal
-        isOpen={showRejectModal}
+        isOpen={false}
         onClose={() => {
           setShowRejectModal(false);
           setSelectedRequest(null);

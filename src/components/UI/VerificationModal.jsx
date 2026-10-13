@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import LoadingSpinner from "./LoadingSpinner";
-import { X, Shield, Lock, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { X, Shield, Lock, CheckCircle, AlertCircle } from "lucide-react";
 import { verificationCodeApi } from "../../services/api";
 import toast from "react-hot-toast";
 
 const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
   const [code, setCode] = useState(["", "", "", "", "", "", "", ""]);
-  const [existingRequest, setExistingRequest] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
   const [error, setError] = useState("");
-  const [hasRequestedCode, setHasRequestedCode] = useState(false);
-  const [requestStatus, setRequestStatus] = useState(null); // null, 'pending', 'approved', 'rejected', 'verified'
+  const [hasApprovedCode, setHasApprovedCode] = useState(false);
+  const [hasApplied, setHasApplied] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [isAlreadyVerified, setIsAlreadyVerified] = useState(false);
 
@@ -26,68 +25,39 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
     if (!isOpen) {
       setCode(["", "", "", "", "", "", "", ""]);
       setError("");
-      // Don't reset verification status if already verified
-      if (!isAlreadyVerified) {
-        setHasRequestedCode(false);
-        setRequestStatus(null);
-        setExistingRequest(null);
-      }
+      // Keep hasApprovedCode so user can reopen and verify without re-requesting
     }
-  }, [isOpen, isAlreadyVerified]);
+  }, [isOpen]);
 
   const checkVerificationStatus = async () => {
     setIsCheckingStatus(true);
+    setError("");
+
     try {
-      // First check if user has already verified this tender via status API
-      try {
-        const statusResponse = await verificationCodeApi.checkStatus(
-          tender._id,
-        );
-        console.log("Verification status check:", statusResponse);
+      const statusResponse = await verificationCodeApi.checkStatus(tender._id);
+      console.log("Verification status check:", statusResponse);
 
-        if (statusResponse.isVerified || statusResponse.codeUsed) {
-          // User has already verified this tender
-          setIsAlreadyVerified(true);
-          setRequestStatus("verified");
-          setHasRequestedCode(true);
+      const applied = !!statusResponse?.hasApplied;
+      const approvedCode = !!statusResponse?.hasApprovedCode;
+      const noRequest = !!statusResponse?.noRequest;
 
-          // Automatically proceed to application after a brief delay
-          setTimeout(() => {
-            onVerified();
-          }, 500);
-          return; // Exit early since user is already verified
-        }
-      } catch (statusError) {
-        // Status check might fail if no request exists yet, that's okay
-        console.log("No existing verification status found");
+      setHasApplied(applied);
+      setHasApprovedCode(approvedCode);
+
+      // If already applied, lock UI.
+      if (applied) return;
+
+      // If the backend indicates there's no *unused* request, it may be because
+      // the bidder already verified in a previous session.
+      // We'll treat this as "not verified" and let Apply enforce via 403.
+      if (noRequest) {
+        setIsAlreadyVerified(false);
+        return;
       }
 
-      // If not verified, check for existing requests
-      const requests = await verificationCodeApi.getMyRequests();
-      const foundRequest = requests.find(
-        (req) => req.tenderId === tender._id || req.tender?._id === tender._id,
-      );
-
-      if (foundRequest) {
-        setHasRequestedCode(true);
-        const status = foundRequest.status?.toLowerCase() || "pending";
-
-        // Double-check if the code was already used
-        if (
-          foundRequest.codeUsed ||
-          foundRequest.isUsed ||
-          foundRequest.verified
-        ) {
-          setRequestStatus("verified");
-          setIsAlreadyVerified(true);
-          // Auto proceed after a brief delay
-          setTimeout(() => {
-            onVerified();
-          }, 500);
-        } else {
-          setRequestStatus(status);
-        }
-        setExistingRequest(foundRequest);
+      // If there is an approved code waiting, show verify UI.
+      if (approvedCode) {
+        setIsAlreadyVerified(false);
       }
     } catch (error) {
       console.error("Error checking verification status:", error);
@@ -124,55 +94,21 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
 
     try {
       await verificationCodeApi.requestCode(tender._id);
-      setHasRequestedCode(true);
-      setRequestStatus("pending");
-      toast.success(
-        "Verification code request sent! Please wait for approval.",
-      );
-
-      // Start checking for approval status
-      startStatusPolling();
+      setHasApprovedCode(true);
+      toast.success("Code sent to your email.");
     } catch (error) {
-      const message =
-        error.response?.data?.message || "Failed to request verification code";
-      setError(message);
-      toast.error(message);
+      const data = error?.response?.data;
+      if (error?.response?.status === 400 && data?.hasApprovedCode) {
+        setHasApprovedCode(true);
+        toast.success("Code already sent. Please check your email.");
+      } else {
+        const message = data?.message || "Failed to request verification code";
+        setError(message);
+        toast.error(message);
+      }
     } finally {
       setIsRequesting(false);
     }
-  };
-
-  const startStatusPolling = () => {
-    const pollInterval = setInterval(async () => {
-      try {
-        const requests = await verificationCodeApi.getMyRequests();
-        const currentRequest = requests.find(
-          (req) =>
-            req.tenderId === tender._id || req.tender?._id === tender._id,
-        );
-
-        if (currentRequest) {
-          const status = currentRequest.status?.toLowerCase() || "pending";
-          setRequestStatus(status);
-          setExistingRequest(currentRequest);
-
-          if (status === "approved") {
-            clearInterval(pollInterval);
-            toast.success(
-              "Your request has been approved! Check your email for the verification code.",
-            );
-          } else if (status === "rejected") {
-            clearInterval(pollInterval);
-            toast.error("Your verification request was rejected.");
-          }
-        }
-      } catch (error) {
-        console.error("Error polling status:", error);
-      }
-    }, 5000); // Poll every 5 seconds
-
-    // Clear interval after 5 minutes
-    setTimeout(() => clearInterval(pollInterval), 300000);
   };
 
   const handleVerifyCode = async () => {
@@ -195,7 +131,6 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
 
       // Mark as verified locally
       setIsAlreadyVerified(true);
-      setRequestStatus("verified");
 
       // Proceed to application
       onVerified();
@@ -210,40 +145,34 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
   };
 
   const getStatusBadge = () => {
-    switch (requestStatus) {
-      case "pending":
-        return (
-          <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-500/20 border border-yellow-400/30 rounded-full">
-            <Clock className="w-4 h-4 text-yellow-400" />
-            <span className="text-yellow-400 text-sm">Pending Approval</span>
-          </div>
-        );
-      case "approved":
-        return (
-          <div className="flex items-center space-x-2 px-3 py-1 bg-green-500/20 border border-green-400/30 rounded-full">
-            <CheckCircle className="w-4 h-4 text-green-400" />
-            <span className="text-green-400 text-sm">
-              Approved - Check Email
-            </span>
-          </div>
-        );
-      case "rejected":
-        return (
-          <div className="flex items-center space-x-2 px-3 py-1 bg-red-500/20 border border-red-400/30 rounded-full">
-            <AlertCircle className="w-4 h-4 text-red-400" />
-            <span className="text-red-400 text-sm">Request Rejected</span>
-          </div>
-        );
-      case "verified":
-        return (
-          <div className="flex items-center space-x-2 px-3 py-1 bg-blue-500/20 border border-blue-400/30 rounded-full">
-            <CheckCircle className="w-4 h-4 text-blue-400" />
-            <span className="text-blue-400 text-sm">Already Verified</span>
-          </div>
-        );
-      default:
-        return null;
+    if (hasApplied) {
+      return (
+        <div className="flex items-center space-x-2 px-3 py-1 bg-slate-500/20 border border-slate-400/30 rounded-full">
+          <CheckCircle className="w-4 h-4 text-slate-300" />
+          <span className="text-slate-200 text-sm">Already Applied</span>
+        </div>
+      );
     }
+
+    if (isAlreadyVerified) {
+      return (
+        <div className="flex items-center space-x-2 px-3 py-1 bg-blue-500/20 border border-blue-400/30 rounded-full">
+          <CheckCircle className="w-4 h-4 text-blue-400" />
+          <span className="text-blue-400 text-sm">Verified</span>
+        </div>
+      );
+    }
+
+    if (hasApprovedCode) {
+      return (
+        <div className="flex items-center space-x-2 px-3 py-1 bg-green-500/20 border border-green-400/30 rounded-full">
+          <CheckCircle className="w-4 h-4 text-green-400" />
+          <span className="text-green-400 text-sm">Code Sent</span>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   if (!isOpen) return null;
@@ -300,24 +229,8 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
           </div>
 
           {/* Status Badge */}
-          {requestStatus && (
-            <>
-              <div className="flex justify-center">{getStatusBadge()}</div>
-
-              {/* Display code if approved and available */}
-              {requestStatus === "approved" && existingRequest?.code && (
-                <div className="mt-4 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl">
-                  <p className="text-xs text-gray-400 mb-3 text-center font-medium">
-                    Your Verification Code
-                  </p>
-                  <div className="text-center">
-                    <p className="text-2xl font-mono font-bold text-green-400 tracking-widest break-all bg-slate-900/50 py-3 px-4 rounded-lg border border-green-400/20">
-                      {existingRequest.code}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </>
+          {(hasApplied || hasApprovedCode || isAlreadyVerified) && (
+            <div className="flex justify-center">{getStatusBadge()}</div>
           )}
 
           {/* Error Message */}
@@ -331,16 +244,15 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
           )}
 
           {/* Already Verified State */}
-          {isAlreadyVerified && requestStatus === "verified" ? (
+          {isAlreadyVerified ? (
             <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4">
               <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-green-400 mx-auto" />
               <div>
                 <p className="text-sm sm:text-base text-white font-medium mb-2">
-                  Already Verified
+                  Verified
                 </p>
                 <p className="text-xs sm:text-sm text-gray-400 px-2">
-                  You have already verified access to this tender. Proceeding to
-                  application form...
+                  Verification successful. Opening application form...
                 </p>
               </div>
             </div>
@@ -348,13 +260,22 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
             <div className="flex justify-center py-6 sm:py-8">
               <LoadingSpinner />
             </div>
+          ) : hasApplied ? (
+            <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4">
+              <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-slate-200 mx-auto" />
+              <div className="px-2">
+                <p className="text-sm sm:text-base text-white font-medium mb-2">
+                  Already Applied
+                </p>
+                <p className="text-xs sm:text-sm text-gray-400">
+                  You have already applied to this tender.
+                </p>
+              </div>
+            </div>
           ) : (
             <>
-              {/* Code Input Section - Show only if approved but not yet verified */}
-              {(hasRequestedCode &&
-                requestStatus === "approved" &&
-                !isAlreadyVerified) ||
-              (requestStatus === null && !isAlreadyVerified) ? (
+              {/* Code Input Section - shown after code is requested/sent */}
+              {hasApprovedCode ? (
                 <div className="space-y-3 sm:space-y-4">
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2 sm:mb-3 text-center">
@@ -375,7 +296,6 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                             )
                           }
                           onKeyDown={(e) => handleKeyDown(index, e)}
-                          whileFocus={{ scale: 1.1 }}
                           className="w-10 h-12 text-center text-lg font-bold bg-slate-800/50 border-2 border-cyan-400/20 rounded-xl text-white focus:outline-none focus:border-cyan-400/60 focus:bg-slate-800/70 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 uppercase shadow-lg"
                           placeholder="-"
                         />
@@ -383,27 +303,24 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                    {!hasRequestedCode && (
-                      <button
-                        onClick={handleRequestCode}
-                        disabled={isRequesting}
-                        className="flex-1 py-2 sm:py-3 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/30 text-cyan-400 font-medium rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                      >
-                        {isRequesting ? (
-                          <div className="flex items-center justify-center space-x-2">
-                            <LoadingSpinner variant="inline" size="sm" />
-                            <span>Requesting...</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center space-x-2">
-                            <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
-                            <span>Request Code</span>
-                          </div>
-                        )}
-                      </button>
-                    )}
+                    <button
+                      onClick={handleRequestCode}
+                      disabled={isRequesting}
+                      className="flex-1 py-2 sm:py-3 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/30 text-cyan-400 font-medium rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                    >
+                      {isRequesting ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <LoadingSpinner variant="inline" size="sm" />
+                          <span>Requesting...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center space-x-2">
+                          <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span>Resend Code</span>
+                        </div>
+                      )}
+                    </button>
 
                     <button
                       onClick={handleVerifyCode}
@@ -428,49 +345,37 @@ const VerificationModal = ({ isOpen, onClose, tender, onVerified }) => {
                     </button>
                   </div>
                 </div>
-              ) : requestStatus === "pending" ? (
+              ) : (
                 <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4">
-                  <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-400 mx-auto" />
+                  <Lock className="w-10 h-10 sm:w-12 sm:h-12 text-cyan-400 mx-auto" />
                   <div className="px-2">
                     <p className="text-sm sm:text-base text-white font-medium mb-2">
-                      Waiting for Approval
+                      Request Verification Code
                     </p>
-                    <p className="text-xs sm:text-sm text-gray-400">
-                      Your verification request is being reviewed. You'll
-                      receive a code via email once approved.
-                    </p>
-                  </div>
-                </div>
-              ) : requestStatus === "rejected" ? (
-                <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4">
-                  <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto" />
-                  <div className="px-2">
-                    <p className="text-sm sm:text-base text-white font-medium mb-2">
-                      Request Rejected
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
-                      Your verification request was not approved. Please contact
-                      support for assistance.
+                    <p className="text-xs sm:text-sm text-gray-400 mb-4">
+                      We'll email you a code for this tender. Enter it here to
+                      verify, then you can apply.
                     </p>
                     <button
                       onClick={handleRequestCode}
                       disabled={isRequesting}
-                      className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/30 text-cyan-400 font-medium rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 transition-all duration-300"
+                      className="w-full py-2 sm:py-3 text-sm sm:text-base bg-slate-800/50 border border-cyan-400/30 text-cyan-400 font-medium rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                     >
-                      Request Again
+                      {isRequesting ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <LoadingSpinner variant="inline" size="sm" />
+                          <span>Requesting...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center space-x-2">
+                          <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span>Request Code</span>
+                        </div>
+                      )}
                     </button>
                   </div>
                 </div>
-              ) : null}
-
-              {/* Help Text */}
-              {!hasRequestedCode &&
-                requestStatus === null &&
-                !isAlreadyVerified && (
-                  <p className="text-center text-gray-400 text-xs sm:text-sm px-2">
-                    Don't have a code? Click "Request Code" to get one.
-                  </p>
-                )}
+              )}
             </>
           )}
         </div>

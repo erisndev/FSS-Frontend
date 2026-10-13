@@ -153,7 +153,7 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
         <div className="flex items-center gap-2 pt-4 border-t border-white/[0.04]">
           <button
             onClick={() => onView(tender)}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-800/50 border border-white/[0.06] text-gray-300 rounded-xl hover:bg-white/[0.06] hover:border-cyan-400/20 hover:text-cyan-400 transition-all duration-200 text-xs font-medium"
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-slate-800/50 border border-white/[0.06] text-gray-300 rounded-xl hover:bg-white/[0.06] hover:border-cyan-400/20 hover:text-cyan-400 transition-all duration-200 text-xs font-medium"
             aria-label="View tender details"
           >
             <Eye className="w-3.5 h-3.5" />
@@ -162,7 +162,7 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
 
           <div className="flex-1">
             {isClosedOrArchived() ? (
-              <div className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-gray-400/10 text-gray-300 border border-gray-400/10">
+              <div className="flex items-center justify-center gap-1.5 px-3 py-3 rounded-xl text-xs font-medium bg-gray-400/10 text-gray-300 border border-gray-400/10">
                 {(tender.status || "").toLowerCase() === "archived" ? (
                   <Archive className="w-3.5 h-3.5" />
                 ) : (
@@ -175,13 +175,13 @@ const TenderCard = ({ tender, index, onView, onApply, isApplied = false }) => {
                 </span>
               </div>
             ) : isApplied ? (
-              <div className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-400/15">
+              <div className="flex items-center justify-center gap-1.5 px-3 py-3 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-400/15">
                 <span>✓ Applied</span>
               </div>
             ) : (
               <button
                 onClick={() => onApply(tender)}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-xl hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 text-xs font-semibold shadow-md shadow-purple-500/15 hover:shadow-lg hover:shadow-purple-500/25 group/btn"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-xl hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 text-xs font-semibold shadow-md shadow-purple-500/15 hover:shadow-lg hover:shadow-purple-500/25 group/btn"
               >
                 <span>Apply Now</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />

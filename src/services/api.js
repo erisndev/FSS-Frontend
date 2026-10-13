@@ -17,7 +17,7 @@ api.interceptors.request.use((config) => {
   ];
 
   const isPublicEndpoint = publicEndpoints.some((endpoint) =>
-    config.url?.includes(endpoint)
+    config.url?.includes(endpoint),
   );
 
   if (!isPublicEndpoint) {
@@ -70,7 +70,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 // ---------------- AUTH API ----------------
@@ -167,7 +167,7 @@ export const teamMemberApi = {
   addTeamMember: async (organizationId, memberData) => {
     const res = await api.post(
       `/team-members/${organizationId}/members`,
-      memberData
+      memberData,
     );
     return res.data;
   },
@@ -177,26 +177,26 @@ export const teamMemberApi = {
   },
   getTeamMember: async (organizationId, memberId) => {
     const res = await api.get(
-      `/team-members/${organizationId}/members/${memberId}`
+      `/team-members/${organizationId}/members/${memberId}`,
     );
     return res.data;
   },
   updateMemberPermissions: async (organizationId, memberId, data) => {
     const res = await api.put(
       `/team-members/${organizationId}/members/${memberId}`,
-      data
+      data,
     );
     return res.data;
   },
   removeTeamMember: async (organizationId, memberId) => {
     const res = await api.delete(
-      `/team-members/${organizationId}/members/${memberId}`
+      `/team-members/${organizationId}/members/${memberId}`,
     );
     return res.data;
   },
   getTeamMemberActivity: async (organizationId, memberId) => {
     const res = await api.get(
-      `/team-members/${organizationId}/members/${memberId}/activity`
+      `/team-members/${organizationId}/members/${memberId}/activity`,
     );
     return res.data;
   },
@@ -204,7 +204,7 @@ export const teamMemberApi = {
   sendInvitation: async (organizationId, invitationData) => {
     const res = await api.post(
       `/team-members/${organizationId}/invitations`,
-      invitationData
+      invitationData,
     );
     return res.data;
   },
@@ -214,13 +214,13 @@ export const teamMemberApi = {
   },
   resendInvitation: async (organizationId, invitationId) => {
     const res = await api.post(
-      `/team-members/${organizationId}/invitations/${invitationId}/resend`
+      `/team-members/${organizationId}/invitations/${invitationId}/resend`,
     );
     return res.data;
   },
   cancelInvitation: async (organizationId, invitationId) => {
     const res = await api.delete(
-      `/team-members/${organizationId}/invitations/${invitationId}`
+      `/team-members/${organizationId}/invitations/${invitationId}`,
     );
     return res.data;
   },
@@ -244,7 +244,7 @@ export const activityLogApi = {
   },
   getMemberActivities: async (organizationId, memberId) => {
     const res = await api.get(
-      `/activity-logs/${organizationId}/member/${memberId}`
+      `/activity-logs/${organizationId}/member/${memberId}`,
     );
     return res.data;
   },
@@ -274,30 +274,30 @@ export const tenderApi = {
   },
   createTender: async (formData) => {
     const data = new FormData();
-    
+
     // Document field names
     const documentFields = [
-      'bidFileDocuments',
-      'compiledDocuments',
-      'financialDocuments',
-      'technicalProposal',
-      'proofOfExperience'
+      "bidFileDocuments",
+      "compiledDocuments",
+      "financialDocuments",
+      "technicalProposal",
+      "proofOfExperience",
     ];
-    
+
     // Append all non-document fields
     Object.entries(formData).forEach(([key, value]) => {
       if (!documentFields.includes(key)) {
         data.append(key, value);
       }
     });
-    
+
     // Append individual document files
     documentFields.forEach((fieldName) => {
       if (formData[fieldName] && formData[fieldName] instanceof File) {
         data.append(fieldName, formData[fieldName]);
       }
     });
-    
+
     const res = await api.post("/tenders", data, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -324,17 +324,17 @@ export const tenderApi = {
 export const applicationApi = {
   applyToTender: async (tenderId, formData) => {
     const data = new FormData();
-    
+
     // Document field names for applications
     const documentFields = [
-      'bidFileDocuments',
-      'compiledDocuments',
-      'financialDocuments',
-      'technicalProposal',
-      'proofOfExperience',
-      'supportingDocuments'
+      "bidFileDocuments",
+      "compiledDocuments",
+      "financialDocuments",
+      "technicalProposal",
+      "proofOfExperience",
+      "supportingDocuments",
     ];
-    
+
     // Append all non-document fields
     for (const [key, value] of Object.entries(formData)) {
       if (!documentFields.includes(key)) {
@@ -345,14 +345,14 @@ export const applicationApi = {
         }
       }
     }
-    
+
     // Append individual document files
     documentFields.forEach((fieldName) => {
       if (formData[fieldName] && formData[fieldName] instanceof File) {
         data.append(fieldName, formData[fieldName]);
       }
     });
-    
+
     const res = await api.post(`/applications/${tenderId}`, data, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -429,8 +429,12 @@ export const notificationApi = {
 
 // ---------------- VERIFICATION CODE API ----------------
 export const verificationCodeApi = {
-  requestCode: async (tenderId) => {
-    const res = await api.post(`/verification-code/request/${tenderId}`);
+  // New bidder flow (auto-approved codes)
+  // NOTE: Router base path is /api/verification-code (singular)
+  requestCode: async (tenderId, message) => {
+    const res = await api.post(`/verification-code/request/${tenderId}`, {
+      ...(message ? { message } : {}),
+    });
     return res.data;
   },
   verifyCode: async (tenderId, code) => {
@@ -443,6 +447,8 @@ export const verificationCodeApi = {
     const res = await api.get(`/verification-code/status/${tenderId}`);
     return res.data;
   },
+
+  // Legacy/admin endpoints (may remain for backward compatibility)
   getMyRequests: async () => {
     const res = await api.get(`/verification-code/my-requests`);
     return res.data;

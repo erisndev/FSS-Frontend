@@ -40,20 +40,11 @@ const MyVerificationRequests = () => {
 
   useEffect(() => {
     fetchRequests();
-    // Auto-refresh every 30 seconds for pending requests
-    const interval = setInterval(() => {
-      const hasPending = requests.some((r) => r.status === "pending");
-      if (hasPending) {
-        fetchRequests(true);
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
   }, []);
 
-  const fetchRequests = async (silent = false) => {
+  const fetchRequests = async () => {
     try {
-      if (!silent) setLoading(true);
+      setLoading(true);
       const data = await verificationCodeApi.getMyRequests();
       console.log("Fetching verification requests:", data);
 
@@ -63,30 +54,9 @@ const MyVerificationRequests = () => {
       );
 
       setRequests(sortedData);
-
-      // Check for newly approved requests
-      if (silent) {
-        const newlyApproved = sortedData.filter(
-          (req) =>
-            req.status === "approved" &&
-            !requests.find((r) => r._id === req._id && r.status === "approved"),
-        );
-
-        if (newlyApproved.length > 0) {
-          toast.success(
-            `${newlyApproved.length} request(s) approved! Check your email for the code.`,
-            {
-              duration: 5000,
-              icon: "🎉",
-            },
-          );
-        }
-      }
     } catch (error) {
       console.error("Error fetching verification requests:", error);
-      if (!silent) {
-        toast.error("Failed to load verification requests");
-      }
+      toast.error("Failed to load verification requests");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -98,7 +68,6 @@ const MyVerificationRequests = () => {
     fetchRequests();
     toast.success("Refreshing requests...", {
       duration: 1000,
-      icon: "🔄",
     });
   };
 
@@ -116,46 +85,35 @@ const MyVerificationRequests = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
-    const statusLower = (status || "pending").toLowerCase();
-    switch (statusLower) {
-      case "pending":
-        return (
-          <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-yellow-500/20 text-yellow-400 text-xs sm:text-sm rounded-full border border-yellow-400/30">
-            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden xs:inline">Pending</span>
-            <span className="xs:hidden">...</span>
-          </span>
-        );
-      case "approved":
-        return (
-          <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-green-500/20 text-green-400 text-xs sm:text-sm rounded-full border border-green-400/30">
-            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span>Approved</span>
-          </span>
-        );
-      case "rejected":
-        return (
-          <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500/20 text-red-400 text-xs sm:text-sm rounded-full border border-red-400/30">
-            <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span>Rejected</span>
-          </span>
-        );
-      case "used":
-        return (
-          <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-blue-500/20 text-blue-400 text-xs sm:text-sm rounded-full border border-blue-400/30">
-            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span>Used</span>
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-400/20 text-gray-400 text-xs sm:text-sm rounded-full border border-gray-400/30">
-            <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span>{status}</span>
-          </span>
-        );
+  const getStatusBadge = (request) => {
+    const isUsed = !!(request?.codeUsed || request?.isUsed || request?.used);
+    const statusLower = (request?.status || "approved").toLowerCase();
+
+    if (isUsed) {
+      return (
+        <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-blue-500/20 text-blue-400 text-xs sm:text-sm rounded-full border border-blue-400/30">
+          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span>Used</span>
+        </span>
+      );
     }
+
+    if (statusLower === "rejected") {
+      return (
+        <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500/20 text-red-400 text-xs sm:text-sm rounded-full border border-red-400/30">
+          <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span>Rejected</span>
+        </span>
+      );
+    }
+
+    // New flow: requests are auto-approved.
+    return (
+      <span className="inline-flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-green-500/20 text-green-400 text-xs sm:text-sm rounded-full border border-green-400/30">
+        <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+        <span>Code Sent</span>
+      </span>
+    );
   };
 
   const formatDate = (date) => {
@@ -195,9 +153,13 @@ const MyVerificationRequests = () => {
         .includes(searchTerm.toLowerCase()) ||
       request.code?.toLowerCase().includes(searchTerm.toLowerCase());
 
+    const isUsed = !!(request.codeUsed || request.isUsed || request.used);
+    const normalizedStatus = isUsed
+      ? "used"
+      : (request.status || "approved").toLowerCase();
+
     const matchesStatus =
-      statusFilter === "all" ||
-      (request.status || "pending").toLowerCase() === statusFilter;
+      statusFilter === "all" || normalizedStatus === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -205,42 +167,40 @@ const MyVerificationRequests = () => {
   // Calculate statistics
   const stats = {
     total: requests.length,
-    pending: requests.filter(
-      (r) => (r.status || "pending").toLowerCase() === "pending",
+    codeSent: requests.filter(
+      (r) =>
+        (r.status || "approved").toLowerCase() === "approved" &&
+        !(r.codeUsed || r.isUsed || r.used),
     ).length,
-    approved: requests.filter(
-      (r) => (r.status || "").toLowerCase() === "approved",
-    ).length,
+    used: requests.filter((r) => r.codeUsed || r.isUsed || r.used).length,
     rejected: requests.filter(
       (r) => (r.status || "").toLowerCase() === "rejected",
     ).length,
   };
 
   const getStatusMessage = (request) => {
-    const status = (request.status || "pending").toLowerCase();
+    if (request.codeUsed || request.isUsed || request.used) {
+      return "This code has been verified and used.";
+    }
+
+    const status = (request.status || "approved").toLowerCase();
     switch (status) {
-      case "pending":
-        return "Your request is being reviewed by the tender issuer. You'll be notified once approved.";
       case "approved":
-        return request.code
-          ? `Use this code to apply for the tender.`
-          : "Check your email for the verification code.";
+        return "Code sent to your email. Enter it on the tender to verify, then apply.";
       case "rejected":
         return (
           request.rejectionReason ||
-          "Your request was not approved. Please contact the tender issuer for more information."
+          "This request was rejected. Please contact support for assistance."
         );
-      case "used":
-        return "You have successfully used this code to apply for the tender.";
       default:
-        return "Status unknown";
+        return "Code sent to your email. Enter it on the tender to verify, then apply.";
     }
   };
 
   return (
     <DashboardLayout
-      title="My Application Requests"
-      subtitle="Track your tender verification code requests"
+      title="My Verification Codes"
+      subtitle="Track verification codes you've requested"
     >
       {/* Stats Cards - Responsive Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
@@ -261,32 +221,27 @@ const MyVerificationRequests = () => {
         <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-xs sm:text-sm">Pending</p>
-              <p className="text-xl sm:text-2xl font-bold text-yellow-400 mt-0.5 sm:mt-1">
-                {stats.pending}
+              <p className="text-gray-400 text-xs sm:text-sm">Code Sent</p>
+              <p className="text-xl sm:text-2xl font-bold text-green-400 mt-0.5 sm:mt-1">
+                {stats.codeSent}
               </p>
             </div>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-              <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
             </div>
           </div>
-          {stats.pending > 0 && (
-            <p className="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2">
-              Auto-refresh...
-            </p>
-          )}
         </div>
 
         <div className="bg-white/5 backdrop-blur-xl border border-cyan-400/20 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-xs sm:text-sm">Approved</p>
-              <p className="text-xl sm:text-2xl font-bold text-green-400 mt-0.5 sm:mt-1">
-                {stats.approved}
+              <p className="text-gray-400 text-xs sm:text-sm">Used</p>
+              <p className="text-xl sm:text-2xl font-bold text-blue-400 mt-0.5 sm:mt-1">
+                {stats.used}
               </p>
             </div>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
             </div>
           </div>
         </div>
@@ -349,8 +304,8 @@ const MyVerificationRequests = () => {
             className="flex-1 sm:flex-initial px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-800/50 border border-cyan-400/20 rounded-lg text-white text-sm sm:text-base focus:outline-none focus:border-cyan-400/50"
           >
             <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
+            <option value="approved">Code Sent</option>
+            <option value="used">Used</option>
             <option value="rejected">Rejected</option>
           </select>
           <button
@@ -424,44 +379,55 @@ const MyVerificationRequests = () => {
 
                         {/* Status Badge */}
                         <div className="mb-3 sm:mb-4">
-                          {getStatusBadge(request.status)}
+                          {getStatusBadge(request)}
                         </div>
 
                         {/* Status Message - Responsive */}
                         <div
                           className={`p-3 sm:p-4 rounded-lg border ${
-                            request.status === "approved"
-                              ? "bg-green-500/10 border-green-400/20"
-                              : request.status === "rejected"
+                            request.codeUsed || request.isUsed || request.used
+                              ? "bg-blue-500/10 border-blue-400/20"
+                              : (request.status || "approved") === "rejected"
                                 ? "bg-red-500/10 border-red-400/20"
-                                : "bg-yellow-500/10 border-yellow-400/20"
+                                : "bg-green-500/10 border-green-400/20"
                           }`}
                         >
                           <div className="flex items-start space-x-2">
                             <Info
                               className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0 ${
-                                request.status === "approved"
-                                  ? "text-green-400"
-                                  : request.status === "rejected"
+                                request.codeUsed ||
+                                request.isUsed ||
+                                request.used
+                                  ? "text-blue-400"
+                                  : (request.status || "approved") ===
+                                      "rejected"
                                     ? "text-red-400"
-                                    : "text-yellow-400"
+                                    : "text-green-400"
                               }`}
                             />
                             <div className="flex-1">
                               <p
                                 className={`text-xs sm:text-sm ${
-                                  request.status === "approved"
-                                    ? "text-green-300"
-                                    : request.status === "rejected"
+                                  request.codeUsed ||
+                                  request.isUsed ||
+                                  request.used
+                                    ? "text-blue-300"
+                                    : (request.status || "approved") ===
+                                        "rejected"
                                       ? "text-red-300"
-                                      : "text-yellow-300"
+                                      : "text-green-300"
                                 }`}
                               >
                                 {getStatusMessage(request)}
                               </p>
 
                               {/* Show code if approved - Responsive */}
-                              {request.status === "approved" &&
+                              {(request.status || "approved") === "approved" &&
+                                !(
+                                  request.codeUsed ||
+                                  request.isUsed ||
+                                  request.used
+                                ) &&
                                 request.code && (
                                   <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-slate-900/50 border border-cyan-400/30 rounded-lg">
                                     <p className="text-xs sm:text-sm text-gray-400 mb-2 text-center">
@@ -470,7 +436,7 @@ const MyVerificationRequests = () => {
                                     <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-3">
                                       <div className="text-center sm:text-left">
                                         <p className="text-xl sm:text-2xl font-mono font-bold text-cyan-400 tracking-wider">
-                                          **{request.code}**
+                                          {request.code}
                                         </p>
                                         <div className="w-full h-px bg-cyan-400/30 mt-2"></div>
                                       </div>
@@ -658,23 +624,21 @@ const MyVerificationRequests = () => {
         <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-300">
           <p className="flex items-start">
             <span className="text-cyan-400 mr-2">1.</span>
-            Request a verification code when you want to apply for a tender
+            Click{" "}
+            <span className="text-white font-medium mx-1">Request code</span> on
+            a tender you want to apply for
           </p>
           <p className="flex items-start">
             <span className="text-cyan-400 mr-2">2.</span>
-            The tender issuer will review and approve/reject your request
+            We'll email you a verification code immediately
           </p>
           <p className="flex items-start">
             <span className="text-cyan-400 mr-2">3.</span>
-            Once approved, you'll receive a code via email
+            Enter the code on the tender to verify
           </p>
           <p className="flex items-start">
             <span className="text-cyan-400 mr-2">4.</span>
-            Enter the code to unlock the application form for that tender
-          </p>
-          <p className="flex items-start">
-            <span className="text-cyan-400 mr-2">5.</span>
-            Track all your requests and their status on this page
+            Once verified, you can submit your application
           </p>
         </div>
       </div>
